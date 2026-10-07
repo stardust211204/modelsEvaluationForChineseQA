@@ -27,8 +27,33 @@ from .types import Config, ParseMode, Stat, Tier
 # 读取 Tally
 # --------------------------------------------------------------------------
 
-def load_tallies(run_id: str, config: Config) -> list[dict]:
-    """读回 Tally 记录（原始 dict，本层不重建对象以免丢字段）。"""
+def load_tallies(
+    run_id: str,
+    config: Config,
+    *,
+    drop_excluded: bool = True,
+) -> list[dict]:
+    """读回 Tally 记录（原始 dict，本层不重建对象以免丢字段）。
+
+    ★ 默认**内置排除清单过滤**（2026-10-06 改）。
+
+      改之前：过滤责任散落在每个调用方，而 `load_tallies` 是个纯读取器。
+      后果是 **9 个脚本读了 tallies 却忘了过滤** —— 同一份 tallies 在不同
+      脚本里会算出不同的准确率（差 37 题，约 1–2 个百分点）。报告用的路径
+      恰好都过滤了，所以结论没错，但这个设计**靠自觉而不靠强制**，
+      迟早有人跑出与报告不一致的数字。
+
+      改之后：默认过滤，**忘记过滤这件事在物理上不可能发生**。
+      确实需要原始全量数据的地方，显式传 `drop_excluded=False`：
+
+        * `scripts/ci_gate.py`  —— 做**完整性计数**（期望 题数×2 口径），
+          过滤会让计数少 74 条，门禁误报
+        * `scripts/run_judge.py` / `run_refusal_judge.py` —— 要与 judge
+          实际评过的实例集合对齐，过滤会改变一致率的分母
+
+      ⚠️ 排除清单若**规则指纹不匹配**，`exclusions.load(strict=True)` 会抛错。
+         这里**让它抛**（不吞异常）—— 静默用错清单比报错危险得多。
+    """
     from . import paths
 
     p = paths.ROOT / "runs" / run_id / "tallies" / config.value / "all.jsonl"
@@ -38,6 +63,13 @@ def load_tallies(run_id: str, config: Config) -> list[dict]:
     for line in p.read_text(encoding="utf-8").splitlines():
         if line.strip():
             out.append(json.loads(line))
+
+    if drop_excluded:
+        from . import exclusions
+
+        drop = exclusions.load()
+        if drop:
+            out = [t for t in out if t.get("instance_id") not in drop]
     return out
 
 

@@ -382,7 +382,7 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
                 g.ok(rname, f"{len(results)}/{exp_j} 条全部成功，被判臂 {targets}")
 
             tname = f"[{run_id}/{ckey}] judge tally 完整性"
-            jt = metrics.load_tallies(run_id, spec.key)
+            jt = metrics.load_tallies(run_id, spec.key, drop_excluded=False)  # 计数校验需全量
             if smoke:
                 g.skip(tname, "演练 run")
             elif len(jt) != len(results):
@@ -407,7 +407,7 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
                 g.ok(rname, f"{got_n}/{exp} 条全部成功")
 
         tname = f"[{run_id}/{ckey}] tally 完整性"
-        tallies = metrics.load_tallies(run_id, spec.key)
+        tallies = metrics.load_tallies(run_id, spec.key, drop_excluded=False)  # 计数校验需全量
         exp_t = exp * 2  # 双口径
         if smoke:
             g.skip(tname, f"演练 run（期望 {exp_t} 条）")

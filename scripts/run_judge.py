@@ -189,7 +189,7 @@ def main() -> int:
     judge_rows = [t.to_dict() for t in rows]
 
     # ---- 与规则判分比对 ----------------------------------------------------
-    rule_rows = metrics.load_tallies(args.source_run, source_cfg)
+    rule_rows = metrics.load_tallies(args.source_run, source_cfg, drop_excluded=False)  # 与 judge 输入对齐
     report: dict = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "run_id": args.run_id, "judge_model": judge_model,

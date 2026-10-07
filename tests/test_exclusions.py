@@ -106,3 +106,70 @@ def test_detect_catches_the_four_known_patterns():
     for text, why in cases.items():
         assert exclusions.detect_bad_symbols(text), f"漏检：{why} —— {text!r}"
     assert not exclusions.detect_bad_symbols("普通中文题目，无公式"), "干净文本被误判"
+
+
+# --------------------------------------------------------------------------
+# ★★ load_tallies 默认过滤（2026-10-06 加）
+#
+# 改之前：过滤责任散落在每个调用方，9 个脚本读了 tallies 却忘了过滤 ——
+# 同一份 tallies 在不同脚本里算出不同准确率。这两条测试锁住"默认必须过滤"。
+# --------------------------------------------------------------------------
+
+def _any_run_with_tallies():
+    """找一个真有 tallies 的 run，找不到就 skip。"""
+    from meval import metrics  # noqa: F401  (仅为下面的类型标注)
+    runs = _ROOT / "runs"
+    if not runs.exists():
+        return None
+    for d in sorted(runs.iterdir()):
+        td = d / "tallies"
+        if td.is_dir() and any(td.rglob("all.jsonl")):
+            return d.name
+    return None
+
+
+def test_load_tallies_filters_by_default():
+    """★★ `load_tallies()` 默认必须剔除排除清单里的题。
+
+    这是防"忘记过滤"的守卫 —— 只要默认行为被改回不过滤，这条就挂。
+    """
+    from meval import metrics
+    from meval.types import Config
+
+    run = _any_run_with_tallies()
+    if run is None:
+        pytest.skip("没有可用的 run")
+    if not exclusions.list_path().exists():
+        pytest.skip("尚未生成清单")
+
+    drop = exclusions.load()
+    flt = metrics.load_tallies(run, Config.C1)
+    raw = metrics.load_tallies(run, Config.C1, drop_excluded=False)
+
+    assert len(flt) <= len(raw), "过滤后条目数不应增加"
+    leftover = {t["instance_id"] for t in flt} & drop
+    assert not leftover, (
+        f"默认读取后仍残留 {len(leftover)} 条被剔除的题 —— 默认过滤失效了。\n"
+        f"  `load_tallies` 的 `drop_excluded` 默认值必须是 True。"
+    )
+    # 只有在真的跑过被剔题时，两者才会不同
+    if {t["instance_id"] for t in raw} & drop:
+        assert len(flt) < len(raw), "存在被剔题却没被过滤掉"
+
+
+def test_load_tallies_opt_out_returns_everything():
+    """显式 `drop_excluded=False` 必须返回全量（门禁的计数校验依赖它）。"""
+    from meval import metrics
+    from meval.types import Config
+
+    run = _any_run_with_tallies()
+    if run is None:
+        pytest.skip("没有可用的 run")
+
+    raw = metrics.load_tallies(run, Config.C1, drop_excluded=False)
+    p = _ROOT / "runs" / run / "tallies" / Config.C1.value / "all.jsonl"
+    n_lines = sum(1 for ln in p.read_text(encoding="utf-8").splitlines() if ln.strip())
+    assert len(raw) == n_lines, (
+        f"drop_excluded=False 应返回全部 {n_lines} 条，实得 {len(raw)} 条。\n"
+        f"  门禁的完整性计数依赖这个行为。"
+    )

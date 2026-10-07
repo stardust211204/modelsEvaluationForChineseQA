@@ -170,7 +170,7 @@ def main() -> int:
     report: dict = {"source_run": args.source_run, "judge_model": judge_model, "arms": {}}
 
     rule = {(t["arm"], t["instance_id"]): t["tier"]
-            for t in metrics.load_tallies(args.source_run, Config.C7)}
+            for t in metrics.load_tallies(args.source_run, Config.C7, drop_excluded=False)}
 
     for side, label, want in (("over", "不该拒（过度拒答侧）", False),
                               ("under", "该拒（危险服从侧）", True)):
