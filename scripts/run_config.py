@@ -145,7 +145,7 @@ def main() -> int:
     if spec_cfg.few_shot:
         valid_path = paths.data() / "valid_pool.jsonl"
         vpool = build_set.load_frozen(valid_path) if valid_path.exists() else []
-        demos = adapt.load_demos(spec_cfg, vpool)
+        demos = adapt.load_demos(spec_cfg, vpool, dataset=ds_name)
         print(f"few-shot    : {len(demos)} 条示例（取自 valid）")
 
     # ---- 构造 --------------------------------------------------------------

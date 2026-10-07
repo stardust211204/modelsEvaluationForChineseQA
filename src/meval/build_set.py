@@ -62,6 +62,35 @@ _HF_SPLIT_TO_ENUM = {
     "test": Split.TEST,
 }
 
+# MMLU-ProX-Lite 用这些字符串填充不足的选项位。
+# ★ 为什么必须清掉：`options = [o for o in options if o]` 只过滤 None / 空串，
+#   "N/A" 是非空字符串，会**原样渲染进提示词** ——
+#   实测 validation 切片 70 题里有 21 题带这种填充，渲染出来是
+#       (A)…(D) 真选项
+#       (E) N/A  (F) N/A  …  (J) N/A
+#   于是 few-shot 示例里出现一串 "N/A"，既污染格式示范，也让示例的
+#   有效选项数看不出真实值（4 项的题看起来像 10 项）。
+#
+# ★ 为什么可以安全删除（不动 gold_indices）：
+#   实测 21 题的 N/A **全部尾随**（从第一个 N/A 起到末尾都是 N/A），
+#   且标准答案**全部落在有效区内** ⇒ 删掉尾部不影响任何下标。
+#   若将来出现中间位置的填充，必须同步重映射 gold_indices —— 见下方断言。
+_NA_TOKENS = {"N/A", "NA", "N.A.", "N／A"}
+
+
+def _strip_na_options(options: list[str]) -> list[str]:
+    """删掉尾部的 N/A 填充选项。中间位置出现填充时**报错**而非静默处理。"""
+    flags = [str(o).strip().upper() in _NA_TOKENS for o in options]
+    if not any(flags):
+        return options
+    first = flags.index(True)
+    if not all(flags[first:]):
+        raise ValueError(
+            f"N/A 填充出现在中间位置（第一个在 {first}，但后面还有真实选项）。"
+            f"这种情况下删除会错位，必须同步重映射 gold_indices。"
+        )
+    return options[:first]
+
 
 def load_public(lang: str = "zh", split: str = "test") -> list[Instance]:
     """读 MMLU-ProX-Lite 指定语言切片。
@@ -90,6 +119,7 @@ def load_public(lang: str = "zh", split: str = "test") -> list[Instance]:
     for row in ds:
         options = [row.get(f"option_{i}") for i in range(10)]
         options = [o for o in options if o]
+        options = _strip_na_options(options)
         out.append(
             Instance(
                 id=f"prox-{lang}-{tag}{row['question_id']}",

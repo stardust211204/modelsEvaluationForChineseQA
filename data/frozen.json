@@ -3,13 +3,14 @@
     "file": "data/eval_set.jsonl",
     "sha256_16": "85fcf41db5a5e42d",
     "n_instances": 588,
-    "frozen_at": "2026-10-05T09:14:19.458121+00:00"
+    "frozen_at": "2026-10-07T10:44:12.742954+00:00"
   },
   "prompt_fingerprints": {
     "c1": "2c22fbc0b667a70f",
     "c2": "263e73cb9bc43adc",
     "c3": "5e5b82ecfb4c0fd6",
-    "c5": "2047ef74f27bd662",
+    "c5": "491de8799486bcb5",
+    "c5b": "34a6a1254eb206e7",
     "c6": "173147c92a7f1184"
   },
   "prompt_fingerprint_notes": {

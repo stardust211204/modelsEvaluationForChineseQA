@@ -177,7 +177,16 @@ def load_frozen_meta() -> dict:
     return json.loads(p.read_text(encoding="utf-8"))
 
 
-def compute_fingerprints(pool: list, matrix: list[adapt.ConfigSpec]) -> tuple[dict, dict]:
+def compute_fingerprints(
+    pool: list,
+    matrix: list[adapt.ConfigSpec],
+    dataset: str = "eval_set",
+) -> tuple[dict, dict]:
+    """算各配置的 prompt 指纹。
+
+    `dataset` 决定 few-shot 取哪一组示例（C5b 按数据集给不同示例组）。
+    门禁默认按 eval_set 算 —— 冻结表里存的也是 eval_set 的指纹。
+    """
     fps, notes = {}, {}
     for spec in matrix:
         demos = None
@@ -185,7 +194,7 @@ def compute_fingerprints(pool: list, matrix: list[adapt.ConfigSpec]) -> tuple[di
             vp = paths.data() / "valid_pool.jsonl"
             vpool = build_set.load_frozen(vp) if vp.exists() else []
             try:
-                demos = adapt.load_demos(spec, vpool)
+                demos = adapt.load_demos(spec, vpool, dataset=dataset)
             except RuntimeError as e:
                 notes[spec.key.value] = f"few-shot 示例池不可用：{e}"
                 continue
@@ -449,7 +458,7 @@ def check_silent_degradation(g: Gate, matrix: list[adapt.ConfigSpec]) -> None:
                         "若直接跑批会得到 0-shot 却被标成 few-shot（静默降级）")
             continue
         try:
-            demos = adapt.load_demos(spec, build_set.load_frozen(vp))
+            demos = adapt.load_demos(spec, build_set.load_frozen(vp), dataset="eval_set")
         except RuntimeError as e:
             g.bad(name, str(e))
             continue

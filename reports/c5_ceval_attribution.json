@@ -1,0 +1,82 @@
+{
+  "C1 基线 / C-Eval": {
+    "run": "ceval-c1-5arm-v2",
+    "config": "c1",
+    "acc": {
+      "ds-flash": 84.56,
+      "ds-pro": 78.39,
+      "longcat": 87.97,
+      "mimo": 75.95,
+      "qwen": 85.93
+    },
+    "dspro_gap_vs_dsflash": -6.17,
+    "dspro_letter_picks": {
+      "A": 103,
+      "C": 107,
+      "D": 244,
+      "B": 129
+    },
+    "dspro_pick_D_rate": 41.85,
+    "dspro_pick_D_when_gold_B": 17.57
+  },
+  "C5 旧（示例均值 8.4）": {
+    "run": "ceval-c5-5arm",
+    "config": "c5",
+    "acc": {
+      "ds-flash": 84.0,
+      "ds-pro": 70.67,
+      "longcat": 90.67,
+      "mimo": 83.11,
+      "qwen": 88.67
+    },
+    "dspro_gap_vs_dsflash": -13.33,
+    "dspro_letter_picks": {
+      "A": 25,
+      "D": 77,
+      "C": 26,
+      "B": 22
+    },
+    "dspro_pick_D_rate": 51.33,
+    "dspro_pick_D_when_gold_B": 40.54
+  },
+  "C5 重跑（清洗后 8.4）": {
+    "run": "ceval-c5-5arm-v3",
+    "config": "c5",
+    "acc": {
+      "ds-flash": 88.0,
+      "ds-pro": 72.0,
+      "longcat": 90.67,
+      "mimo": 84.93,
+      "qwen": 86.67
+    },
+    "dspro_gap_vs_dsflash": -16.0,
+    "dspro_letter_picks": {
+      "D": 73,
+      "C": 27,
+      "A": 25,
+      "B": 25
+    },
+    "dspro_pick_D_rate": 48.67,
+    "dspro_pick_D_when_gold_B": 32.43
+  },
+  "C5b（示例均值 5.0）": {
+    "run": "ceval-c5b-5arm",
+    "config": "c5b",
+    "acc": {
+      "ds-flash": 88.0,
+      "ds-pro": 79.33,
+      "longcat": 94.0,
+      "mimo": 80.54,
+      "qwen": 88.67
+    },
+    "dspro_gap_vs_dsflash": -8.67,
+    "dspro_letter_picks": {
+      "D": 62,
+      "A": 28,
+      "C": 30,
+      "B": 30
+    },
+    "dspro_pick_D_rate": 41.33,
+    "dspro_pick_D_when_gold_B": 18.92
+  }
+}

@@ -15,7 +15,7 @@ configs:
     factor: null
     desc: "强格式约束 + 0-shot + 关思考"
     prompt_template: "prompts/c1_strict.txt"
-    n_instances: 600
+    n_instances: 588           # ★ 原写 600，但池子只有 588（分层抽样产出的上限）
     sampling: "c1_subset"
     reps: 1
     params_override: {}
@@ -76,6 +76,40 @@ configs:
                   "prox-zh-valid-30", "prox-zh-valid-35"]   # biology/business/chemistry/CS/economics
     params_override: {}
     rq: "RQ2b 0-shot vs 5-shot"
+
+  # ---------------------------------------------------------------------------
+  # C5b：5-shot 的第二组示例 —— 让**示例的选项数**与目标题匹配
+  # ---------------------------------------------------------------------------
+  # 为什么要它：MMLU-ProX 以 10 选项为主（485/588），C-Eval 全部 583 题**都是 4 选项**。
+  # 原 C5 两个评测集共用一组示例（选项数 10/10/10/8/4，平均 8.4），
+  # 在 C-Eval 上即「10 选项示例 → 4 选项题」的跨格式迁移。
+  # 实测 C5/C-Eval 上 ds-pro 掉 13.3pp，无法区分是「示例数量」还是「格式错配」造成。
+  #
+  # 本配置按数据集分别给示例组：
+  #   eval_set  → 5 个 10 选项示例（平均值 10.0，与 MMLU 主流一致）
+  #   ceval_set → 4/4/4/6/7 选项示例（平均 5.0，接近 C-Eval 的 4）
+  # ★ 示例数量仍是 5，只有「选项数」这一个因子变了 —— 符合矩阵的正交化纪律。
+  # ★ valid 池只有 3 道 4 选项题，凑不满 5 个，故用 6/7 选项补齐（已与用户确认）。
+  c5b:
+    name: "5-shot（示例选项数匹配目标）"
+    factor: "示例选项数"
+    desc: "5-shot，两组数据集各用与目标题选项数接近的示例"
+    prompt_template: "prompts/c5_fewshot.txt"      # 与 C5 同模板
+    n_instances: 150
+    sampling: "from_c1"
+    reps: 1
+    few_shot:
+      n: 5
+      from_split: "valid"
+      fixed_ids: ["prox-zh-valid-22", "prox-zh-valid-15", "prox-zh-valid-25",
+                  "prox-zh-valid-31", "prox-zh-valid-35"]   # 默认 = MMLU 组（全 10 选项）
+      fixed_ids_by_dataset:
+        eval_set:  ["prox-zh-valid-22", "prox-zh-valid-15", "prox-zh-valid-25",
+                    "prox-zh-valid-31", "prox-zh-valid-35"]  # 10,10,10,10,10 → 均值 10.0
+        ceval_set: ["prox-zh-valid-20", "prox-zh-valid-23", "prox-zh-valid-45",
+                    "prox-zh-valid-4", "prox-zh-valid-11"]   # 4,4,4,6,7 → 均值 5.0
+    params_override: {}
+    rq: "RQ2c 示例选项数错配是否是 C5/C-Eval 异常的主因"
 
   c6:
     name: "选项乱序"

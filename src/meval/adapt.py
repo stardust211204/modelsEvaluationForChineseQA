@@ -335,14 +335,33 @@ def subset_from_c1(c1_instances: list[Instance], n: int) -> list[Instance]:
     return [c1_instances[i] for i in sorted(idxs)[:n]]
 
 
-def load_demos(c5: ConfigSpec, valid_pool: list[Instance]) -> list[Instance]:
+def load_demos(
+    c5: ConfigSpec,
+    valid_pool: list[Instance],
+    dataset: str | None = None,
+) -> list[Instance]:
     """按 C5 配置取固定的 few-shot 示例。
 
     只在 split == valid 的池子里取。取不到就报错 —— 不允许静默从 test 取。
+
+    ★ `fixed_ids_by_dataset`（2026-10-06 加）
+      同一配置在不同评测集上用不同的示例组。用途：让示例的**选项数**与目标题匹配。
+
+      为什么需要它：MMLU-ProX 以 10 选项为主（485/588），而 C-Eval **全部 583 题
+      都是 4 选项**。原先两个评测集共用同一组示例（选项数 10/10/10/8/4，平均 8.4），
+      在 C-Eval 上就成了一次「10 选项示例 → 4 选项题」的跨格式迁移实验 ——
+      C5/C-Eval 上 ds-pro 掉 13.3 个百分点，无法区分是「示例数量」还是
+      「示例格式错配」造成的。
+
+      `dataset` 为 None 时（如门禁做整体指纹时）退回 `fixed_ids`。
     """
     fs = c5.few_shot or {}
     n = int(fs.get("n", 5))
     fixed = fs.get("fixed_ids") or []
+    by_ds = fs.get("fixed_ids_by_dataset") or {}
+
+    if dataset and dataset in by_ds:
+        fixed = by_ds[dataset]
 
     pool = [i for i in valid_pool if i.split is Split.VALID]
     if not pool:

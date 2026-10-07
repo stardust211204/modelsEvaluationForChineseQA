@@ -34,3 +34,6 @@ desktop.ini
 
 # ---- 临时提交信息 ----
 COMMIT_MSG_TMP.txt
+
+# ---- 数据文件的一次性备份（改动前的版本已在 git 历史里）----
+data/_backup_*/
