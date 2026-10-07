@@ -31,3 +31,6 @@ data/cache/
 .idea/
 Thumbs.db
 desktop.ini
+
+# ---- 临时提交信息 ----
+COMMIT_MSG_TMP.txt
