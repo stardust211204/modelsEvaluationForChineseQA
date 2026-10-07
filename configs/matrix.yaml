@@ -1,0 +1,122 @@
+# 配置矩阵（正交化：每个配置只改一个因子）
+#
+# ★ 纪律一：C1 是干净基线，不加 few-shot。
+#   HELM 对 MMLU 用 5-shot，但若 C1 自带 5-shot，
+#   「格式约束的影响」与「示例数量的影响」会纠缠，因果解释失效。
+#
+# ★ 纪律二：C2 与 C5 的题集必须是 C1 的子集（否则无法做配对比较）。
+#
+# ★ 纪律三：每个配置只改一个因子。改两个就说不清是谁造成的差异。
+
+configs:
+
+  c1:
+    name: "基线"
+    factor: null
+    desc: "强格式约束 + 0-shot + 关思考"
+    prompt_template: "prompts/c1_strict.txt"
+    n_instances: 600
+    sampling: "c1_subset"
+    reps: 1
+    params_override: {}
+    rq: "RQ1 准确率与排名"
+
+  c2:
+    name: "去掉格式约束"
+    factor: "格式约束"
+    desc: "自由作答，靠宽松解析提取答案"
+    prompt_template: "prompts/c2_free.txt"
+    n_instances: 150
+    sampling: "from_c1"          # 必须是 c1 的子集
+    reps: 1
+    params_override: {}
+    rq: "RQ2a 判分口径 / 风格偏差"
+
+  c3:
+    name: "重复采样"
+    factor: "确定性"
+    desc: "与 C1 完全相同，同题重复 10 次"
+    prompt_template: "prompts/c1_strict.txt"   # 与 C1 同模板
+    n_instances: 100
+    sampling: "from_c1"
+    reps: 10
+    params_override: {}
+    rq: "RQ5 同题跨次一致率 / 采样方差"
+
+  c4:
+    name: "LLM-as-Judge 复核"
+    factor: "判分者"
+    desc: "judge 独立判定 C1 的输出，与规则判分比对"
+    prompt_template: "prompts/judge_cot.txt"
+    judge: true
+    judge_arm: null              # TODO 选定：须与被评模型不同家族，规避 self-preference
+    n_instances: 150
+    sampling: "from_c1"
+    reps: 1
+    params_override: {}
+    rq: "RQ3 规则判分 vs judge 的一致率 / Kappa"
+    note: "CoT forcing（先分析再判定）；judge 存在 validity 争议，仅作复核不作唯一判分"
+
+  c5:
+    name: "5-shot"
+    factor: "示例数量"
+    desc: "5-shot，示例固定取自 validation split"
+    prompt_template: "prompts/c5_fewshot.txt"
+    n_instances: 150
+    sampling: "from_c1"
+    reps: 1
+    few_shot:
+      n: 5
+      from_split: "valid"        # ★ 必须取自 validation，取自 test 即数据泄漏
+      # 已回填：valid 池 70 题（data/valid_pool.jsonl，hash 24b2c8a6a6c243cd）
+      # 选题规则：每个学科取 id 最小的一条，学科按名称排序取前 5 —— 确定性，非随机。
+      # 已核验：与 test 题集题干重合 0 条、id 撞号 0 个 ⇒ 无数据泄漏。
+      # 回填后不再变动：一变，C5 与后续 run 就不可配对比较（门禁的 prompt 指纹会拦）。
+      fixed_ids: ["prox-zh-valid-20", "prox-zh-valid-15", "prox-zh-valid-25",
+                  "prox-zh-valid-30", "prox-zh-valid-35"]   # biology/business/chemistry/CS/economics
+    params_override: {}
+    rq: "RQ2b 0-shot vs 5-shot"
+
+  c6:
+    name: "选项乱序"
+    factor: "位置敏感性"
+    desc: "与 C1 完全相同，只重排选项顺序；rep 即「第几个排列」"
+    prompt_template: "prompts/c1_strict.txt"   # ★ 与 C1 同模板（只改一个因子）
+    n_instances: 100           # ★ 与 C3 同一批 100 题 —— 才能把「乱序导致的答案变化」
+                               #   与「重复采样导致的答案变化」放在**同一批题**上对比
+    sampling: "from_c1"
+    reps: 4                    # 排列 0 = 原顺序（内部基线）；排列 1/2/3 = 三次乱序
+    option_permutation: true
+    params_override: {}
+    rq: "RQ6 位置敏感性：乱序造成的答案变化 vs 重复噪声地板"
+
+# ---------------------------------------------------------------------------
+# 调用量核算（3 臂）
+# ---------------------------------------------------------------------------
+budget:
+  c1: 1800      # 600 × 3
+  c2: 450       # 150 × 3
+  c3: 3000      # 100 × 3 × 10
+  c4: 150       # 150 × 1（judge 调用）
+  c5: 450       # 150 × 3
+  subtotal: 5850
+  difficulty_proxy_local: 588   # 本地模型，不计费
+  total: 6438
+
+# ---------------------------------------------------------------------------
+# 止损顺序（触发即执行，从 1 到 5）
+# ---------------------------------------------------------------------------
+stop_loss:
+  - {order: 1, cut: "评测 SOP 文档", when: "F6 末"}
+  - {order: 2, cut: "C3 从 3 臂降到 1 臂", when: "F4 末", impact: "调用量 -2000"}
+  - {order: 3, cut: "C5 整体砍掉", when: "F4 末", impact: "RQ2b 无法回答，需写入 Limitations"}
+  - {order: 4, cut: "C2 从 150 降到 80 题", when: "F4 末且 C1 未达 80%"}
+  - {order: 5, cut: "（已移除：自建边界集不作为交付项）", when: "—"}
+
+never_cut:
+  - "四档判分体系"
+  - "C1 全量"
+  - "C4 judge 复核（一致率 + Kappa）"
+  - "badcase 归因"
+  - "评测报告"
+  - "一键复现"

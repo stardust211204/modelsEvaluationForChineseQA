@@ -1,0 +1,201 @@
+{
+  "generated_at": "2026-10-05T06:53:54.389263+00:00",
+  "dataset": "eval_set",
+  "pool_size": 588,
+  "reason": "MMLU-ProX 中文版公式密集题存在 LaTeX 提取错误（源头缺陷，非模型能力问题）",
+  "rule_fingerprint": "311c8412490d",
+  "patterns": [
+    {
+      "regex": "\\\\[a-zA-Z]+[a-zA-Z]",
+      "desc": "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    },
+    {
+      "regex": "\\^\\{?\\\\",
+      "desc": "上标缺失或嵌套错误"
+    },
+    {
+      "regex": "[a-zA-Z]\\\\[a-zA-Z]",
+      "desc": "字母后紧跟命令且无空格"
+    },
+    {
+      "regex": "\\$\\s*\\$",
+      "desc": "空数学环境"
+    }
+  ],
+  "instance_ids": [
+    "prox-zh-235",
+    "prox-zh-239",
+    "prox-zh-248",
+    "prox-zh-259",
+    "prox-zh-262",
+    "prox-zh-267",
+    "prox-zh-273",
+    "prox-zh-274",
+    "prox-zh-284",
+    "prox-zh-435",
+    "prox-zh-436",
+    "prox-zh-447",
+    "prox-zh-452",
+    "prox-zh-458",
+    "prox-zh-462",
+    "prox-zh-463",
+    "prox-zh-471",
+    "prox-zh-473",
+    "prox-zh-474",
+    "prox-zh-477",
+    "prox-zh-479",
+    "prox-zh-490",
+    "prox-zh-495",
+    "prox-zh-498",
+    "prox-zh-516",
+    "prox-zh-517",
+    "prox-zh-540",
+    "prox-zh-560",
+    "prox-zh-573",
+    "prox-zh-583",
+    "prox-zh-613",
+    "prox-zh-618",
+    "prox-zh-630",
+    "prox-zh-634",
+    "prox-zh-652",
+    "prox-zh-92",
+    "prox-zh-98"
+  ],
+  "per_instance_reasons": {
+    "prox-zh-235": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-239": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "字母后紧跟命令且无空格"
+    ],
+    "prox-zh-248": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "空数学环境"
+    ],
+    "prox-zh-259": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-262": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "空数学环境"
+    ],
+    "prox-zh-267": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-273": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-274": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "空数学环境"
+    ],
+    "prox-zh-284": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-435": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误"
+    ],
+    "prox-zh-436": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "字母后紧跟命令且无空格"
+    ],
+    "prox-zh-447": [
+      "空数学环境"
+    ],
+    "prox-zh-452": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误"
+    ],
+    "prox-zh-458": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-462": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误",
+      "字母后紧跟命令且无空格"
+    ],
+    "prox-zh-463": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-471": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-473": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "字母后紧跟命令且无空格"
+    ],
+    "prox-zh-474": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-477": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-479": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误",
+      "空数学环境"
+    ],
+    "prox-zh-490": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-495": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误"
+    ],
+    "prox-zh-498": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-516": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-517": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-540": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-560": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-573": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误",
+      "空数学环境"
+    ],
+    "prox-zh-583": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "空数学环境"
+    ],
+    "prox-zh-613": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "字母后紧跟命令且无空格"
+    ],
+    "prox-zh-618": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-630": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-634": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "上标缺失或嵌套错误"
+    ],
+    "prox-zh-652": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-92": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
+    ],
+    "prox-zh-98": [
+      "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
+      "字母后紧跟命令且无空格"
+    ]
+  },
+  "effect": {
+    "excluded": 37,
+    "remaining": 551,
+    "note": "题集文件不改动；分析层读本清单过滤，raw/tallies 完整保留，可随时撤销"
+  }
+}
