@@ -30,8 +30,16 @@ sys.path.insert(0, str(_SCRIPTS.parents[0] / "src"))
 
 from meval import paths  # noqa: E402
 
+# 控制台是 GBK 时，打印缺字警告（含 emoji）会 UnicodeEncodeError 崩掉。
+# 构建本身已经完成，但脚本会以非零码退出，看起来像构建失败 —— 必须修掉。
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8", errors="replace")
+
 # 实测在 Microsoft YaHei 中缺失、会被静默渲染成空白的字符
-BAD_CHARS = {"\u26a0": "⚠ (U+26A0)", "\ufe0f": "变体选择符 (U+FE0F)"}
+BAD_CHARS = {"\u26a0": "⚠ (U+26A0)", "\ufe0f": "变体选择符 (U+FE0F)",
+             "\u2705": "✅ (U+2705)", "\u274c": "❌ (U+274C)",
+             "\u2714": "✔ (U+2714)", "\u2716": "✖ (U+2716)"}
 
 VSPACE = [
     "-V", "geometry:margin=2.2cm",
@@ -88,6 +96,10 @@ def main() -> int:
         "-V", f"mainfont={args.mainfont}",
         "-V", f"monofont={args.monofont}",
         "--resource-path", str(paths.ROOT),
+        # ★ 必须带这个头文件：pandoc 模板把图钉成 [H]（不许浮动），
+        #   页面放不下时图会被裁掉、图注整条消失，且不报任何警告。
+        #   详见 scripts/latex_header.tex。
+        "-H", str(_SCRIPTS / "latex_header.tex"),
         *VSPACE,
     ]
     if args.toc:
