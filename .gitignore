@@ -1,9 +1,9 @@
-# ---- 环境与密�?----
+# ---- 环境与密钥 ----
 .venv/
 .env
 *.key
 
-# ---- 跑批产物（体积大、可重生成；证据单独保留�?data/raw_evidence/�?---
+# ---- 跑批产物（体积大、可重生成；证据单独保留在 data/raw_evidence/）----
 runs/
 figures/*.png
 figures/*.pdf
@@ -12,10 +12,10 @@ figures/latex/*.pdf
 figures/latex/*.aux
 figures/latex/*.log
 
-# ---- vendored 第三方包�?0 MB，可由上游重新获取）----
+# ---- vendored 第三方包（30 MB，可由上游重新获取）----
 reports/Eisvogel-3.5.1/
 
-# ---- 引用审计的参考图渲染（可�?HELM 原文 PDF 重新导出�?---
+# ---- 引用审计的参考图渲染（可由 HELM 原文 PDF 重新导出）----
 reports/_audit/
 
 # ---- Python ----
@@ -28,7 +28,7 @@ __pycache__/
 data/cache/
 .cache/
 
-# ---- 编辑�?/ 系统 ----
+# ---- 编辑器 / 系统 ----
 .vscode/
 .idea/
 Thumbs.db
