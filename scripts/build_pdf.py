@@ -65,6 +65,15 @@ TEMPLATE = paths.ROOT / "reports" / "Eisvogel-3.5.1" / "eisvogel.latex"
 #   所以这里存的是相对路径，且文件放在被 git 跟踪的 reports/assets/ 下
 #   （Eisvogel 自带的 examples/ 整个目录被 .gitignore 忽略，不能直接引用）。
 COVER_BACKGROUND = "reports/assets/cover_background.pdf"
+# 内页背景：与封面同一张几何图形，但**预先调淡**（保留 20% 原色）。
+# ★ 不能靠 Eisvogel 的 page-background-opacity —— background 宏包的 opacity
+#   对嵌入的 PDF **不生效**：实测传 0.2 后渲染像素与封面完全同色（#E10058），
+#   一点没淡。所以改用 scripts/make_page_background.py 预先生成淡版。
+PAGE_BACKGROUND = "reports/assets/page_background.pdf"
+# ★ 必须显式传 1.0。模板在不传时的默认值是 0.2，会**再淡一层**
+#   （实测：预调淡 20% × 模板 0.2 = 实际只剩 4%，几乎看不见）。
+#   淡的程度完全由 make_page_background.py 的参数控制，模板这层关掉。
+PAGE_BACKGROUND_OPACITY = "1.0"
 
 VSPACE = [
     # ★ 必须设 lang=zh-CN，否则图注前缀是英文 "Figure"；设了才是「图」
@@ -122,6 +131,10 @@ def main() -> int:
     ap.add_argument("--date", default="", help="封面日期；留空则用 pandoc 默认")
     ap.add_argument("--cover-background", default=COVER_BACKGROUND,
                     help="封面背景 PDF（相对仓库根）；传空字符串则用无背景封面")
+    ap.add_argument("--page-background", default=PAGE_BACKGROUND,
+                    help="内页背景 PDF（相对仓库根）；传空字符串则用无背景内页")
+    ap.add_argument("--page-background-opacity", default=PAGE_BACKGROUND_OPACITY,
+                    help="内页背景不透明度；满不透明度会压掉正文可读性")
     ap.add_argument("--no-toc", action="store_true")
     args = ap.parse_args()
 
@@ -167,6 +180,17 @@ def main() -> int:
         cmd += ["-V", f"titlepage-background={bg.as_posix()}"]
     elif args.cover_background:
         print(f"  [警告] 封面背景不存在，改用无背景封面：{args.cover_background}")
+
+    pbg = Path(args.page_background)
+    if args.page_background and (paths.ROOT / pbg).exists():
+        cmd += ["-V", f"page-background={pbg.as_posix()}"]
+        if args.page_background_opacity:
+            cmd += ["-V", f"page-background-opacity={args.page_background_opacity}"]
+        # ★ 第 1 页不画内页背景：封面自带 titlepage-background，两者同时生效
+        #   会在该页留下悬空的 ExtGState 引用。详见 scripts/latex_pagebg.tex。
+        cmd += ["-H", str(_SCRIPTS / "latex_pagebg.tex")]
+    elif args.page_background:
+        print(f"  [警告] 内页背景不存在，改用无背景内页：{args.page_background}")
     if args.author:
         cmd += ["-V", f"author={args.author}"]
     if args.date:
@@ -196,7 +220,11 @@ def main() -> int:
     # 构建后自检：图注会静默消失，必须数一遍
     n_fig, n_img = count_captions(out), md.count("![")
     flag = "" if n_fig == n_img else f"   ★ 少 {n_img - n_fig} 条 —— 检查浮动设置"
-    print(f"  产出 : {out.relative_to(paths.ROOT)}  ({out.stat().st_size / 1024:,.0f} KB)")
+    try:
+        shown = out.relative_to(paths.ROOT)
+    except ValueError:                     # --out 指到了仓库外
+        shown = out
+    print(f"  产出 : {shown}  ({out.stat().st_size / 1024:,.0f} KB)")
     print(f"  图注 : {n_fig} / {n_img}{flag}")
     return 0
 

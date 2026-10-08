@@ -1,0 +1,39 @@
+% 传给 pandoc 的 LaTeX 头（仅在内页背景启用时使用，--include-in-header）
+%
+% ★ 要解决什么
+%   封面用 Eisvogel 的 `titlepage-background`，内页用 background 宏包的
+%   `page-background`。启用后 PDF 里会出现**悬空的 ExtGState 引用**：
+%
+%       Syntax Error: ExtGState 'pgf@CA1.0' is unknown
+%       Syntax Error: ExtGState 'pgf@ca1.0' is unknown
+%
+% ★ 根因
+%   background 宏包（background.sty:148-162）把背景画在一个 TikZ 节点上：
+%       \node[opacity=\Background@Opacity, ...]{\Background@Contents};
+%   **那个 `opacity=` 键会生成一个 ExtGState**（名字形如 pgf@CA1.0）。
+%   而封面的 titlepage 又用 `\newpagecolor` + TikZ overlay 重画整页，
+%   页面资源字典被换掉，定义丢了、引用还在。
+%
+%   ★ 实测走过的弯路（都不行）：
+%     · `\NoBgThispage`               —— 无效
+%     · opacity 设成 1 / 0.999 / 1.0  —— PGF 无论取值都建 ExtGState，只是名字跟着变
+%     · 只在第 1 页跳过绘制            —— 错误会挪到别的页，治标不治本
+%
+% ★ 做法：把 `opacity=` 键整个去掉
+%   内页背景图**已经预先调淡**（scripts/make_page_background.py，保留 20% 原色），
+%   根本不需要 TikZ 再乘一次透明度。去掉该键后不再生成 ExtGState，
+%   悬空引用自然消失。
+%
+% ★ 验证
+%   pdftoppm -png -r 40 -f N -l N report.pdf out   # 逐页都应无 Syntax Error
+
+\makeatletter
+\AtBeginDocument{%
+  \renewcommand\bg@material{%
+    \begin{tikzpicture}[remember picture,overlay]%
+      \node[inner sep=0pt, anchor=center] at (current page.center)%
+        {\includegraphics[width=\paperwidth,height=\paperheight]%
+          {reports/assets/page_background.pdf}};%
+    \end{tikzpicture}}%
+}
+\makeatother
