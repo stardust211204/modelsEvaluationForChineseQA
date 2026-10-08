@@ -79,8 +79,20 @@ def check_chars(text: str) -> list[str]:
 
 
 def pick_title(md: str) -> str:
-    """把 markdown 的第一个一级标题当作封面标题。"""
-    for line in md.splitlines():
+    """取封面标题。
+
+    ★ 优先读 YAML front matter 的 `title:`。
+      早先的写法是「取第一个一级标题」，在标题改为元数据驱动之后就取错了 ——
+      正文第一个 `#` 是「评测概述」，于是封面印成了「评测概述」。
+    """
+    lines = md.splitlines()
+    if lines and lines[0].strip() == "---":
+        for line in lines[1:]:
+            if line.strip() == "---":
+                break
+            if line.startswith("title:"):
+                return line.split(":", 1)[1].strip().strip("\"'")
+    for line in lines:                       # 回退：没有 front matter 时
         if line.startswith("# "):
             return line[2:].strip()
     return "评测报告"
@@ -138,6 +150,9 @@ def main() -> int:
         "-V", f"CJKmainfont={args.mainfont}",
         "-V", "titlepage=true",
         "-V", f"title={pick_title(md)}",
+        # ★ 章节编号交给 LaTeX。markdown 里**不要**再手写编号
+        #   （写了会变成「1 1 评测概述」）。
+        "--number-sections",
         *VSPACE,
     ]
     if args.author:
