@@ -39,3 +39,4 @@ COMMIT_MSG_TMP.txt
 
 # ---- 数据文件的一次性备份（改动前的版本已在 git 历史里）----
 data/_backup_*/
+reports/_audit/helm_fulltext.txt
