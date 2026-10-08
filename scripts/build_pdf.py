@@ -61,6 +61,11 @@ BAD_CHARS = {"\u26a0": "⚠ (U+26A0)", "\ufe0f": "变体选择符 (U+FE0F)",
 
 TEMPLATE = paths.ROOT / "reports" / "Eisvogel-3.5.1" / "eisvogel.latex"
 
+# ★ 封面背景：路径必须**相对于 pandoc 的执行目录**，--resource-path 对它无效。
+#   所以这里存的是相对路径，且文件放在被 git 跟踪的 reports/assets/ 下
+#   （Eisvogel 自带的 examples/ 整个目录被 .gitignore 忽略，不能直接引用）。
+COVER_BACKGROUND = "reports/assets/cover_background.pdf"
+
 VSPACE = [
     # ★ 必须设 lang=zh-CN，否则图注前缀是英文 "Figure"；设了才是「图」
     "-V", "lang=zh-CN",
@@ -115,6 +120,8 @@ def main() -> int:
     ap.add_argument("--monofont", default="Consolas")
     ap.add_argument("--author", default="", help="封面与页脚作者；留空则不显示")
     ap.add_argument("--date", default="", help="封面日期；留空则用 pandoc 默认")
+    ap.add_argument("--cover-background", default=COVER_BACKGROUND,
+                    help="封面背景 PDF（相对仓库根）；传空字符串则用无背景封面")
     ap.add_argument("--no-toc", action="store_true")
     args = ap.parse_args()
 
@@ -155,6 +162,11 @@ def main() -> int:
         "--number-sections",
         *VSPACE,
     ]
+    bg = Path(args.cover_background)
+    if args.cover_background and (paths.ROOT / bg).exists():
+        cmd += ["-V", f"titlepage-background={bg.as_posix()}"]
+    elif args.cover_background:
+        print(f"  [警告] 封面背景不存在，改用无背景封面：{args.cover_background}")
     if args.author:
         cmd += ["-V", f"author={args.author}"]
     if args.date:
