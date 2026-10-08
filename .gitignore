@@ -6,6 +6,7 @@
 # ---- 跑批产物（体积大、可重生成；证据单独保留在 data/raw_evidence/）----
 runs/
 figures/*.png
+figures/*.pdf
 figures/latex/*.pdf
 figures/latex/*.aux
 figures/latex/*.log
