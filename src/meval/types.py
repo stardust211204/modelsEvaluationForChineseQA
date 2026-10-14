@@ -298,6 +298,14 @@ class RunManifest:
     #   门禁会拿它的哈希去比冻结的 eval_set 哈希，把"用了另一份数据集"
     #   误报成"题集被改了，此 run 不可配对比较"。
     dataset: str = "eval_set"
+    # ---- 以下两项为**补充验证实验**新增，默认 None ⇒ 历史 manifest 不受影响 ----
+    #   `reps`：本 run **实际**用的重复次数。门禁原先只读 matrix.yaml 的 reps，
+    #     于是 `--reps 1` 的 run 会被按 matrix 的 reps（如 c3 的 10）判成"缺条数"。
+    #   `param_arms`：`--param` **实际作用的臂**。原先 param_overrides 被当作
+    #     作用于全部臂；用 `--param-arms` 限定后，未覆盖的臂会被误报成参数漂移。
+    #   两项都是"把有意的变体如实声明出来"，与 param_overrides 的用途一致。
+    reps: int | None = None
+    param_arms: list[str] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

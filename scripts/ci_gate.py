@@ -92,13 +92,21 @@ class Gate:
 # 期望值推算（与 run_config.py 保持同一套规则）
 # --------------------------------------------------------------------------
 
-def expected_specs(pool: list, spec: adapt.ConfigSpec, n_arms: int) -> int:
-    """一个 run 一个 config 应有多少条请求 —— 用与跑批**同一套**抽样规则算。"""
+def expected_specs(pool: list, spec: adapt.ConfigSpec, n_arms: int,
+                   reps: int | None = None) -> int:
+    """一个 run 一个 config 应有多少条请求 —— 用与跑批**同一套**抽样规则算。
+
+    ★ `reps`：manifest 显式声明了实际重复次数时以它为准。
+      原先只读 matrix.yaml 的 `spec.reps`，于是补充验证实验用 `--reps 1`
+      （如 E1 思考开关，矩阵里没有「100 题 + reps=1」的组合）时，
+      门禁会按 c3 的 reps=10 判成「缺 4500 条」—— 把有意的变体误报成数据缺失。
+      历史 manifest 无该键 ⇒ 回退到 matrix 值，行为不变。
+    """
     if spec.key is Config.C1:
         insts = list(pool)
     else:
         insts = adapt.subset_from_c1(pool, spec.n_instances)
-    return len(insts) * n_arms * spec.reps
+    return len(insts) * n_arms * (reps if reps is not None else spec.reps)
 
 
 def prompt_fingerprint(pool: list, spec: adapt.ConfigSpec, demos=None) -> str:
@@ -316,7 +324,20 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
         if _is_judge_run:
             continue                       # ★ 该 run 里它是 judge，参数不适用臂配置
         # ★ 有意的覆盖不算漂移：期望值 = arms.yaml + 本 run 声明的覆盖
-        expect = {**cur[arm], **ov}
+        #   `param_arms`：覆盖**实际作用的臂**。用 `--param-arms` 限定后，
+        #   未覆盖的臂必须按 arms.yaml 原值比对 —— 否则会把「有意只给部分臂
+        #   加参数」误报成参数漂移（E1 的 longcat 就是这样被误报的）。
+        #
+        #   ★ `"<dropped>"` 是 `run_config.py --drop-param` 的哨兵：它表示该键被
+        #     **删除**，而不是被设成这个字符串。不特判的话，期望值里会多出一个
+        #     `thinking: "<dropped>"`，把「有意删除参数」误报成参数漂移
+        #     （E1b 打开 longcat 思考就是这么触发的）。
+        _pa = man.get("param_arms")
+        _drop = {k for k, v in ov.items() if v == "<dropped>"}
+        _ov = {k: v for k, v in ov.items() if k not in _drop}
+        expect = {**cur[arm], **_ov} if (_pa is None or arm in _pa) else dict(cur[arm])
+        for _k in _drop:
+            expect.pop(_k, None)
         if norm(expect) != norm(p):
             drift.append(f"{arm}: manifest={norm(p)} vs 期望={norm(expect)}")
     if drift:
@@ -363,7 +384,7 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
             continue
         if not pool_ok:
             continue                       # 题集读不出来 ⇒ 条数无从判断，跳过
-        exp = expected_specs(run_pool, spec, n_arms)
+        exp = expected_specs(run_pool, spec, n_arms, reps=man.get("reps"))
 
         # ---- judge run（C4）：记录数 = 题数 × **被判臂数** ----------------
         # 不能用 manifest.arms 推算 —— judge run 的 manifest 里只有 judge 自己一个臂，

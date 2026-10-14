@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-05T06:53:54.389263+00:00",
+  "generated_at": "2026-10-10T06:59:50.459820+00:00",
   "dataset": "eval_set",
   "pool_size": 588,
-  "reason": "MMLU-ProX 中文版公式密集题存在 LaTeX 提取错误（源头缺陷，非模型能力问题）",
-  "rule_fingerprint": "311c8412490d",
+  "reason": "MMLU-ProX 中文版：含 LaTeX 公式的题提取可靠性无法保证（既定策略：不使用）；另有 5 题选项在翻译后出现完全相同的重复项",
+  "rule_fingerprint": "23c9c5c3e131",
   "patterns": [
     {
       "regex": "\\\\[a-zA-Z]+[a-zA-Z]",
@@ -22,7 +22,15 @@
       "desc": "空数学环境"
     }
   ],
+  "structural_rules": [
+    {
+      "key": "duplicate_options",
+      "desc": "选项在中文翻译后出现完全相同的重复项"
+    }
+  ],
   "instance_ids": [
+    "prox-zh-156",
+    "prox-zh-163",
     "prox-zh-235",
     "prox-zh-239",
     "prox-zh-248",
@@ -31,6 +39,7 @@
     "prox-zh-267",
     "prox-zh-273",
     "prox-zh-274",
+    "prox-zh-282",
     "prox-zh-284",
     "prox-zh-435",
     "prox-zh-436",
@@ -47,6 +56,7 @@
     "prox-zh-490",
     "prox-zh-495",
     "prox-zh-498",
+    "prox-zh-515",
     "prox-zh-516",
     "prox-zh-517",
     "prox-zh-540",
@@ -58,10 +68,17 @@
     "prox-zh-630",
     "prox-zh-634",
     "prox-zh-652",
+    "prox-zh-88",
     "prox-zh-92",
     "prox-zh-98"
   ],
   "per_instance_reasons": {
+    "prox-zh-156": [
+      "选项在中文翻译后出现完全相同的重复项"
+    ],
+    "prox-zh-163": [
+      "选项在中文翻译后出现完全相同的重复项"
+    ],
     "prox-zh-235": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
     ],
@@ -89,6 +106,9 @@
     "prox-zh-274": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）",
       "空数学环境"
+    ],
+    "prox-zh-282": [
+      "选项在中文翻译后出现完全相同的重复项"
     ],
     "prox-zh-284": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
@@ -147,6 +167,9 @@
     "prox-zh-498": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
     ],
+    "prox-zh-515": [
+      "选项在中文翻译后出现完全相同的重复项"
+    ],
     "prox-zh-516": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
     ],
@@ -185,6 +208,9 @@
     "prox-zh-652": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
     ],
+    "prox-zh-88": [
+      "选项在中文翻译后出现完全相同的重复项"
+    ],
     "prox-zh-92": [
       "LaTeX 命令后直接跟字母（丢空格，如 \\pir 应为 \\pi r）"
     ],
@@ -194,8 +220,8 @@
     ]
   },
   "effect": {
-    "excluded": 37,
-    "remaining": 551,
+    "excluded": 42,
+    "remaining": 546,
     "note": "题集文件不改动；分析层读本清单过滤，raw/tallies 完整保留，可随时撤销"
   }
 }

@@ -121,8 +121,11 @@ def run_specs(
     arms_concurrency: dict[str, int],
     client: ChatClient | None = None,
     arm_endpoints: dict[str, tuple[str | None, str | None]] | None = None,
+    arm_timeouts: dict[str, float] | None = None,
+    arm_retries: dict[str, int] | None = None,
     limit: int | None = None,
     progress: bool = True,
+    timeout_s: float | None = None,
 ) -> dict[str, object]:
     """执行一批 PromptSpec，返回统计摘要。
 
@@ -132,25 +135,45 @@ def run_specs(
         ★ 为什么按臂而非按 run：旗舰档走官方端点、其余臂走聚合端点时，
           若拆成两个 run，"臂"和"接入方式"就同时变了，违反单因子纪律；
           合成一个 run + 臂级端点，至少让这个差异**显式记录在 manifest 里**。
+
+    timeout_s: 客户端超时（秒）。**默认 None ⇒ 用 ChatClient 的默认值（120s），
+        与改动前逐字节相同。**
+        ★ 为什么需要它：补充验证实验里 `reasoning_effort=high` 的请求实测会超过
+          120s（推理最长的那几条），被掐断后记成 `transport` 失败。
+          而 `configs/arms.yaml` 的 `timeout_s: 120` 被 `adapt.load_arms()`
+          弹出后**从未传给客户端** —— 那个配置项一直是摆设，实际生效的
+          只是 `client.py` 的同值默认。
     """
     own_client = client is None
-    # ★ 臂级客户端池。没有 arm_endpoints 时退化成"所有臂共用一个客户端"
-    #   （即原行为），所以这是纯增量改动。
+    # ★ 臂级客户端池。没有 arm_endpoints / arm_timeouts / arm_retries 时
+    #   退化成"所有臂共用一个客户端"（即原行为），所以这是纯增量改动。
+    _ckw = {"timeout_s": timeout_s} if timeout_s is not None else {}
     _pool: dict[str, ChatClient] = {}
-    _shared = client if client is not None else ChatClient()
+    _shared = client if client is not None else ChatClient(**_ckw)
 
     def client_for(arm: str) -> ChatClient:
         ep = (arm_endpoints or {}).get(arm)
-        if not ep or client is not None:
+        # 超时优先级：run 级 `timeout_s` 覆盖 > 臂级 `arm_timeouts` > ChatClient 默认。
+        # ★ 臂级这一路原先**根本不存在** —— `adapt.load_arms` 把 arms.yaml 的
+        #   `timeout_s` 弹出后丢弃，所以那个配置项改了没有任何效果。
+        to = timeout_s if timeout_s is not None else (arm_timeouts or {}).get(arm)
+        mr = (arm_retries or {}).get(arm)
+        # 三者都没有 ⇒ 沿用共享客户端（原行为，逐字节相同）
+        if client is not None or (not ep and to is None and mr is None):
             return _shared
         if arm not in _pool:
-            burl, kenv = ep
+            burl, kenv = ep or (None, None)
             key = None
             if kenv:
                 key = paths.env(kenv)
                 if not key:
                     raise RuntimeError(f"臂 {arm} 需要环境变量 {kenv}，但未设置")
-            _pool[arm] = ChatClient(base_url=burl, api_key=key)
+            kw = dict(_ckw)
+            if to is not None:
+                kw["timeout_s"] = to
+            if mr is not None:
+                kw["max_retries"] = mr
+            _pool[arm] = ChatClient(base_url=burl, api_key=key, **kw)
         return _pool[arm]
 
     def close_all() -> None:
@@ -263,6 +286,8 @@ def write_manifest(
     stats: dict | None = None,
     prompt_fingerprints: dict[str, str] | None = None,
     param_overrides: dict | None = None,
+    reps: int | None = None,
+    param_arms: list[str] | None = None,
     dataset: str = "eval_set",
 ) -> Path:
     """写跑批元数据。让每个数字可回溯到哪次跑批、哪版代码、哪版数据。
@@ -309,6 +334,8 @@ def write_manifest(
         data_hash=data_hash,
         prompt_fingerprints=prompt_fingerprints or {},
         param_overrides=param_overrides or {},
+        reps=reps,
+        param_arms=param_arms,
         code_version=_code_version(),
         models_snapshot=merged_models,
         started_at=(stats or {}).get("started_at", datetime.now(timezone.utc).isoformat()),

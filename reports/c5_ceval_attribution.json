@@ -19,26 +19,6 @@
     "dspro_pick_D_rate": 41.85,
     "dspro_pick_D_when_gold_B": 17.57
   },
-  "C5 旧（示例均值 8.4）": {
-    "run": "ceval-c5-5arm",
-    "config": "c5",
-    "acc": {
-      "ds-flash": 84.0,
-      "ds-pro": 70.67,
-      "longcat": 90.67,
-      "mimo": 83.11,
-      "qwen": 88.67
-    },
-    "dspro_gap_vs_dsflash": -13.33,
-    "dspro_letter_picks": {
-      "A": 25,
-      "D": 77,
-      "C": 26,
-      "B": 22
-    },
-    "dspro_pick_D_rate": 51.33,
-    "dspro_pick_D_when_gold_B": 40.54
-  },
   "C5 重跑（清洗后 8.4）": {
     "run": "ceval-c5-5arm-v3",
     "config": "c5",

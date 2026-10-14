@@ -44,6 +44,28 @@ def main() -> int:
                     help="题集名（data/<名>.jsonl）。默认 eval_set；跨题库验证用 ceval_set"),
     ap.add_argument("--param", action="append", default=None,
                     help="覆盖臂参数（可重复）：--param max_tokens=2048")
+    # ---- 以下四项为**补充验证实验**新增，默认行为与新增前逐字节相同 ----------
+    #   设计前提：`configs/matrix.yaml` 与 `src/meval/*` 一律不改动。
+    #   门禁 `ci_gate.py` 会 `compute_fingerprints(pool, matrix)`，往 matrix.yaml
+    #   里加配置块会改变指纹集合、直接判 FAIL —— 所以实验配置只能走命令行覆盖。
+    ap.add_argument("--template", default=None,
+                    help="覆盖 prompt 模板路径（如 prompts/e6_b_noreq.txt）")
+    ap.add_argument("--drop-param", action="append", default=None,
+                    help="从全部臂的参数里删除某个键（可重复）：--drop-param reasoning_effort")
+    ap.add_argument("--fewshot-n", type=int, default=None,
+                    help="覆盖 few_shot.n（示例数量梯度实验用）")
+    ap.add_argument("--fewshot-ids", default=None,
+                    help="覆盖 few_shot.fixed_ids，逗号分隔（受控 few-shot 用）")
+    ap.add_argument("--param-arms", default=None,
+                    help="限定 --param 只作用于这些臂（逗号分隔），默认全部。"
+                         "E1 用：longcat 的思考开关是 `thinking` 而非 "
+                         "`reasoning_effort`，不能把后者发给它")
+    ap.add_argument("--reps", type=int, default=None,
+                    help="覆盖 reps。E1 用 `--config c3 --reps 1` 得到"
+                         "「100 题子集 + reps=1 + c1 模板」，矩阵里没有这个组合")
+    ap.add_argument("--timeout", type=float, default=None,
+                    help="客户端超时（秒）。默认不传 ⇒ 用 ChatClient 默认 120s。"
+                         "开思考的请求实测会超过 120s，需调大")
     args = ap.parse_args()
 
     cfg_key = Config(args.config)
@@ -60,6 +82,30 @@ def main() -> int:
     if spec_cfg is None:
         print(f"!! matrix.yaml 中没有配置 {cfg_key.value}")
         return 2
+
+    # ---- 补充验证实验的配置覆盖（全部走命令行，不改 matrix.yaml）----------
+    #   默认（不传这四项）时 spec_cfg 与改动前**完全相同**，历史 run 不受影响。
+    if args.template:
+        tpath = Path(args.template)
+        if not tpath.is_absolute():
+            tpath = paths.ROOT / tpath
+        if not tpath.exists():
+            print(f"!! --template 指向的文件不存在：{tpath}")
+            return 2
+        spec_cfg = replace(spec_cfg, prompt_template=args.template)
+        print(f"模板覆盖    : {args.template}")
+    if args.fewshot_n is not None or args.fewshot_ids is not None:
+        fs = dict(spec_cfg.few_shot or {})
+        if args.fewshot_n is not None:
+            fs["n"] = args.fewshot_n
+        if args.fewshot_ids is not None:
+            fs["fixed_ids"] = [x.strip() for x in args.fewshot_ids.split(",") if x.strip()]
+            fs.pop("fixed_ids_by_dataset", None)   # 显式指定时以 fixed_ids 为准
+        spec_cfg = replace(spec_cfg, few_shot=fs)
+        print(f"few-shot 覆盖: n={fs.get('n')} ids={fs.get('fixed_ids')}")
+    if args.reps is not None:
+        spec_cfg = replace(spec_cfg, reps=args.reps)
+        print(f"reps 覆盖   : {args.reps}")
 
     # ---- 题集选择 ----------------------------------------------------------
     # ★ 默认仍是 eval_set（MMLU-ProX-zh），**这不是可选项而是纪律**：
@@ -127,9 +173,29 @@ def main() -> int:
             return 2
         k, _, v = kv.partition("=")
         overrides[k.strip()] = _coerce(v.strip())
+    #   ★ `_tgt` 必须在 if **之外**初始化：没有 `--param` 时（如 E1 的 none 组）
+    #     它只在 if 内定义会 UnboundLocalError，manifest 写不出来 ——
+    #     实测第 1 组的 manifest 因此缺 reps/param_arms，门禁无法判断条数。
+    _tgt = ({x.strip() for x in args.param_arms.split(",")}
+            if args.param_arms else None)
     if overrides:
-        selected = [replace(a, params={**a.params, **overrides}) for a in selected]
-        print(f"参数覆盖    : {overrides}")
+        selected = [replace(a, params={**a.params, **overrides})
+                    if (_tgt is None or a.name in _tgt) else a
+                    for a in selected]
+        print(f"参数覆盖    : {overrides}"
+              + (f"   仅作用于 {sorted(_tgt)}" if _tgt else ""))
+
+    # ---- --drop-param：从全部臂删除某个参数键（补充验证实验用）-------------
+    #   动机：`--param` 只能**设置**键，无法**删除**。而 E1「思考开关」的第三组
+    #   要测的是「完全不传思考参数时端点的默认行为」—— 必须真的把键去掉。
+    #   删除同样记进 manifest.param_overrides（值记成 "<dropped>"），
+    #   门禁据此区分「有意的参数变体」与「参数悄悄漂移」。
+    if args.drop_param:
+        for k in args.drop_param:
+            selected = [replace(a, params={kk: vv for kk, vv in a.params.items() if kk != k})
+                        for a in selected]
+            overrides[k] = "<dropped>"
+        print(f"参数删除    : {args.drop_param}")
 
     # ---- 题集范围：C1 全量；其余配置取 C1 子集 -----------------------------
     if cfg_key is Config.C1:
@@ -204,6 +270,8 @@ def main() -> int:
         note=f"{spec_cfg.name}｜{spec_cfg.desc}" + (f"｜limit={args.limit}" if args.limit else "")
              + "｜（执行前预写：臂集合从此确定）",
         param_overrides=overrides,
+        reps=spec_cfg.reps,
+        param_arms=(sorted(_tgt) if _tgt else None),
         dataset=ds_name,
     )
 
@@ -213,9 +281,21 @@ def main() -> int:
     arm_eps = {a.name: (a.base_url, a.key_env) for a in selected if a.base_url}
     for _n, (_u, _k) in arm_eps.items():
         print(f"端点覆盖    : {_n} -> {_u}（key={_k}）")
+    # ★ 臂级客户端参数：只有**显式设置**的臂才进表（None 的走 ChatClient 默认）。
+    #   修的是 arms.yaml 的 `timeout_s` / `max_retries` 被 `load_arms` 弹出后丢弃、
+    #   改了没有任何效果的问题。
+    arm_tos = {a.name: a.timeout_s for a in selected if a.timeout_s is not None}
+    arm_mrs = {a.name: a.max_retries for a in selected if a.max_retries is not None}
+    if arm_tos:
+        print(f"臂级超时    : {arm_tos}" + ("（被 --timeout 覆盖）" if args.timeout else ""))
+    if arm_mrs:
+        print(f"臂级重试    : {arm_mrs}")
     stats = execute.run_specs(
         run_id=run_id, specs=specs, arms_concurrency=conc, limit=args.limit,
         arm_endpoints=arm_eps or None,
+        arm_timeouts=arm_tos or None,
+        arm_retries=arm_mrs or None,
+        timeout_s=args.timeout,
     )
 
     # ---- manifest ----------------------------------------------------------
@@ -229,6 +309,8 @@ def main() -> int:
         stats=stats,
         prompt_fingerprints={cfg_key.value: fp},
         param_overrides=overrides,
+        reps=spec_cfg.reps,
+        param_arms=(sorted(_tgt) if _tgt else None),
         dataset=ds_name,
     )
     print(f"manifest    : {mp.relative_to(paths.ROOT)}")

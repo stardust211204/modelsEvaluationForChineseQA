@@ -45,6 +45,14 @@ class Arm:
     #      v4-pro 的端点一致性未验证 —— 报告里必须声明。
     base_url: str | None = None
     key_env: str | None = None      # 该臂用哪个环境变量取 key；None ⇒ OPENCODE_API_KEY
+    # ★ 客户端参数（2026-10-10 修）：原先 `load_arms` 把这两个键从 params 里
+    #   `pop` 出来**直接丢弃** ⇒ `configs/arms.yaml` 的 `timeout_s: 120` 一直是摆设，
+    #   实际生效的只是 `client.py` 的同值默认。后果是**改了这个配置项没有任何效果**，
+    #   而开思考的请求实测会超过 120s（E1 实测 8/1000 条被掐断记成 transport 失败）。
+    #   现在它们随 Arm 传递，由 run_config / run_specs 真正用上。
+    #   None ⇒ 用 ChatClient 的默认值（120s / 4 次重试），与改动前逐字节相同。
+    timeout_s: float | None = None
+    max_retries: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = {
@@ -55,6 +63,11 @@ class Arm:
             d["base_url"] = self.base_url
         if self.key_env:
             d["key_env"] = self.key_env
+        # 只在**显式设置**时出现 ⇒ 未设置的臂与历史记录逐字节一致
+        if self.timeout_s is not None:
+            d["timeout_s"] = self.timeout_s
+        if self.max_retries is not None:
+            d["max_retries"] = self.max_retries
         return d
 
 
@@ -88,13 +101,18 @@ def load_arms(path: Path | None = None) -> tuple[dict[str, Any], list[Arm]]:
     arms: list[Arm] = []
     for a in cfg.get("arms", []):
         params = {**defaults, **(a.get("params") or {})}
-        params.pop("timeout_s", None)   # 这两个走客户端参数，不属于模型参数
-        params.pop("max_retries", None)
+        # ★ 这两个是**客户端参数**，不属于模型参数 ⇒ 从 params 里取出。
+        #   但**必须留着传给 Arm**：原先 pop 完就丢，等于让 arms.yaml 的
+        #   `timeout_s` / `max_retries` 变成摆设（改了没有任何效果）。
+        _to = params.pop("timeout_s", None)
+        _mr = params.pop("max_retries", None)
         arms.append(
             Arm(
                 name=a["name"], vendor=a.get("vendor", ""), model=a["model"],
                 concurrency=int(a.get("concurrency", 4)), params=params,
                 base_url=a.get("base_url"), key_env=a.get("key_env"),
+                timeout_s=float(_to) if _to is not None else None,
+                max_retries=int(_mr) if _mr is not None else None,
             )
         )
     return cfg, arms
@@ -152,15 +170,34 @@ def render_prompt(inst: Instance, template: str, demos: list[Instance] | None = 
       ⇒ 受影响的是**严格照字面执行指令的臂**：旗舰 2.4% 越界，
         而四个 flash 臂 0–1.5%（它们会自己看选项列表）。
         这不是"模型差异"，是**提示词把一部分模型带进了坑**。
+
+    ★ `{demos}` 必须在 `.format()` **之后**才填进去。
+
+      原先的写法是先 `text.replace("{demos}", render_demos(...))` 再对**整个字符串**
+      调 `.format()`。后果：**示例内容里的花括号被当成占位符**。
+
+      实测（E5 的 n=10 一档）：示例 `prox-zh-valid-0` 是一道组合数学题，题面含
+      `{n}` 与 `{10}` ⇒ `text.format()` 抛 `KeyError: 'n'`，**整个 run 崩掉**。
+      valid 池 70 条里有 2 条含花括号（`valid-0`、`valid-2`）。
+
+      为什么主跑批从未暴露：题目内容（`question`/`options`）是作为 `.format()` 的
+      **参数**传入的，`str.format` 只解析**格式串**、不解析参数 ⇒ 题目里的花括号无害。
+      **只有 `{demos}` 这一条路径会把数据拼进格式串。** 而 `{demos}` 只出现在
+      `prompts/c5_fewshot.txt` ⇒ 只有 few-shot 配置会踩到。
+
+      ⇒ 用哨兵把示例的插入挪到 `.format()` 之后：**数据永远不参与模板解析**。
     """
-    text = template
-    if "{demos}" in text:
-        text = text.replace("{demos}", render_demos(demos or []))
-    return text.format(
+    # 哨兵用 \x00 包裹：正常文本里不可能出现，故不会与模板内容冲突。
+    demos_slot = "\x00DEMOS\x00"
+    text = template.replace("{demos}", demos_slot)
+    out = text.format(
         question=inst.question,
         options=render_options(inst),
         last=chr(64 + len(inst.options)),   # ★ 按实际选项数，不再写死 J
     )
+    if demos_slot in out:
+        out = out.replace(demos_slot, render_demos(demos or []))
+    return out
 
 
 def render_judge_prompt(inst: Instance, response: str, template: str) -> str:

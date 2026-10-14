@@ -8,6 +8,11 @@
 #   * 三臂温度**全部失效**（temp=1.0 同题 6 次仅 1 种输出）
 #   * 关思考参数各不相同：LongCat 用 thinking，MiMo/DeepSeek 用 reasoning_effort
 #   * max_tokens 下限 512 即够；此处取 1024 为隐含思考留余量
+#     ★ 2026-10-10 更正（E1 实测，1,500 次调用）：**1024 只在思考关闭时才够**。
+#       开思考后 ds-pro / ds-flash 分别有 37% / 32% 的回复撞上 1024 被截断
+#       （`finish_reason=length`、content 为空），提到 8192 仍有 9~14 条。
+#       另：qwen3.8-flash 的思考 token **不占** max_tokens（实测 reasoning 达 5131
+#       仍 `finish_reason=stop`）⇒ **同一个 max_tokens 对不同臂含义不同**。
 #   * ★ 厂商私有参数必须走 extra_body —— 直传 kwarg 会在本地抛 TypeError
 
 base_url: "https://opencode.ai/zen/go/v1"
@@ -15,6 +20,10 @@ base_url: "https://opencode.ai/zen/go/v1"
 # 请求层的公共默认值（可被单臂覆盖）
 defaults:
   max_tokens: 1024
+  # ★ 2026-10-10 修：这两个键原先被 `adapt.load_arms()` 从 params 里 `pop` 出来
+  #   **直接丢弃** ⇒ 它们一直是摆设，改了没有任何效果（实际生效的只是
+  #   `client.py` 的同值默认）。现在随 `Arm` 传递，由 run_config / run_specs 真正用上。
+  #   `run_config.py --timeout` 可对单次跑批覆盖臂级值。
   timeout_s: 120
   max_retries: 4
 

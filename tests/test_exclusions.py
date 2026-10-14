@@ -40,15 +40,39 @@ def test_every_excluded_instance_really_hits_a_rule():
     """★ 反向检查：清单里的每一题都必须真的命中规则。
 
     如果这条挂了，说明清单与规则脱节 —— 那么"剔除的是缺陷题"这个说法就是假的。
+
+    ★ 必须用 `detect_instance_defects`（文本正则 + 结构化判据）。
+      只用 `detect_bad_symbols` 会把"选项重复"那几题误判成查不出缺陷。
     """
     if not exclusions.list_path().exists():
         pytest.skip("尚未生成清单")
     drop = exclusions.load()
     pool = {i.id: i for i in build_set.load_frozen(paths.data() / "eval_set.jsonl")}
     missed = [k for k in drop
-              if k in pool and not exclusions.detect_bad_symbols(
-                  pool[k].question + " " + " ".join(pool[k].options))]
-    assert not missed, f"清单里有 {len(missed)} 题查不出坏符号：{missed[:5]}"
+              if k in pool and not exclusions.detect_instance_defects(pool[k])]
+    assert not missed, f"清单里有 {len(missed)} 题查不出缺陷：{missed[:5]}"
+
+
+def test_duplicate_options_are_detected():
+    """★ 选项重复必须能被检出。
+
+    重复选项使"选中正确选项"失去唯一解，属机翻引入的题目缺陷。
+    """
+    from meval.types import Instance
+
+    def mk(opts):
+        return Instance(id="t", question="q", options=opts, gold_indices=[0])
+
+    dup = mk(["甲", "乙", "甲", "丁"])
+    assert exclusions.detect_duplicate_options(dup), "重复选项漏检"
+    assert exclusions.detect_instance_defects(dup), "重复选项未进总判据"
+
+    clean = mk(["甲", "乙", "丙", "丁"])
+    assert not exclusions.detect_duplicate_options(clean), "干净选项被误判"
+
+    # 仅空白差异不算不同项（翻译常见形态）
+    ws = mk(["甲 ", "甲", "乙", "丙"])
+    assert exclusions.detect_duplicate_options(ws), "去空白后重复应被检出"
 
 
 def test_apply_reduces_and_removes():

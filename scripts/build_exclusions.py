@@ -39,15 +39,32 @@ def main() -> int:
 
     hits: dict[str, list[str]] = {}
     for inst in pool:
-        txt = inst.question + " " + " ".join(inst.options)
-        reasons = exclusions.detect_bad_symbols(txt)
+        reasons = exclusions.detect_instance_defects(inst)
         if reasons:
             hits[inst.id] = reasons
 
-    print(f"  命中坏符号的题：**{len(hits)}** / {len(pool)} = {len(hits)/len(pool):.1%}")
+    print(f"  命中规则的题：**{len(hits)}** / {len(pool)} = {len(hits)/len(pool):.1%}")
+    structural = {desc for _, desc in exclusions.STRUCTURAL_RULES}
+    n_struct = sum(1 for rs in hits.values() if any(r in structural for r in rs))
+    print(f"    其中含结构化判据（选项重复）：{n_struct} 题")
     byreason = Counter(r for rs in hits.values() for r in rs)
+    structural = {desc for _, desc in exclusions.STRUCTURAL_RULES}
+    print("    文本正则：")
     for desc, n in byreason.most_common():
-        print(f"    {n:>4} 题  {desc}")
+        if desc not in structural:
+            print(f"      {n:>4} 题  {desc}")
+    print("    结构化判据：")
+    for desc in sorted(structural):
+        print(f"      {byreason.get(desc, 0):>4} 题  {desc}")
+
+    if n_struct:
+        print("\n  选项重复的题：")
+        for k, rs in hits.items():
+            if any(r in structural for r in rs):
+                n_opt = len(next(i for i in pool if i.id == k).options)
+                n_uniq = len({o.strip() for o in next(i for i in pool if i.id == k).options})
+                print(f"    {k:<16} {n_opt} 个选项 / {n_uniq} 个不同"
+                      f"  （重复 {n_opt - n_uniq} 处）")
 
     if hits:
         subj = Counter(next(i for i in pool if i.id == k).stratum.get("subject") for k in hits)
@@ -66,9 +83,11 @@ def main() -> int:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "dataset": ds,
         "pool_size": len(pool),
-        "reason": "MMLU-ProX 中文版公式密集题存在 LaTeX 提取错误（源头缺陷，非模型能力问题）",
+        "reason": "MMLU-ProX 中文版：含 LaTeX 公式的题提取可靠性无法保证（既定策略：不使用）；"
+                  "另有 5 题选项在翻译后出现完全相同的重复项",
         "rule_fingerprint": exclusions.rule_fingerprint(),
         "patterns": [{"regex": p, "desc": d} for p, d in exclusions.BAD_PATTERNS],
+        "structural_rules": [{"key": k, "desc": d} for k, d in exclusions.STRUCTURAL_RULES],
         "instance_ids": sorted(hits),
         "per_instance_reasons": {k: v for k, v in sorted(hits.items())},
         "effect": {

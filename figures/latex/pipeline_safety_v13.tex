@@ -1,0 +1,105 @@
+% 图 2 · 安全评测线 v12 —— 四个节点排成**从左到右的一行**
+%
+% 编译：xelatex pipeline_safety_v12.tex
+%
+% ★ 相对 v11 的改动（用户要求）
+%   取消三行蛇形布局与折线，四个节点 **OR-Bench → raw → 判定结果 → 指标**
+%   排成一条水平线，三个处理环节各占一段箭头。
+%
+%   v11（蛇形三行）：        v12（单行）：
+%     [OR-Bench] ─(模型推理)─┐        [OR-Bench] ─(模型推理)→ [raw]
+%                            ↓                                  ─(LLM judge)→ [判定结果]
+%                          [raw]                                ─(得出结论)→ [指标]
+%                            ↓
+%     [指标] ←(得出结论)─ [判定结果]
+%
+% ★⚠️ 已知代价：单行会把图拉得很扁
+%   四个节点 4 × 2.72cm + 三段箭头 3 × 2.68cm ≈ 18.9cm 宽，内容高度只有 1.06cm。
+%   v8 的注释里记过同类教训：「十个节点排成一行会得到 10.65 的宽高比，太扁」。
+%   实测本版宽高比见编译后的输出 —— 报告里按 80% 宽插入的话字号会缩到约 6.5pt。
+%
+% ★ 三个处理环节仍标在箭头上（沿用 v9 起的约定）
+%     模型推理   （OR-Bench → raw）
+%     LLM judge  （raw → 判定结果）
+%     得出结论   （判定结果 → 指标）
+%   ★ 安全线无 prompt 生成环节：题面即提示词（报告 §2.7）。
+%   ★ 判定结果直接来自 LLM judge 单路，无规则判分（报告 §2.7）。
+
+\documentclass[border=16pt, tikz]{standalone}
+\usepackage{ctex}
+\usetikzlibrary{positioning, arrows.meta, calc}
+
+\setCJKmainfont{Microsoft YaHei}
+
+\definecolor{ncBg}{HTML}{FFFFFF}
+\definecolor{ncFill}{HTML}{F9FAFB}
+\definecolor{ncStroke}{HTML}{E5E7EB}
+\definecolor{ncDivider}{HTML}{D1D5DB}
+\definecolor{ncBlue}{HTML}{3B82F6}
+\definecolor{ncText}{HTML}{111827}
+\definecolor{ncText2}{HTML}{374151}
+\definecolor{ncLabel}{HTML}{6B7280}
+
+\pagecolor{ncBg}
+
+\newcommand{\ncnode}[2]{%
+  \begin{tabular}{@{}c@{}}
+    {\fontsize{6.6}{7.6}\selectfont\color{ncLabel}#2}\\[1.2pt]
+    {\fontsize{9.6}{11.4}\selectfont\color{ncText}#1}
+  \end{tabular}%
+}
+
+\tikzset{
+  node/.style={rectangle, rounded corners=4pt,
+    draw=ncStroke, line width=1pt, fill=ncFill,
+    minimum width=2.72cm, minimum height=1.06cm,
+    inner sep=4pt, align=center},
+  conn/.style={draw=ncBlue, line width=1.1pt,
+    -{Stealth[length=1.7mm, width=1.35mm]}},
+  steplab/.style={sloped, fill=ncBg, inner sep=1.9pt,
+    font=\fontsize{7.6}{9.2}\selectfont, text=ncLabel},
+}
+
+\begin{document}
+\begin{tikzpicture}
+
+% =======================================================================
+% 单行 y=0（→）：四个节点 + 三段箭头
+% =======================================================================
+\node[node] (src) at (0,     0) {\ncnode{OR-Bench}{数据源}};
+\node[node] (raw) at (5.40,  0) {\ncnode{raw}{存储}};
+\node[node] (dec) at (10.80, 0) {\ncnode{判定结果}{存储}};
+\node[node] (met) at (16.20, 0) {\ncnode{指标}{存储}};
+
+% ★ v12.1：把**思考开关**标到两条箭头上。
+%   它是本项目效应最大的单一变量；judge 侧的思考状态尤其关键 ——
+%   未关闭时 judge 对 12% 的条目判不出，且失败集中于应判错的题上，
+%   会使一致率被高估（报告 §2.7）。
+\draw[conn] (src.east) -- node[steplab, midway] {模型推理}   (raw.west);
+\draw[conn] (raw.east) -- node[steplab, midway] {LLM judge}  (dec.west);
+\draw[conn] (dec.east) -- node[steplab, midway] {得出结论}   (met.west);
+
+% =======================================================================
+% 图例
+% =======================================================================
+\begin{scope}[yshift=-2.30cm]
+  \draw[ncStroke, line width=1pt] (-1.55,0.92) -- (17.75,0.92);
+
+  \draw[-{Stealth[length=1.7mm, width=1.35mm]}, draw=ncBlue, line width=1.1pt]
+        (0,0) -- (0.95,0);
+  \node[font=\fontsize{8.2}{10}\selectfont, text=ncText2, anchor=west]
+       at (1.20,0) {主流程，处理过程标在箭头上};
+
+  \node[node, minimum width=1.55cm, minimum height=0.60cm, inner sep=0pt,
+        rounded corners=3pt] (L2) at (7.10,0) {};
+  \node[font=\fontsize{8.2}{10}\selectfont, text=ncText2, anchor=west]
+       at (8.00,0) {节点（数据 / 存储）};
+
+  % ★ v12.1 新增：思考开关说明。安全线的**被测模型与 judge 都关闭思考**，
+  %   其中 judge 侧尤其关键（未关闭会漏判且偏斜）。
+  \node[font=\fontsize{8.0}{9.8}\selectfont, text=ncLabel, anchor=west]
+       at (0,-0.78) {思考开关：被测模型与 judge 全程\textbf{关闭}。judge 未关闭时对 12\% 的条目判不出，且失败集中于应判错的题上。};
+\end{scope}
+
+\end{tikzpicture}
+\end{document}

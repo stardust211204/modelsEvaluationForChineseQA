@@ -11,18 +11,34 @@
       * `configs/exclusions.json` 记录被剔除的题 + 依据 + 生成时间
       * 分析层读它并过滤，`raw/` 与 `tallies/` 完整保留 ⇒ **随时可回溯、可撤销**
 
-剔除依据（2026-10-05）
-    MMLU-ProX 的中文版是从英文 PDF 抽取+翻译而来，**公式密集题存在 LaTeX 提取错误**，
-    实测四类模式（见 `detect_bad_symbols`）：
+剔除依据（2026-10-05，2026-10-10 增补第 5 条）
 
-        \\pir     应为 \\pi r        —— 命令后丢空格，36 题
-        ^\\pi     上标缺失或嵌套错误             7 题
-        x\\alpha  字母后紧跟命令无空格           6 题
-        $ $       空数学环境                     7 题
+    **一、含 LaTeX 公式的题全部不纳入统计（既定策略）。**
 
-    这些题**在源头就是坏的**，模型答不对不能归因于能力。
+    MMLU-ProX 的中文版是从英文 PDF 抽取+翻译而来。公式段落的提取可靠性**无法保证** ——
+    实测能确证损坏的只是少数（全库真正的「命令后丢空格」只有 6 题），
+    但**无法排除未检出的错误**。既然无法验证，就不使用这部分题目。
+
+    文本正则四类（见 `detect_bad_symbols`）：
+
+        \\[a-zA-Z]+[a-zA-Z]  题面出现多字母 LaTeX 命令  36 题
+        \\^\\{?\\\\            上标含命令                 7 题
+        [a-zA-Z]\\\\[a-zA-Z]  字母后紧跟命令且无空格      6 题
+        \\$\\s*\\$             空数学环境                 7 题
+
+    ★ 第 1 条正则**不区分**「真缺陷 \\pir」与「合法命令 \\pi / \\gamma」——
+      它退化为「题面含公式」。这**符合上面的策略**，不是误伤：
+      策略就是含公式的一律不用。但引用时不得把它描述成「36 题提取错误」。
+
+    **二、选项重复的题（2026-10-10 增补）。**
+
+    MMLU-ProX 中文翻译后，5 题的选项出现**完全相同**的重复项（英文原版 0 处）。
+    重复选项使「选中正确选项」失去唯一解 —— 属机翻引入的题目缺陷，
+    与模型能力无关。该项**不是正则**，需要结构化比较选项列表（`detect_duplicate_options`）。
+    这条也是当初引入 C-Eval 交叉验证的理由之一。
+
     ★ 与 `longcat` 在公式题上 22.2% 判不出那件事**不是同一回事**：
-      那条是模型行为特征（保留，进画像卡）；这条是题目缺陷（剔除）。
+      那条是模型行为特征（保留，进画像卡）；这些是题目缺陷（剔除）。
 
 用法
     from meval import exclusions
@@ -48,6 +64,12 @@ BAD_PATTERNS: list[tuple[str, str]] = [
     (r"\$\s*\$", "空数学环境"),
 ]
 
+# ★ 结构化判据（作用于 Instance 的选项列表，无法用文本正则表达）。
+#   与 BAD_PATTERNS 一起进 rule_fingerprint —— 任一侧漂移都必须报错。
+STRUCTURAL_RULES: list[tuple[str, str]] = [
+    ("duplicate_options", "选项在中文翻译后出现完全相同的重复项"),
+]
+
 _CACHE: set[str] | None = None
 
 
@@ -55,6 +77,7 @@ def rule_fingerprint() -> str:
     """规则的指纹，用于校验清单是不是用当前规则生成的。"""
     import hashlib
     blob = "|".join(p for p, _ in BAD_PATTERNS)
+    blob += "#" + "|".join(k for k, _ in STRUCTURAL_RULES)
     return hashlib.sha256(blob.encode()).hexdigest()[:12]
 
 
@@ -65,6 +88,28 @@ def list_path() -> Path:
 def detect_bad_symbols(text: str) -> list[str]:
     """返回命中的模式描述；空列表表示干净。"""
     return [desc for pat, desc in BAD_PATTERNS if re.search(pat, text)]
+
+
+def detect_duplicate_options(inst) -> list[str]:
+    """选项列表里出现完全相同的两项（去空白后比较）。"""
+    seen: set[str] = set()
+    for o in inst.options:
+        k = o.strip()
+        if k in seen:
+            return [desc for key, desc in STRUCTURAL_RULES if key == "duplicate_options"]
+        seen.add(k)
+    return []
+
+
+def detect_instance_defects(inst) -> list[str]:
+    """一题的**全部**剔除依据：文本正则 + 结构化判据。
+
+    ★ 判「清单里的题是否真的命中规则」必须用这个，不能用 `detect_bad_symbols`
+      —— 否则选项重复那 5 题会被判成「查不出缺陷」。
+    """
+    reasons = detect_bad_symbols(inst.question + " " + " ".join(inst.options))
+    reasons += detect_duplicate_options(inst)
+    return reasons
 
 
 def load(*, strict: bool = True) -> set[str]:
