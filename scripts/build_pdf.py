@@ -1,4 +1,4 @@
-"""把 Markdown 报告转成 PDF（pandoc + xelatex + Eisvogel 模板）。
+r"""把 Markdown 报告转成 PDF（pandoc + xelatex + Eisvogel 模板）。
 
 产物
     A4、带封面与页眉页脚、图注为中文编号（图 1、图 2…）的报告 PDF。
