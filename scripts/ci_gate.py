@@ -64,6 +64,26 @@ def is_smoke(run_id: str) -> bool:
     return "smoke" in run_id or "pilot" in run_id
 
 
+def raw_available() -> bool:
+    """仓库里是否存在**任何** raw 数据。
+
+    raw 不进 git（75 MB，走 GitHub Release 附件，见 README §六），
+    所以**刚 clone 下来的仓库一条 raw 都没有**。此时「raw 完整性」「judge tally
+    完整性」这类检查的**输入根本不存在**，应当报 SKIP 而不是 FAIL ——
+    否则面试官照 README 跑一遍会看到「门禁结果：不通过 —— 有结论级前提被破坏」，
+    而真相只是没下载数据包。
+
+    ★ 判据必须是**全局**的：只要有一个 `runs/*/raw` 存在，就说明数据已下载，
+      此时某个批次缺 raw 是**真失败**，必须照报 FAIL。不能按单批次判断，
+      否则「跑批跑丢了」这种真事故会被静默降级成 SKIP。
+    """
+    return any((paths.ROOT / "runs").glob("*/raw"))
+
+
+_RAW_AVAILABLE = raw_available()
+_RAW_HINT = "raw 未下载（走 Release 附件，见 README §六）"
+
+
 class Gate:
     def __init__(self) -> None:
         self.results: list[dict] = []
@@ -399,6 +419,8 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
             rname = f"[{run_id}/{ckey}] judge raw 完整性"
             if smoke:
                 g.skip(rname, "演练 run")
+            elif not _RAW_AVAILABLE:
+                g.skip(rname, _RAW_HINT)
             elif missing:
                 g.bad(rname, f"{missing} 条记录的 target_arm 为空 —— "
                              "三臂的 judge 请求会互相覆盖（与 HANDOFF §4 坑 6 同类）")
@@ -415,6 +437,9 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
             jt = metrics.load_tallies(run_id, spec.key, drop_excluded=False)  # 计数校验需全量
             if smoke:
                 g.skip(tname, "演练 run")
+            elif not _RAW_AVAILABLE:
+                # 应有的条数是「题数 × 被判臂数」，而被判臂只能从 raw 里读出来
+                g.skip(tname, f"{_RAW_HINT}，无法核对应有条数（tally 实有 {len(jt)} 条）")
             elif len(jt) != len(results):
                 g.bad(tname, f"应有 {len(results)} 条（judge 只有单口径），实有 {len(jt)}")
             else:
@@ -424,6 +449,8 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
         rname = f"[{run_id}/{ckey}] raw 完整性"
         if smoke:
             g.skip(rname, f"演练 run（期望 {exp} 条）")
+        elif not _RAW_AVAILABLE:
+            g.skip(rname, f"{_RAW_HINT}；期望 {exp} 条")
         else:
             results = execute.load_results(run_id, spec.key)
             got_n = len(results)

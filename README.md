@@ -208,8 +208,8 @@ Copy-Item .env.example .env    # 填入真实 key
 
 # 4) 单测 + 两个门禁
 .\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe scripts\ci_gate.py      # 210 项：PASS 203 / FAIL 1 / WARN 6
-.\.venv\Scripts\python.exe scripts\exp_smoke.py    # 124/124
+.\.venv\Scripts\python.exe scripts\ci_gate.py      # 210 项
+.\.venv\Scripts\python.exe scripts\exp_smoke.py    # 124 项
 
 # 5) 出报告（Markdown → PDF；默认源即唯一权威报告）
 .\.venv\Scripts\python.exe scripts\build_pdf.py
@@ -217,10 +217,30 @@ Copy-Item .env.example .env    # 填入真实 key
 # 6) 报告自检与逐格复算（不需要 API）
 .\.venv\Scripts\python.exe scripts\_check_polished_report.py
 .\.venv\Scripts\python.exe scripts\_check_render_safe.py
+.\.venv\Scripts\python.exe scripts\report_metrics.py --run-id c1-5arm-v2 --config c1
 ```
 
-> **只复算、不跑批**：第 4~6 步全部是离线脚本。`runs/*/tallies/` 判分台账已入库，
-> clone 后无需任何 API key 即可复算报告全部指标。
+> **只复算、不跑批**：第 4~6 步全部是离线脚本。`runs/*/tallies/` 判分台账**已入库**，
+> clone 后**无需任何 API key** 即可复算报告全部指标。
+> 实测：全新 clone 里跑 `report_metrics.py --run-id c1-5arm-v2 --config c1`，
+> 五个模型的 MMLU-ProX 准确率复算为 58.6 / 64.1 / 62.9 / 49.1 / 61.2（n=546），
+> 与报告 §3.1 逐个吻合。
+
+> **门禁的两种读数**（差别只在 raw 在不在）：
+>
+> | 场景 | `ci_gate`（210 项） | `exp_smoke`（124 项） |
+> | --- | --- | --- |
+> | **完整工作区**（raw 已下载） | PASS **203** / FAIL **1** / WARN 6 | **124/124** |
+> | **刚 clone**（raw 走 Release，不在 git 里） | PASS 162 / FAIL **0** / **SKIP 42** | **123/123**（跳过 1 项） |
+>
+> 被跳过的是**输入不存在**的检查（「raw 完整性」「judge tally 完整性」「被复核 run 含 5 臂」等），
+> 脚本会写明原因 —— **是跳过，不是失败**。
+> 那 1 项 FAIL 是 `longcat` 的**上游连接失败**（间歇性路由缺陷，客户端无法修复），不是口径问题。
+> 这里如实写 210 项而非「203 项全绿」：**门禁的价值在于它敢报红**。
+>
+> 判据是**全局**的：只要有一个 `runs/*/raw` 存在，就按完整工作区标准判 ——
+> 此时某个批次缺 raw 是**真事故**，照报 FAIL。要拿到完整读数，
+> 下载 Release 里的 raw 包解压到仓库根即可（见 [`docs/reports-fix.md`](docs/reports-fix.md) §10.4）。
 
 **小样本走完整条管线**：`.\run_all.ps1`（末步即门禁）。
 

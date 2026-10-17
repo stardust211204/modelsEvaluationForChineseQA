@@ -30,10 +30,22 @@ DROP = exclusions.load()
 MAIN_ARMS = ["deepseek-v4.1-flash", "deepseek-v4-pro", "longcat-2.5-preview-free",
              "mimo-v2.6-flash", "qwen3.8-flash"]
 CHECKS: list[tuple[str, str, bool, str]] = []   # (实验, 检查项, 通过, 详情)
+SKIPS: list[tuple[str, str, str]] = []          # (实验, 检查项, 跳过原因)
 
 
 def check(exp: str, name: str, ok: bool, detail: str = "") -> None:
     CHECKS.append((exp, name, bool(ok), detail))
+
+
+def skip(exp: str, name: str, detail: str = "") -> None:
+    """记录一项**无法执行**的检查 —— 输入不存在，不是失败。
+
+    例：刚 clone 下来的仓库没有 raw（75 MB，走 GitHub Release 附件，见 README §六），
+    而「被复核 run 含 5 臂」这类检查的判据只能从 raw 里读出来。
+    此时报 SKIP 而不是 FAIL —— **门禁乱报红比不报红更糟**：
+    面试官照 README 跑一遍不该看到「有未通过项，先修」。
+    """
+    SKIPS.append((exp, name, detail))
 
 
 def load_pool(name: str):
@@ -279,7 +291,10 @@ def smoke_e3(show: int) -> None:
     src = paths.ROOT / "runs" / "c1-5arm-v2" / "raw" / "c1"
     arms = sorted(p.stem for p in src.glob("*.jsonl")) if src.exists() else []
     print(f"  被复核 run：c1-5arm-v2    实际臂 {len(arms)}：{arms}")
-    check(E, "被复核 run 含 5 臂", len(arms) == 5, str(arms))
+    if arms:
+        check(E, "被复核 run 含 5 臂", len(arms) == 5, str(arms))
+    else:
+        skip(E, "被复核 run 含 5 臂", "raw 未下载（走 Release 附件，见 README §六）")
     old = paths.ROOT / "runs" / "c4-full2" / "judge_vs_rule.json"
     if old.exists():
         j = json.loads(old.read_text(encoding="utf-8"))
@@ -461,22 +476,33 @@ def main() -> int:
             print(f"  ★ {k} 抛异常：{type(e).__name__}: {e}")
 
     print(f"\n{'='*92}\n  冒烟确认汇总\n{'='*92}")
-    by = {}
+    by: dict[str, list] = {}
     for exp, name, ok, detail in CHECKS:
         by.setdefault(exp, []).append((name, ok, detail))
+    sk: dict[str, list] = {}
+    for exp, name, detail in SKIPS:
+        sk.setdefault(exp, []).append((name, detail))
+
     total = passn = 0
-    for exp in sorted(by):
-        rows = by[exp]
+    for exp in sorted(set(by) | set(sk)):
+        rows = by.get(exp, [])
         p = sum(1 for _, ok, _ in rows if ok)
         total += len(rows)
         passn += p
-        flag = "✅" if p == len(rows) else "★"
-        print(f"  {flag} {exp}: {p}/{len(rows)} 通过")
+        n_sk = len(sk.get(exp, []))
+        flag = "✅" if (rows and p == len(rows)) else ("--" if not rows else "★")
+        tail = f"，另 {n_sk} 项跳过" if n_sk else ""
+        print(f"  {flag} {exp}: {p}/{len(rows)} 通过{tail}")
         for name, ok, detail in rows:
             if not ok:
                 print(f"       ✗ {name}   {detail}")
+        for name, detail in sk.get(exp, []):
+            print(f"       -- {name}   {detail}")
+
+    n_skip = len(SKIPS)
+    note = f"（跳过 {n_skip} 项：输入未下载，非失败）" if n_skip else ""
     print(f"\n  合计 {passn}/{total} 通过    "
-          f"{'★ 全部通过，可以进入正式跑批' if passn == total else '★ 有未通过项，先修'}")
+          f"{'★ 全部通过，可以进入正式跑批' if passn == total else '★ 有未通过项，先修'}{note}")
     print("  （本脚本未发起任何模型调用）")
     return 0 if passn == total else 1
 
