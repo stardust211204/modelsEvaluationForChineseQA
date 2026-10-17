@@ -114,12 +114,18 @@ rep16 = {
 
 
 def stability(rid, cfg, arm):
-    ts = [t for t in tallies(rid, cfg) if t["arm"] == arm and t["mode"] == "strict"]
-    by = {}
-    for t in ts:
-        by.setdefault(t["instance_id"], []).append(t["answer_index"])
-    same = sum(1 for v in by.values() if len(v) == len(set(v)) and None not in v)
-    return same / len(by) * 100, len(by)
+    """答案全同率。★ 直接复用 `metrics.consistency_c3`，不再在核校脚本里重写口径。
+
+    旧版写的是 `len(v) == len(set(v))` —— 判的是「10 次**全不相同**」，
+    与报告口径（「解出的选项是否每次都一样」）正好相反，且额外要求 None 不出现，
+    导致五个臂一律返回 0.0%、下表五行全报 XX。
+    那是对报告 §3.2 稳定性的**长期误报**，不是报告有错。
+    """
+    c = metrics.consistency_c3(tallies(rid, cfg), arm)
+    rate = c.get("answer_all_same_rate")
+    if rate is None:
+        return float("nan"), c.get("n_answerable", 0)
+    return rate * 100, c["n_answerable"]
 
 
 def flip(rid, cfg, arm, permuted):
@@ -146,8 +152,13 @@ for arm in ARMS:
     s1, n1 = stability("c3-5arm-v2", "c3", arm)
     s2, n2 = stability("ceval-c3-5arm", "c3", arm)
     r = rep16[arm]
-    f1 = "OK" if abs(s1 - r[0]) < 0.05 else "XX"
-    f2 = "OK" if abs(s2 - r[1]) < 0.05 else "XX"
+    # 容差说明：`answer_all_same_rate` 是 4 位小数量化过的（粒度 0.0001 = 0.01pp），
+    # 因此比较容差必须 ≥ 0.05pp，否则会卡在量化边界上误报。
+    # 实例：ds-pro 的 MMLU 真值 75/93 = 80.6451% → 报告取一位小数得 **80.6%**（正确）；
+    #       脚本拿到量化后的 0.8065，×100 = 80.65，与 80.6 相差正好 0.05。
+    TOL = 0.051
+    f1 = "OK" if abs(s1 - r[0]) <= TOL else "XX"
+    f2 = "OK" if abs(s2 - r[1]) <= TOL else "XX"
     print(f"  {SH[arm]:<10}{s1:>11.1f}%{n1:>5}{s2:>13.1f}%{n2:>5}   {r[0]:>5.1f}/{r[1]:<5.1f}  {f1} {f2}")
 
 print()
