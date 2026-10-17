@@ -1,0 +1,27 @@
+% ─────────────────────────────────────────────────────────────────────────────
+%  中文段落格式：首行缩进 + 标题后首段也缩进
+% ─────────────────────────────────────────────────────────────────────────────
+%  为什么需要这个文件
+%    Eisvogel 默认走 KOMA-Script 的 `parskip=half`：**首行不缩进、段间空一行**。
+%    那是西文排版的做法。中文的惯例是「段间不空行、每段首行缩进」。
+%    构建脚本传了 `-V indent=true` 让 Eisvogel **跳过**那段设置，
+%    再由这里把 \parindent 显式定成 1em（10pt 字号下正好是一个汉字宽）。
+%
+%  为什么还要 indentfirst
+%    LaTeX 的 `\@startsection` 默认 `\@afterindentfalse` —— 紧跟标题的
+%    **第一段不缩进**。中文排版要求它也缩进，所以加载 indentfirst
+%    （它做的就是把 \@afterindentfalse 换成 \@afterindenttrue）。
+%    《中文信息学报》等模板同样加载了这个宏包。
+%
+%  ⚠ `@` 在 pandoc 的 header-includes 里不是字母（catcode 12），
+%    所以不在这里直接写 \@afterindenttrue，交给 indentfirst 宏包处理。
+% ─────────────────────────────────────────────────────────────────────────────
+
+\usepackage{indentfirst}
+
+% 用 AtBeginDocument 兜底：确保最终生效的是 1em，
+% 不受宏包加载顺序或 KOMA 默认值的影响。
+\AtBeginDocument{%
+  \setlength{\parindent}{1em}%
+  \setlength{\parskip}{0pt plus 0.5pt}%
+}

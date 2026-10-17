@@ -1,0 +1,46 @@
+% ─────────────────────────────────────────────────────────────────────────────
+%  分级标题字号与字体：一级 12pt 黑体；二、三级 10pt 黑体
+% ─────────────────────────────────────────────────────────────────────────────
+%  依据：CCL 2026 官方中文论文模板（reports/_verify/web/ccl2026_chinese_template/）
+%    一级 \titleformat{\section}      {\normalfont\CJKfamily{zhhei}\bfseries\large}
+%    二级 \titleformat{\subsection}   {\normalfont\CJKfamily{zhhei}\bfseries\normalsize}
+%    三级 \titleformat{\subsubsection}{\normalfont\CJKfamily{zhhei}\bfseries\normalsize}
+%  该模板基于 IEEEtran 10pt：\large = 12pt、\normalsize = 10pt
+%  ⇒ 一级 12pt、二三级 10pt，中文一律黑体。
+%
+%  ⚠ 这里**没有**照抄它的 \bfseries：
+%    黑体本身笔画就重，再叠一层（宋体没有真粗体，只会是假粗）会糊。
+%    CCL 模板之所以加 \bfseries，是因为它没设 BoldFont；
+%    我们直接指定黑体字面更干净。
+%
+%  ★ 关键：xeCJK **没有** \CJKsffamily（那是 ctex 提供的接口）。
+%    在 xeCJK 下要单独把「中文」切到黑体、而不动西文，只能自己声明一个字族：
+%        \setCJKfamilyfont{zhhei}{SimHei}  +  \CJKfamily{zhhei}
+%    这正是 ctex 的 \CJKfamily{zhhei} 背后的机制。
+%    （曾经试过 \sffamily：它会把西文也切成 \sansfont，标题里的「1」「2」
+%      就掉到 Latin Modern Sans 上，与正文的 Times 不一致。）
+%
+%  ⚠ 字体名写死为 SimHei。它**不跟随** build_pdf.py 的 --cjksansfont ——
+%    换标题字体需要同时改本文件这一行。
+%
+%  ★ 为什么用 AtBeginDocument
+%    Eisvogel 把标题样式挂在 KOMA 的 `disposition` 上（模板第 689 行）：
+%        \addtokomafont{disposition}{\normalfont\color{heading-color}\bfseries}
+%    而 pandoc 的 header-includes 插在第 541 行 —— 比它**早**。
+%    放 AtBeginDocument 才能保证在这条之后生效。
+%    KOMA 的字体是「先父元素、后自身」，所以下面的 \normalfont 会**撤掉**
+%    disposition 里的 \bfseries（正是想要的），而 \color 不受影响、标题颜色保留。
+% ─────────────────────────────────────────────────────────────────────────────
+
+% 声明「中文黑体」字族。\CJKfamily 只作用于汉字，西文仍走 \rmfamily（Times）。
+\setCJKfamilyfont{zhhei}{SimHei}
+\providecommand{\heiti}{\CJKfamily{zhhei}}
+
+\AtBeginDocument{%
+  % 一级标题：12pt / 行距 14pt
+  \setkomafont{section}{\normalfont\heiti\fontsize{12}{14}\selectfont}%
+  % 二级标题：10pt / 行距 12pt（与正文同大，靠黑体拉开层次）
+  \setkomafont{subsection}{\normalfont\heiti\fontsize{10}{12}\selectfont}%
+  % 三级标题：同上
+  \setkomafont{subsubsection}{\normalfont\heiti\fontsize{10}{12}\selectfont}%
+}

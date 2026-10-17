@@ -27,30 +27,35 @@ def note(tag, msg):
 
 # ---------- 1. 图片引用 ----------
 img_old = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", old)
-img_new = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", text)
-widths_new = re.findall(r"^\{width=(\d+%)\}$", text, re.M)
+img_new = re.findall(r"!\[[^\]]*\]\(figures/([^)]+)\)", text)
+pairs_new = re.findall(r"!\[[^\]]*\]\(figures/([^)]+)\)\{width=(\d+%)\}", text)
 if not img_new:
-    bad("图", f"润色版丢失了全部 {len(img_old)} 处图片引用，只剩 {len(widths_new)} 个 {{{{width=..%}}}} 占位")
-    missing = sorted(set(img_old))
-    note("图", "原报告引用：" + "、".join(missing))
+    bad("图", f"丢失全部 {len(img_old)} 处图片引用（只剩 {{{{width=..%}}}} 占位）")
+    note("图", "原报告引用：" + "、".join(sorted(set(img_old))))
 else:
-    lost = sorted(set(img_old) - set(img_new))
+    lost = sorted(set(img_old) - {f"figures/{f}" for f in img_new})
     if lost:
         bad("图", "丢失引用：" + "、".join(lost))
+    orphan = re.findall(r"^\{width=\d+%\}$", text, re.M)
+    if orphan:
+        bad("图", f"仍有 {len(orphan)} 处孤立 width 占位（缺图片路径）")
 
-# 图号与 width 顺序比对：润色版按 §5.1 图表索引的顺序给出占位
-new_order = widths_new
-old_w = dict(re.findall(r"\(figures/([^)]+)\)\{width=(\d+%)\}", old))
+# 图号与 width 顺序比对：正文图片顺序应与 §5.1 图表索引一致，且宽度沿用原报告
+new_order = [w for _, w in pairs_new]
+old_w = dict(re.findall(r"figures/([^)]+)\)\{width=(\d+%)\}", old))
 idx = re.findall(r"\| `(\d+_[a-z_]+\.png)` \| §", text)
-if len(idx) == len(new_order):
+if len(idx) != len(img_new):
+    bad("图", f"图表索引 {len(idx)} 行 vs 正文图片 {len(img_new)} 处，数量不符")
+else:
+    if idx != img_new:
+        bad("图", "正文图片顺序与 §5.1 图表索引不一致："
+            + "、".join(f"{a}!={b}" for a, b in zip(idx, img_new) if a != b))
     mismatch = [(f, old_w.get(f), w) for f, w in zip(idx, new_order) if old_w.get(f) != w]
     if mismatch:
         for f, w1, w2 in mismatch:
-            bad("图", f"{f} 宽度原为 {w1}，润色版占位为 {w2}")
-    else:
-        note("图", f"{len(new_order)} 处 width 占位与 §5.1 图表索引的图序、原报告宽度逐一吻合")
-else:
-    bad("图", f"图表索引 {len(idx)} 行 vs 正文 {len(new_order)} 处占位，数量不符")
+            bad("图", f"{f} 宽度原为 {w1}，现为 {w2}")
+    if not mismatch and idx == img_new:
+        note("图", f"{len(img_new)} 处图片引用与 §5.1 图表索引的图序、原报告宽度逐一吻合")
 
 # ---------- 2. 表格结构 ----------
 def split_row(r):

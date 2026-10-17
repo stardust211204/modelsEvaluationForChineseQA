@@ -1,0 +1,127 @@
+% 图 1 · 主评测线 v11 —— 「内容对齐版」
+%
+% 编译：xelatex pipeline_main_v11.tex
+%
+% ★ 相对 v10 的改动：版式不动，只把内容对齐报告
+%   ① 分组框「五条作答路径」→ 一个与 benchmark 同款的小节点「评测 prompt」
+%      （原先列 5 项、实为 9 项，越列越容易与报告 §2.6 的任务表脱节；
+%        改成概括表示后，明细完全交给 §2.6 的表，图上只留主干）
+%   ② 命名对齐报告：v10 的「限制格式作答」→「直接作答」、
+%      「多次作答」→「重复采样」（这两项已随大框一并收起）
+%   ③ 图例补报告里有、图上原先没有的约定：
+%      · 判分分「严格 / 宽松」两个解析口径，判定结果分四类
+%      · OR-Bench 走独立的安全评测线（图 2）
+%
+% ★ 沿用 v9 起的约定（用户已确认）
+%   取消全部「处理」节点，处理过程由**箭头上的标签**承载。
+%   保留的节点只有「数据 / 存储」两类 —— 图上每个方框都是一份真实产物。
+%   `scripts/_verify_pipeline_steps.py` 会逐个核对环节在代码里的落点。
+%
+% ⚠ standalone 里必须同时设 CJK 主字体与 main 主字体，
+%   否则 ①② 这类非 CJK 区的符号会落到 Latin Modern 上缺字形（渲染成空白）。
+
+\documentclass[border=16pt, tikz]{standalone}
+\usepackage{ctex}
+\usetikzlibrary{positioning, arrows.meta, calc}
+
+\setCJKmainfont{Microsoft YaHei}
+% ★ main 也设雅黑：与 build_pdf.py 的 mainfont 一致，
+%   否则非 CJK 区的符号会落到 Latin Modern 上缺字形。
+\setmainfont{Microsoft YaHei}
+
+\definecolor{ncBg}{HTML}{FFFFFF}
+\definecolor{ncFill}{HTML}{F9FAFB}
+\definecolor{ncStroke}{HTML}{E5E7EB}
+\definecolor{ncDivider}{HTML}{D1D5DB}
+\definecolor{ncBlue}{HTML}{3B82F6}
+\definecolor{ncText}{HTML}{111827}
+\definecolor{ncText2}{HTML}{374151}
+\definecolor{ncMuted}{HTML}{9CA3AF}
+\definecolor{ncLabel}{HTML}{6B7280}
+
+\pagecolor{ncBg}
+
+\newcommand{\ncnode}[2]{%
+  \begin{tabular}{@{}c@{}}
+    {\fontsize{6.6}{7.6}\selectfont\color{ncLabel}#2}\\[1.2pt]
+    {\fontsize{9.6}{11.4}\selectfont\color{ncText}#1}
+  \end{tabular}%
+}
+
+\tikzset{
+  node/.style={rectangle, rounded corners=4pt,
+    draw=ncStroke, line width=1pt, fill=ncFill,
+    minimum width=2.72cm, minimum height=1.06cm,
+    inner sep=4pt, align=center},
+  conn/.style={draw=ncBlue, line width=1.1pt,
+    -{Stealth[length=1.7mm, width=1.35mm]}},
+  connp/.style={draw=ncBlue, line width=1.1pt, -},
+  steplab/.style={midway, sloped, fill=ncBg, inner sep=1.9pt,
+    font=\fontsize{7.6}{9.2}\selectfont, text=ncLabel},
+}
+
+\begin{document}
+\begin{tikzpicture}
+
+% =======================================================================
+% 第一行：数据源 →(抽样)→ benchmark →(prompt 生成)→ 评测 prompt
+% =======================================================================
+\node[node] (srcA) at (0,  1.05) {\ncnode{MMLU-ProX}{数据源}};
+\node[node] (srcB) at (0, -1.05) {\ncnode{C-Eval}{数据源}};
+\node[node] (bench) at (5.60, 0) {\ncnode{benchmark}{数据}};
+% ★ 原「评测任务（9 项设置）」分组框收成一个节点：概括表示，
+%   9 项设置的明细见报告 §2.6 的任务表。
+\node[node] (prm) at (11.00, 0) {\ncnode{评测 prompt}{数据}};
+
+\coordinate (m1) at (2.45, 0);
+% 两条汇合线**不带箭头头部** —— 否则同一个汇合点会堆两个箭头
+\draw[connp] (srcA.east) -- (2.45,  1.05) -- (m1);
+\draw[connp] (srcB.east) -- (2.45, -1.05) -- (m1);
+\draw[conn] (m1) -- node[steplab] {抽样} (bench.west);
+
+\draw[conn] (bench.east) -- node[steplab] {prompt 生成} (prm.west);
+
+% =======================================================================
+% 第二行：评测 prompt ─(模型推理)→ raw
+% =======================================================================
+\node[node] (raw) at (6.30, -4.60) {\ncnode{raw}{存储}};
+
+\draw[conn] (prm.south) -- (11.00,-2.60) -- (6.30,-2.60) -- (raw.north);
+% ★ 思考开关是**请求参数**，挂在「模型推理」这一步上（此处按用户要求
+%   只写「模型推理」，思考关闭的约定改由正文与图注承担）。
+\node[fill=ncBg, inner sep=1.9pt, font=\fontsize{7.6}{9.2}\selectfont,
+      text=ncLabel] at (8.65,-2.60) {模型推理};
+
+% =======================================================================
+% 第三行：raw ─┬─(规则判分)→ 判定结果 ─(得出结论)→ 指标
+%              └─(LLM judge 复核)──────────────→ 指标
+% =======================================================================
+\node[node] (dec) at (2.80, -7.60) {\ncnode{判定结果}{存储}};
+\node[node] (met) at (9.80, -7.60) {\ncnode{指标}{存储}};
+
+\draw[conn] (raw.south) -- node[steplab] {规则判分} (dec.north);
+\draw[conn] (raw.south) -- node[steplab] {LLM judge 复核} (met.north);
+\draw[conn] (dec.east)  -- node[steplab] {得出结论} (met.west);
+
+% =======================================================================
+% 图例（只留「主流程 / 节点」两项；原先下面那四行说明文字已按用户要求去掉，
+%        思考开关、判分两口径、四类判定、OR-Bench 的约定改由正文承担）
+% =======================================================================
+% ★ 横线只画到内容右边缘（12.45）—— 画长了它自己就成了最宽的元素，
+%   会把整张 standalone 图撑宽，插进正文后字号被迫缩小。
+\begin{scope}[yshift=-9.90cm]
+  \draw[ncStroke, line width=1pt] (-1.45,0.92) -- (12.45,0.92);
+
+  \draw[-{Stealth[length=1.7mm, width=1.35mm]}, draw=ncBlue, line width=1.1pt]
+        (0,0) -- (0.95,0);
+  \node[font=\fontsize{8.2}{10}\selectfont, text=ncText2, anchor=west]
+       at (1.20,0) {主流程，处理过程标在箭头上};
+
+  \node[node, minimum width=1.55cm, minimum height=0.60cm, inner sep=0pt,
+        rounded corners=3pt] (L2) at (7.10,0) {};
+  \node[font=\fontsize{8.2}{10}\selectfont, text=ncText2, anchor=west]
+       at (8.00,0) {节点（数据 / 存储）};
+\end{scope}
+
+\end{tikzpicture}
+\end{document}

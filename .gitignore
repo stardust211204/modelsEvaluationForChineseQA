@@ -43,3 +43,22 @@ data/_backup_*/
 
 # ---- 已归档的历史批次（不支撑报告结论）----
 archive/
+
+# ---- 排版调研目录里的 LaTeX 编译产物（源文件与预览图要留，这些不留）----
+# 说明：reports/_verify/web/ 存的是各中文期刊的模板原件与编译预览，
+#       它们是我们那套排版参数的证据，所以 .tex/.cls/.png 要进版本库；
+#       但 .aux/.log/.out/.pdf 每次编译都会变，属于噪声。
+reports/_verify/web/**/*.aux
+reports/_verify/web/**/*.log
+reports/_verify/web/**/*.out
+reports/_verify/web/**/*.pdf
+reports/_verify/web/*.aux
+reports/_verify/web/*.log
+reports/_verify/web/*.out
+reports/_verify/web/*.pdf
+
+# ---- 可由脚本重新生成的清单（850 KB，纯目录树 dump）----
+directory_structure.txt
+
+# ---- 报告渲染时散落的单页截图 ----
+reports/*-*_*.jpg

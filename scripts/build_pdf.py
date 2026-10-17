@@ -27,6 +27,27 @@
        与 markdown 里 `![` 的个数比对，不一致会报警。
     * `—`(U+2014) `−`(U+2212) `→`(U+2192) `≤` `≥` `①②` 均正常，可放心用。
 
+★ 三个版式约定（都在本脚本里处理，markdown 不用管）
+    1. **章节编号只有一个来源**。标题里已手写编号（`# 1 评测概述`）的报告，
+       不再传 `--number-sections`，否则会渲染成「1 1 评测概述」。
+       用 `--numbering on|off` 可强制覆盖。
+    2. **目录与正文分页**。`toc-own-page` 让正文另起一页；
+       目录**与摘要同页**（封面 → 摘要 + 目录 → 正文）。不要改成目录单独一页 ——
+       摘要只有几行，单独占一页会显得很空。
+    3. **中文段落格式**：宋体正文 + Times New Roman 西文 + 单倍行距 + 首行缩进 1em。
+       这套参数取自 CCL 2026 官方中文论文模板（调研产物在 `reports/_verify/web/`）。
+    4. **分级标题**：一级 12pt 黑体、二三级 10pt 黑体（同样取自 CCL 模板）。
+       实现在 `latex_headings.tex` —— 注意 **xeCJK 没有 `\CJKsffamily`**
+       （那是 ctex 的接口），要单独切中文必须 `\setCJKfamilyfont` + `\CJKfamily`。
+
+★ 字体为什么要分三个参数传
+    以前 `mainfont` 同时兼作 `CJKmainfont`（都用微软雅黑），中文靠它兜底。
+    西文换成 Times New Roman 之后，**中文字体必须单独指定** ——
+    否则中文会落到 Times 上，而 Times 没有汉字字形，整篇中文会**静默渲染成空白**
+    （xelatex 只在 log 里报 `Missing character`，不报错）。
+    同理 `CJKmonofont` 必须设：行内代码走 monofont（Consolas），
+    Consolas 没有汉字字形，代码里的中文会变空白。
+
 用法
     .venv\\Scripts\\python.exe scripts\\build_pdf.py
     .venv\\Scripts\\python.exe scripts\\build_pdf.py --src reports/report_external_helm.md
@@ -79,7 +100,7 @@ VSPACE = [
     # ★ 必须设 lang=zh-CN，否则图注前缀是英文 "Figure"；设了才是「图」
     "-V", "lang=zh-CN",
     "-V", "fontsize=10pt",
-    "-V", "linestretch=1.15",
+    # 行距改由 --linestretch 传（默认单倍），不再写死在这里
     "-V", "colorlinks=true",
     "-V", "linkcolor=NavyBlue",
     "-V", "urlcolor=NavyBlue",
@@ -125,8 +146,16 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Markdown 报告 -> PDF（Eisvogel）")
     ap.add_argument("--src", default="reports/report_external_helm.md")
     ap.add_argument("--out", default=None)
-    ap.add_argument("--mainfont", default="Microsoft YaHei")
-    ap.add_argument("--monofont", default="Consolas")
+    ap.add_argument("--mainfont", default="Times New Roman",
+                    help="西文正文字体")
+    ap.add_argument("--monofont", default="Consolas", help="西文等宽（行内代码）")
+    ap.add_argument("--cjkfont", default="SimSun", help="中文正文（宋体）")
+    ap.add_argument("--cjksansfont", default="SimHei",
+                    help="中文无衬线（黑体）。CJK 的粗体没有独立字面时会回退到它")
+    ap.add_argument("--cjkmonofont", default="SimSun",
+                    help="行内代码里的中文。**必须设**，否则该处中文渲染成空白")
+    ap.add_argument("--linestretch", default="1",
+                    help="行距倍率，1 = 单倍（中文会议论文常规值）")
     ap.add_argument("--author", default="", help="封面与页脚作者；留空则不显示")
     ap.add_argument("--date", default="", help="封面日期；留空则用 pandoc 默认")
     ap.add_argument("--cover-background", default=COVER_BACKGROUND,
@@ -136,6 +165,9 @@ def main() -> int:
     ap.add_argument("--page-background-opacity", default=PAGE_BACKGROUND_OPACITY,
                     help="内页背景不透明度；满不透明度会压掉正文可读性")
     ap.add_argument("--no-toc", action="store_true")
+    ap.add_argument("--numbering", choices=("auto", "on", "off"), default="auto",
+                    help="章节编号来源。auto（默认）：标题里已手写编号就不再加自动编号；"
+                         "on：强制 LaTeX 自动编号；off：强制沿用标题里的编号")
     args = ap.parse_args()
 
     src = paths.ROOT / args.src
@@ -160,6 +192,17 @@ def main() -> int:
             print(f"          {h}")
         print("         建议替换为文字表述。")
 
+    # ★ 章节编号只能有一个来源。
+    #   report_external_helm.md 的标题不带编号，靠 LaTeX 自动编号；
+    #   report_external_helm_polished.md 的标题**自带**编号（`# 1 评测概述`）。
+    #   两种都传 --number-sections 会渲染成「1 1 评测概述」。这里按标题自动判定。
+    h1 = re.search(r"^#\s+(.+)$", md, re.M)
+    manual_num = bool(h1 and re.match(r"^\d+(?:\.\d+)*[\s.、]", h1.group(1)))
+    if args.numbering == "auto":
+        number_sections = not manual_num
+    else:
+        number_sections = args.numbering == "on"
+
     cmd = [
         "pandoc", str(src), "-o", str(out),
         "--template", str(TEMPLATE),
@@ -167,12 +210,25 @@ def main() -> int:
         "--resource-path", str(paths.ROOT),
         "-V", f"mainfont={args.mainfont}",
         "-V", f"monofont={args.monofont}",
-        "-V", f"CJKmainfont={args.mainfont}",
+        # ★ 中文字体分三档传。以前 mainfont 同时兼作 CJKmainfont（都用雅黑），
+        #   现在西文换成 Times New Roman，就必须单独指定中文，
+        #   否则中文会落到 Times 上 → 整篇缺字。
+        "-V", f"CJKmainfont={args.cjkfont}",
+        "-V", f"CJKsansfont={args.cjksansfont}",
+        "-V", f"CJKmonofont={args.cjkmonofont}",
+        # ★ 首行缩进：Eisvogel 默认走 `\KOMAoptions{parskip=half}`（首行不缩进、
+        #   段间空行）。传 indent=true 会让它**跳过**那段设置，改由
+        #   latex_indentfirst.tex 显式定成 1em。
+        "-V", "indent=true",
+        "-H", str(_SCRIPTS / "latex_indentfirst.tex"),
+        # ★ 分级标题：一级 12pt 黑体、二三级 10pt 黑体（依据 CCL 2026 中文模板）
+        "-H", str(_SCRIPTS / "latex_headings.tex"),
+        "-V", f"linestretch={args.linestretch}",
         "-V", "titlepage=true",
         "-V", f"title={pick_title(md)}",
-        # ★ 章节编号交给 LaTeX。markdown 里**不要**再手写编号
-        #   （写了会变成「1 1 评测概述」）。
-        "--number-sections",
+        # ★ 章节编号交给 LaTeX，但**仅在报告标题没手写编号时**。
+        #   手写了再传这个参数会变成「1 1 评测概述」，见上面的 manual_num 判定。
+        *(["--number-sections"] if number_sections else []),
         *VSPACE,
     ]
     bg = Path(args.cover_background)
@@ -196,12 +252,18 @@ def main() -> int:
     if args.date:
         cmd += ["-V", f"date={args.date}"]
     if not args.no_toc:
-        cmd += ["--toc", "-V", "toc-title=目录", "--toc-depth=2"]
+        cmd += ["--toc", "-V", "toc-title=目录", "--toc-depth=2",
+                # ★ 目录与正文分页（但**与摘要同页**）：
+                #   Eisvogel 的 toc-own-page 在 \tableofcontents 之后插 \newpage，
+                #   正文因此另起一页；目录本身不另起页，紧跟摘要。
+                "-V", "toc-own-page=true"]
 
     print("=" * 78)
     print("  构建 PDF（Eisvogel）")
     print("=" * 78)
     print(f"  源   : {src.relative_to(paths.ROOT)}  ({len(md):,} 字符)")
+    print(f"  编号 : {'LaTeX 自动编号（标题未手写）' if number_sections else '沿用标题里的手写编号'}"
+          f"{'  [--numbering 强制]' if args.numbering != 'auto' else ''}")
     r = subprocess.run(cmd, cwd=paths.ROOT, capture_output=True, text=True, encoding="utf-8")
 
     warn = [l for l in (r.stderr or "").splitlines() if "Missing character" in l]
