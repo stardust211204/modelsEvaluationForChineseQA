@@ -11,7 +11,7 @@
 
 ## 一、这个项目在做什么
 
-不是"再跑一遍榜单"，而是回答四个榜单不会回答的问题：
+**以准确性评测为载体，把「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」这条评测工程闭环完整走一遍**（定位见 [`docs/design.md`](docs/design.md)）。准确性是载体，闭环是目的 —— 所以本项目不是"再跑一遍榜单"，而是回答四个榜单不会回答的问题：
 
 1. **判分口径本身会改变结论多少？** 同一批 680 条作答，严格口径 **0 条可判**（准确率没有定义，不是 0%），宽松口径恢复到 **40.6%（B 组）～93.4%（C 组）**。
 2. **规则判分可信吗？** 五个模型各 150 条独立 judge 复核，一致率 99.3–100%、κ 0.986–1.000。
@@ -209,14 +209,14 @@ Copy-Item .env.example .env    # 填入真实 key
 
 ### 踩过的坑（挑几个贵的）
 
-| 坑 | 现象 | 应对 |
-|---|---|---|
-| **空 `content` 静默失败** | 推理模型把预算烧在 reasoning 上，`content` 为空串，**而 HTTP 状态是 200** | `max_tokens≥1024`；读 reasoning；`finish_reason=='length'` 归 `truncated` 而非 `invalid` |
-| **judge 思考未关 = 选择性偏差**<br>（三臂期 C4 首轮） | judge 隐藏思考吃光预算，41/450（9.1%）条判不出，**且失败集中在规则判错的题上** → 一致率被高估 | 判分前显式关闭 judge 思考（`reasoning_effort: "none"`），并记录到 manifest；`_check_judge_verdicts.py` 可复核 |
-| **翻转率不能相除** | 两侧观测次数不同（4 次 vs 10 次），比值被系统性低估 | 改用**逐对不一致率**（与观测次数无关） |
-| **C-Eval 选项重排也是乱序的** | 不还原坐标系就跨参照系比较，得到 67–76% 的假值、比值虚高到 12.7–58.4 | 还原到原题坐标系再比（正确值 10.7–30.3%） |
-| **示例示范的格式压倒正文指令**<br>（三臂期 C5 首轮） | 示例写 `答案：X` → 模型输出长篇推理 → 严格口径 393/450 判不出，配对差被伪造成 +11.9~+17.3pp | 示例必须示范**目标输出格式本身** |
-| **厂商私有参数必须走 `extra_body`** | 直传 kwarg 在**本地**抛 `TypeError`，错误信息像网络问题 | 标准参数走 kwargs、私有参数走 `extra_body` |
+| 坑 | 现象 | 应对 | 固化为 |
+|---|---|---|---|
+| **空 `content` 静默失败** | 推理模型把预算烧在 reasoning 上，`content` 为空串，**而 HTTP 状态是 200** | `max_tokens≥1024`；读 reasoning；`finish_reason=='length'` 归 `truncated` 而非 `invalid` | `tests/test_truncation_bias.py`（偏倚区间）· `tests/test_tally.py` |
+| **judge 思考未关 = 选择性偏差**<br>（三臂期 C4 首轮） | judge 隐藏思考吃光预算，41/450（9.1%）条判不出，**且失败集中在规则判错的题上** → 一致率被高估 | 判分前显式关闭 judge 思考（`reasoning_effort: "none"`），并记录到 manifest | `scripts/_check_judge_verdicts.py`（可复核） |
+| **翻转率不能相除** | 两侧观测次数不同（4 次 vs 10 次），比值被系统性低估 | 改用**逐对不一致率**（与观测次数无关） | `tests/test_consistency.py` · `scripts/_ratio_pairwise.py` |
+| **C-Eval 选项重排也是乱序的** | 不还原坐标系就跨参照系比较，得到 67–76% 的假值、比值虚高到 12.7–58.4 | 还原到原题坐标系再比（正确值 10.7–30.3%） | `tests/test_position_refusal.py` |
+| **示例示范的格式压倒正文指令**<br>（三臂期 C5 首轮） | 示例写 `答案：X` → 模型输出长篇推理 → 严格口径 393/450 判不出，配对差被伪造成 +11.9~+17.3pp | 示例必须示范**目标输出格式本身** | `tests/test_prompt_letters.py` · `adapt.prompt_fingerprint()` 守卫（改模板即拒跑） |
+| **厂商私有参数必须走 `extra_body`** | 直传 kwarg 在**本地**抛 `TypeError`，错误信息像网络问题 | 标准参数走 kwargs、私有参数走 `extra_body` | `tests/test_client_params.py` |
 
 ---
 
@@ -258,10 +258,9 @@ PDF 走 `build_pdf.py`（pandoc + xelatex + Eisvogel），排版参数取自 **C
 - [x] 报告排版对齐 CCL 2026 中文模板；管线图重绘
 - [x] `ci_gate` PASS 203 / FAIL 1（longcat 连接，非口径问题）· 报告一致性 27/27
 
-**待办 / 已知未修**
+**已知局限**
 
-- [ ] 精简版报告的 11 条口径与自洽问题（见 `polished_report_review.md` B/C 组），其中两条是原稿里防「把估计当结论」与「表图打架」的提醒被删
-- [ ] 安全线管线图两处过时（图例引用的 12% 已不在正文；未标四类判据）
-- [ ] `manifest.params_effective` 有 13 处与实际请求参数不符（3 处在权威批次上）。**报告结论不受影响**（raw 记录是对的），但该字段不能单独作证据 —— 见 [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) §4.6
-- [ ] badcase 人工回填（104 条；先报 κ 再报分布）
-- [ ] 全部改动尚未 git 提交
+- **badcase 归因停在候选池。** 归因脚本已跑通并产出 100 条复核清单，但 `confirmed_attribution` 字段需人工回填（104 条错题），回填后重跑才产生可用分布。这是上述闭环里唯一没有走完的一环，卡点在人工标注成本。
+- `manifest.params_effective` 有 13 处与实际请求参数不符（3 处在权威批次上）。**报告结论不受影响** —— raw 记录才是真值，问题字段不能单独作证据。见 [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) §4.6。
+- 对外报告仍有若干口径与呈现细节待修，已逐条登记（含 2 条经复核确认**并非**报告错误）。见 [`reports/polished_report_review.md`](reports/polished_report_review.md)。
+- 完整局限见 [`docs/limitations.md`](docs/limitations.md)。
