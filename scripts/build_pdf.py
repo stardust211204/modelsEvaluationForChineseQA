@@ -50,8 +50,11 @@
 
 用法
     .venv\\Scripts\\python.exe scripts\\build_pdf.py
-    .venv\\Scripts\\python.exe scripts\\build_pdf.py --src reports/report_external_helm.md
+    .venv\\Scripts\\python.exe scripts\\build_pdf.py --src reports/_archive/report_external_helm_full.md
     .venv\\Scripts\\python.exe scripts\\build_pdf.py --author "某某" --date "2026-10-05"
+
+默认源是精简版 `reports/report_external_helm_polished.md` —— 它自 2026-10-17 起是
+**唯一权威对外报告**；完整版已冻结归档到 `reports/_archive/`，需要时用 --src 显式指定。
 """
 
 from __future__ import annotations
@@ -144,7 +147,7 @@ def count_captions(pdf: Path) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Markdown 报告 -> PDF（Eisvogel）")
-    ap.add_argument("--src", default="reports/report_external_helm.md")
+    ap.add_argument("--src", default="reports/report_external_helm_polished.md")
     ap.add_argument("--out", default=None)
     ap.add_argument("--mainfont", default="Times New Roman",
                     help="西文正文字体")
@@ -193,8 +196,8 @@ def main() -> int:
         print("         建议替换为文字表述。")
 
     # ★ 章节编号只能有一个来源。
-    #   report_external_helm.md 的标题不带编号，靠 LaTeX 自动编号；
-    #   report_external_helm_polished.md 的标题**自带**编号（`# 1 评测概述`）。
+    #   完整版（现归档于 _archive/report_external_helm_full.md）的标题不带编号，
+    #   靠 LaTeX 自动编号；精简版（现为唯一权威报告）的标题**自带**编号（`# 1 评测概述`）。
     #   两种都传 --number-sections 会渲染成「1 1 评测概述」。这里按标题自动判定。
     h1 = re.search(r"^#\s+(.+)$", md, re.M)
     manual_num = bool(h1 and re.match(r"^\d+(?:\.\d+)*[\s.、]", h1.group(1)))

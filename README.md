@@ -55,7 +55,7 @@ scripts/            入口、实验仪器与核校工具（~170 个）
   ci_gate.py          回归门禁（题集 / 参数 / 口径冻结）
   exp_smoke.py        实验冒烟（124 项）
   _check_external_report.py / _check_polished_report.py   报告一致性自检
-  _ratio_pairwise.py  逐对不一致率（§3.4 的主口径）
+  _ratio_pairwise.py  逐对不一致率（§4.3 的主口径）
   _verify_*.py        逐表逐格复算（见溯源文档 §4）
 
 configs/            arms.yaml（五臂 + 各自生效参数）· matrix.yaml（配置矩阵）· exclusions.json
