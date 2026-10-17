@@ -2,15 +2,15 @@
 
 大模型**中文问答能力**的评测工程实践：以 HELM 的「场景 × 适配 × 指标」三元组为口径字典，自建轻量双管线框架，把「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」这条闭环完整走一遍。
 
-> **一句话定位**：**准确性是载体，评测闭环是目的** —— 本项目侧重回答四个公开榜单较少涉及的问题（见 §一）。
+> **一句话定位**：**准确性是载体，评测闭环是目的** —— 本项目侧重回答四个公开榜单较少涉及的方法学问题（见 §一）。
 > **读结论前先读** [`docs/limitations.md`](docs/limitations.md)。
-> **数字不手抄**：报告里每个数字都在 [`reports/report_data_provenance.md`](reports/report_data_provenance.md) 登记了来源与复算命令。
+> **报告数字均可溯源**：每个数字都在 [`reports/report_data_provenance.md`](reports/report_data_provenance.md) 登记了来源与复算命令。
 
 ---
 
-## 一、项目定位与成果物看板
+## 一、项目定位与成果物
 
-### 四个榜单不会回答的问题
+### 四个方法学问题
 
 1. **判分口径本身会改变结论多少？** 同一批 680 条作答，严格口径 **0 条可判**（准确率**没有定义**，不可读作 0%），宽松口径恢复到 **40.6%（B 组）～93.4%（C 组）**。
 2. **规则判分可信吗？** 五个模型各 150 条独立 judge 复核，一致率 99.3–100%、κ 0.986–1.000，未见同厂偏好。
@@ -27,23 +27,29 @@
 | **调用总量** | **53,379 次**（成功 53,291，失败 88），**37 个权威批次**（全库 85 批次 / 77,512 次） |
 | **口径** | 准确率 = `correct ÷ (correct + wrong)`；`invalid` / `truncated` 不进分母、单独报告 |
 
-### 成果物看板
+### 成果物索引
 
-| 我想看… | 去哪 |
+| 文件 | 内容 |
 |---|---|
-| **评测本身做得怎么样** | [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md) —— **唯一权威对外报告**（6 章 / 26 表 / 14 图 / 24 页 PDF） |
-| **工程是怎么建的** | 本文件 §二 排障闭环 · §三 系统架构 · §四 质量防线 |
-| **数字是真的吗** | [`reports/report_data_provenance.md`](reports/report_data_provenance.md) + `runs/*/tallies/`（判分台账**已入库**，clone 后可直接复算） |
-| **批次怎么管的** | [`reports/RUN_AUDIT.md`](reports/RUN_AUDIT.md)（全库 85 批次分 A–F 六类）· [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md)（37 权威批次选用 + 数据可用性核查） |
-| **踩过什么坑** | 本文件 §二 · [`docs/open_issues.md`](docs/open_issues.md) |
-| **还差什么** | 本文件 §五 已知局限 · [`docs/limitations.md`](docs/limitations.md) |
-| **完整版报告** | `reports/_archive/report_external_helm_full.md`（35 表，含全部明细与推导；已冻结归档，仅供技术参考） |
+| [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（及同名 PDF） | **对外评测报告 —— 唯一权威版**，6 章 / 26 表 / 14 图 |
+| [`reports/report_data_provenance.md`](reports/report_data_provenance.md) | 数据溯源清单：报告全部数字的来源与复算命令 |
+| [`reports/RUN_AUDIT.md`](reports/RUN_AUDIT.md) · [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) | 批次台账：全库 85 批次分类 · 37 个权威批次与数据可用性核查 |
+| [`docs/design.md`](docs/design.md) | 评测方案设计，含对 HELM 判分契约的三处修正 |
+| [`docs/param_matrix.md`](docs/param_matrix.md) | 逐臂参数探测矩阵 |
+| [`docs/badcase_method.md`](docs/badcase_method.md) | badcase 归因方法（含未完成部分与执行状态） |
+| [`docs/open_issues.md`](docs/open_issues.md) | 缺陷清单与修复记录 |
+| [`docs/limitations.md`](docs/limitations.md) | 局限必读 |
+| `reports/exp_*.md` | 专项实验报告（思考开关 / 选项标签替换 / judge 复核 / 5-shot / 作答格式递进） |
+| 本文件 §二 · §三 · §四 | 工程侧：六类失真与对应防线 · 系统架构 · 四道自动化质量防线 |
+| `reports/_archive/report_external_helm_full.md` | 完整版报告（35 表，已冻结归档，仅供技术参考） |
+
+> 时间有限时，建议的阅读顺序为：**对外报告 → 本文件 §二（六类失真与防线）→ [`docs/limitations.md`](docs/limitations.md)**。
 
 ---
 
 ## 二、六大评测陷阱与排障闭环
 
-这一节是整个项目的**技术核心**：下面六类失真都是真实发生过的，每一类都配有「怎么发现的 → 怎么修 → 固化成哪条防线」。
+本节记录六类实际发生过的失真，以及各自的发现方式、处理办法与固化成的防线。
 
 | # | 陷阱 | 现象与实测影响 | 应对 | 固化为 |
 |---|---|---|---|---|
@@ -63,14 +69,14 @@
 ### 与 HELM 的关系
 
 HELM 已于 2026-06-01 进入 maintenance mode，且其前提（开放权重 + logprob 打分）在封闭 API 环境不成立。
-**该抄的**：分层架构、数据契约、截断与错误单列、污染显式声明。
-**不能抄的**：logprob 打分路径、16 场景套件、多客户端抽象层、前端。
+**本项目采用**：分层架构、数据契约、截断与错误单列、污染显式声明。
+**本项目未采用**：logprob 打分路径、16 场景套件、多客户端抽象层、前端。
 
 **三处修正**（`docs/design.md`）：
 
 | 维度 | HELM | 本项目 | 理由 |
 |---|---|---|---|
-| 解析失败 | 并入错误，计为答错 | **独立 `invalid` 档**，不计入准确率分母 | 否则我们在测量一个被自己污染的量 |
+| 解析失败 | 并入错误，计为答错 | **独立 `invalid` 档**，不计入准确率分母 | 否则会把判分口径自身的问题计入模型表现 |
 | 生成截断 | 单独记录，**但仍计入准确率** | **独立 `truncated` 档**，不计入分母 | 推理模型把预算烧在思考上是常态；把"预算设小了"记成"模型答错"是错误的归因 |
 | 多正确答案 | 原生支持 | **同样支持** `gold_indices: list[int]` | 否定式提问可能有争议答案，数据结构预留 |
 
@@ -88,13 +94,13 @@ src/meval/
   exclusions.py  题集剔除清单（42 题，带指纹）
 ```
 
-**越界即为 bug —— 五条不可违反的纪律**：
+**各层职责边界（越界即为缺陷）—— 五条纪律**：
 
 1. **`execute` 层不解读模型输出。** 判分逻辑出现在这一层即为 bug。
 2. **`tally` 层不发起任何模型调用。** 必须能对同一批 raw 反复重跑。
 3. **few-shot 示例只能取自 `valid` split。** 取自 `test` 即数据泄漏。
 4. **准确率只能有一个分母。** 分母是 `correct + wrong`，实现只允许有一份：`metrics.tier_accounting()`。
-   历史上跑批日志自己算过 `correct / 全部`，于是同一批数据出现两套准确率 —— **两套分母共存比任何一个错值都危险**。
+   历史上跑批日志自己算过 `correct / 全部`，于是同一批数据出现两套准确率 —— **两套分母共存比单个错值更难发现**。
 5. **统一题集规则**：截断率高时必须剔除「任一模型没做完」的题，且**在所有模型上剔同一批**。
 
 ### 核心工程决策：`raw` 与 `tally` 分离
@@ -105,7 +111,7 @@ runs/{run_id}/raw/{config}/{arm}.jsonl      # 不可变：PromptSpec + ModelResu
 runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，报告全部指标由它算出）
 ```
 
-8 天窗口里最可能返工的是**判分逻辑**（解析阶梯、档位边界）。分离后改判分规则**不需要重跑 API** ——
+最可能返工的是**判分逻辑**（解析阶梯、档位边界）。分离后改判分规则**不需要重跑 API** ——
 项目期间判分口径改过多次，**一次 API 都没重跑**；返工成本从小时级降到秒级。
 
 ---
@@ -114,7 +120,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 按测试生命周期排列。**四道防线都是跑批流程中的实际环节，各有对应脚本与失败记录。**
 
-### 防线 1 · 跑批前探针（Peak / Probe）
+### 防线 1 · 跑批前探针
 
 | 脚本 | 查什么 |
 |---|---|
@@ -144,7 +150,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | `scripts/exp_smoke.py` | **124 项**补充实验冒烟，**124/124** |
 
 > 那 1 项 FAIL 是 `longcat` 的**上游连接失败**（间歇性路由缺陷，客户端无法修复），与口径无关。
-> 这里如实写「210 项，PASS 203 / FAIL 1」：**门禁的价值在于它敢报红**。
+> 这里如实写「210 项，PASS 203 / FAIL 1」：**门禁的意义在于它报告真实状态，而不是只显示通过项**。
 
 ### 防线 4 · 报告逐格自检
 
@@ -155,7 +161,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | `scripts/_check_render_safe.py` | 反引号内含 CJK、字体缺失符号、代码块含中文 —— 这些在 PDF 里**静默渲染成空白，不报错** |
 | `scripts/report_metrics.py` | 从 `tallies/` 逐格重算报告正文与表格数字 |
 
-配合 [`reports/report_data_provenance.md`](reports/report_data_provenance.md)（35 表 / 14 图 / 52 处正文数字的来源与复算命令），做到**报告里没有一个手抄数字**。
+配合 [`reports/report_data_provenance.md`](reports/report_data_provenance.md)（35 表 / 14 图 / 52 处正文数字的来源与复算命令），**报告中的数字均可逐格复算**。
 
 ---
 
@@ -176,7 +182,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 ### 六条核心发现
 
 1. **判分口径的作用是让作答从不可判定变为可判定。** 同一模型、同一批题，只换口径就从「无法评分」变成「可以评分」（严格口径 0 条可判 → 宽松口径 40.6%~93.4%）。
-2. **强格式约束本身有代价，量级 13.8–29.1pp**（配对显著）；机制在于强约束**拿掉了草稿纸与作答空间**（直接作答平均输出 1.0–12.8 token，自由作答 200–962 token）。
+2. **强格式约束本身有代价，量级 13.8–29.1pp**（配对显著）；机制在于强约束**压缩了模型写出中间推理过程的空间**（直接作答平均输出 1.0–12.8 token，自由作答 200–962 token）。
 3. **参数被忽略 ≠ 输出可复现。** 探针实测三个臂的温度**全部被忽略**，但同题 10 次仍有模型只有 **28.0%** 的题答案全同。⇒「固定温度 = 可复现」不成立；单次评测自带重复噪声，而这条信息**只有重复采样能量化**。
 4. **思考开关是效应最大的单一变量**，且会改变排名。任何跨模型对比都必须声明思考状态。
 5. **单一总分不足以区分这五个模型。** 前三名差距低于判定阈值、两集排序相反；而分领域、稳定性、安全三个维度上差异显著。
@@ -238,7 +244,7 @@ Copy-Item .env.example .env    # 填入真实 key
 >
 > 判据是**全局**的：只要有一个 `runs/*/raw` 存在，就按完整工作区标准判 ——
 > 此时某个批次缺 raw 是**真事故**，照报 FAIL。要拿到完整读数，
-> 下载 Release 里的 raw 包解压到仓库根即可（见 [`docs/reports-fix.md`](docs/reports-fix.md) §10.4）。
+> 把 Release 里的 raw 包解压到仓库根（保持 `runs/{run_id}/raw/...` 结构）即可。
 
 **小样本走完整条管线**：`.\run_all.ps1`（末步即门禁）。
 
@@ -248,7 +254,7 @@ Copy-Item .env.example .env    # 填入真实 key
 
 ```
 src/meval/       五层管线本体（见 §三）
-scripts/         入口、实验仪器与核校工具（~190 个）
+scripts/         入口、实验与分析脚本、核校工具（~190 个）
 configs/         arms.yaml（五臂 + 各自生效参数）· matrix.yaml · exclusions.json
 data/            eval_set.jsonl · ceval_set.jsonl · orbench_set.jsonl · frozen.json
 prompts/         c1_strict / c2_free / c5_fewshot / e2_labelshuffle / e6_* / judge_*
