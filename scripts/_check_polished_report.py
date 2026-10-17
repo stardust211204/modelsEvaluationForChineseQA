@@ -28,18 +28,24 @@ def note(tag, msg):
 
 # ---------- 1. 图片引用 ----------
 # ★ 图片路径的写法有两种，本脚本必须都认（2026-10-17 起）：
-#   报告里写 `../figures/x.png` —— 这是给 **GitHub 预览**用的，它按文件所在目录解析；
-#   pandoc 从仓库根跑，靠 build_pdf.py 的 --resource-path 折回来。
-#   完整版（对照用的 old）仍是旧的 `figures/x.png` 写法，故只在正文侧放行 `../` 前缀。
-IMG_RE = r"!\[[^\]]*\]\((?:\.\./)?figures/([^)]+)\)"
-img_old = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", old)
+#   报告里写 `../figures/x.png`（归档件写 `../../figures/x.png`）—— 这是给
+#   **GitHub 预览**用的，它按文件所在目录解析；pandoc 从仓库根跑，
+#   靠 build_pdf.py 的 --resource-path 折回来。
+#   早期写的 `figures/x.png` 在 pandoc 下也能过，但 GitHub 上整页裂图。
+#   ⇒ 比较时**只按文件名归一**，不看前缀 —— 前缀差异是刻意的，不是错误。
+def _base(p: str) -> str:
+    return p.rsplit("/", 1)[-1]
+
+
+IMG_RE = r"!\[[^\]]*\]\((?:\.\./)*figures/([^)]+)\)"
+img_old = [_base(p) for p in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", old)]
 img_new = re.findall(IMG_RE, text)
 pairs_new = re.findall(IMG_RE[:-1] + r"\{width=(\d+%)\}", text)
 if not img_new:
     bad("图", f"丢失全部 {len(img_old)} 处图片引用（只剩 {{{{width=..%}}}} 占位）")
     note("图", "原报告引用：" + "、".join(sorted(set(img_old))))
 else:
-    lost = sorted(set(img_old) - {f"figures/{f}" for f in img_new})
+    lost = sorted(set(img_old) - set(img_new))
     if lost:
         bad("图", "丢失引用：" + "、".join(lost))
     orphan = re.findall(r"^\{width=\d+%\}$", text, re.M)
