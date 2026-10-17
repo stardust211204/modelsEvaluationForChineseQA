@@ -1,0 +1,31 @@
+{
+  "run_id": "sb-c1-ceval",
+  "configs": [
+    "c1"
+  ],
+  "arms": [
+    "space-bunny-free"
+  ],
+  "params_effective": {
+    "space-bunny-free": {
+      "max_tokens": 4096,
+      "temperature": 0.1,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  },
+  "data_hash": "bda88b1f9e8d1f5b",
+  "prompt_fingerprints": {
+    "c1": "27457ff240008273"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "space-bunny-free"
+  ],
+  "started_at": "2026-10-05T09:10:54.700919+00:00",
+  "finished_at": "2026-10-05T09:44:34.251515+00:00",
+  "note": "基线｜强格式约束 + 0-shot + 关思考",
+  "dataset": "ceval_set"
+}

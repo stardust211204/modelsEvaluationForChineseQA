@@ -1,0 +1,43 @@
+从 runs/ 归档的批次（不支撑报告结论）
+归档时间：2026-10-08 18:08
+
+[C] badcase-judge            项目内部质检
+[C] badcase-judge-pilot      项目内部质检
+[C] badcase-judge2           项目内部质检
+[D] c1-4arm                  早期批次，已被 v2/v3 取代
+[D] c1-pilot                 早期批次，已被 v2/v3 取代
+[D] c1-pilot2                早期批次，已被 v2/v3 取代
+[D] c2-full                  早期批次，已被 v2/v3 取代
+[D] c2-full-hi               早期批次，已被 v2/v3 取代
+[D] c2-full-hi-qwen          早期批次，已被 v2/v3 取代
+[D] c2-full-qwen             早期批次，已被 v2/v3 取代
+[E] c2-qwen-smoke            管线连通性测试
+[D] c3-full                  早期批次，已被 v2/v3 取代
+[D] c3-full-qwen             早期批次，已被 v2/v3 取代
+[D] c4-pilot                 早期批次，已被 v2/v3 取代
+[D] c4-pilot2                早期批次，已被 v2/v3 取代
+[D] c5-5arm-v2               早期批次，已被 v2/v3 取代
+[D] c5-full                  早期批次，已被 v2/v3 取代
+[D] c5-full2                 早期批次，已被 v2/v3 取代
+[D] c5-full2-qwen            早期批次，已被 v2/v3 取代
+[D] c5b-5arm                 早期批次，已被 v2/v3 取代
+[D] c6-full                  早期批次，已被 v2/v3 取代
+[D] c6-full-qwen             早期批次，已被 v2/v3 取代
+[F] c7-full                  C7 早期试跑，无 manifest，被 orbench-* 取代
+[F] c7-full2                 同上
+[F] c7-full3                 自建中文拒答题（300 条），两侧全饱和，改投 OR-Bench
+[F] c7-judge                 自建题集的 judge 判定，随题集一起作废
+[F] c7-judge2                同上
+[D] ceval-c1-4arm            早期批次，已被 v2/v3 取代
+[D] ceval-c5-5arm            早期批次，已被 v2/v3 取代
+[E] ceval-smoke              管线连通性测试
+[C] gold-audit               项目内部质检
+[F] orbench-judge            试水的 judge 判定，作废
+[F] orbench-pilot            OR-Bench 100 条试水，正式批次后作废
+[E] pipe-smoke               管线连通性测试
+[F] sb-c2hi-ceval            限额模型的自由作答（C-Eval），报告未采用
+[F] sb-c2hi-eval             限额模型的自由作答（MMLU-ProX），报告未采用
+[F] sb-c3-eval               限额模型的稳定性，无 manifest、记录不完整（184/1000）
+[E] sb-smoke                 管线连通性测试
+[E] smoke-fp2                管线连通性测试
+[E] v4pro-smoke              管线连通性测试

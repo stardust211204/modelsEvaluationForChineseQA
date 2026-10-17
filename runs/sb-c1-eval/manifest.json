@@ -1,0 +1,31 @@
+{
+  "run_id": "sb-c1-eval",
+  "configs": [
+    "c1"
+  ],
+  "arms": [
+    "space-bunny-free"
+  ],
+  "params_effective": {
+    "space-bunny-free": {
+      "max_tokens": 4096,
+      "temperature": 0.1,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c1": "2c22fbc0b667a70f"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "space-bunny-free"
+  ],
+  "started_at": "2026-10-05T08:16:03.123236+00:00",
+  "finished_at": "2026-10-05T09:10:52.392472+00:00",
+  "note": "基线｜强格式约束 + 0-shot + 关思考",
+  "dataset": "eval_set"
+}

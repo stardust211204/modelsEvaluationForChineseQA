@@ -1,0 +1,41 @@
+{
+  "judge_model": "deepseek-v4-pro",
+  "n_audited": 61,
+  "distribution": {
+    "无": 56,
+    "D3": 3,
+    "D2": 2
+  },
+  "flagged": [
+    {
+      "instance_id": "prox-zh-516",
+      "defect": "D3",
+      "reason": "依据：1 μF 电容在角频率 100、1000、10000 rad/s 时的容抗应为 10000 Ω、1000 Ω、100 Ω，对应选项 J，而不是 C。",
+      "program_detected_dup": false
+    },
+    {
+      "instance_id": "prox-zh-183",
+      "defect": "D2",
+      "reason": "依据：选项B“个案研究不依赖多种信息来源”也是不正确的，因为个案研究通常依赖多种信息来源（如访谈、观察、档案记录等）。",
+      "program_detected_dup": false
+    },
+    {
+      "instance_id": "prox-zh-391",
+      "defect": "D2",
+      "reason": "依据：选项E（V = PQ/M）与标准答案J（PQ ≡ MV）代数等价，也正确。",
+      "program_detected_dup": false
+    },
+    {
+      "instance_id": "prox-zh-407",
+      "defect": "D3",
+      "reason": "依据：VAR模型的预测效果并不必然优于联立方程结构模型，该说法缺乏普遍成立的事实依据，标准答案可被证伪。",
+      "program_detected_dup": false
+    },
+    {
+      "instance_id": "prox-zh-242",
+      "defect": "D3",
+      "reason": "依据：用题干两条莱曼线波长计算，里德伯常数应约为109678 cm⁻¹和109677 cm⁻¹，选项J的109689 cm⁻¹和109667 cm⁻¹与正确计算值不符。",
+      "program_detected_dup": false
+    }
+  ]
+}

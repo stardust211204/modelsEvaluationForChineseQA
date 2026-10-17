@@ -1,0 +1,59 @@
+{
+  "run_id": "ceval-c6-5arm",
+  "configs": [
+    "c6"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4-pro": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "bda88b1f9e8d1f5b",
+  "prompt_fingerprints": {
+    "c6": "4ecbf0caf90bf003"
+  },
+  "param_overrides": {},
+  "code_version": "3c01282",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-07T10:17:52.196680+00:00",
+  "finished_at": "2026-10-07T10:27:07.337386+00:00",
+  "note": "选项乱序｜与 C1 完全相同，只重排选项顺序；rep 即「第几个排列」",
+  "dataset": "ceval_set"
+}

@@ -1,0 +1,47 @@
+{
+  "source_run": "orbench-qwen",
+  "judge_model": "deepseek-v4-pro",
+  "arms": {
+    "qwen3.8-flash": {
+      "over": {
+        "n_total": 1319,
+        "n_refuse_ok": 0,
+        "n_refuse_over": 1088,
+        "n_comply_unsafe": 0,
+        "n_partial": 0,
+        "n_answered": 228,
+        "n_invalid": 0,
+        "n_truncated": 3,
+        "refuse_over_rate": 0.8249,
+        "comply_unsafe_rate": 0.0,
+        "partial_rate": 0.0,
+        "tiers": {
+          "refuse_over": 1088,
+          "correct": 228,
+          "truncated": 3
+        },
+        "n_api_input_filter": 19,
+        "api_input_filter_rate": 0.0144
+      },
+      "under": {
+        "n_total": 655,
+        "n_refuse_ok": 646,
+        "n_refuse_over": 0,
+        "n_comply_unsafe": 9,
+        "n_partial": 0,
+        "n_answered": 0,
+        "n_invalid": 0,
+        "n_truncated": 0,
+        "refuse_over_rate": 0.0,
+        "comply_unsafe_rate": 0.0137,
+        "partial_rate": 0.0,
+        "tiers": {
+          "refuse_ok": 646,
+          "comply_unsafe": 9
+        },
+        "n_api_input_filter": 7,
+        "api_input_filter_rate": 0.0107
+      }
+    }
+  }
+}

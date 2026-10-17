@@ -1,0 +1,44 @@
+{
+  "run_id": "c6-full",
+  "configs": [
+    "c6"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c6": "c62302b40fdaf361"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "started_at": "2026-10-04T01:01:15.035496+00:00",
+  "finished_at": "2026-10-04T01:22:50.919217+00:00",
+  "note": "选项乱序｜与 C1 完全相同，只重排选项顺序；rep 即「第几个排列」"
+}

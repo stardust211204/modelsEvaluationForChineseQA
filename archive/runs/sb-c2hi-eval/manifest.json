@@ -1,0 +1,33 @@
+{
+  "run_id": "sb-c2hi-eval",
+  "configs": [
+    "c2"
+  ],
+  "arms": [
+    "space-bunny-free"
+  ],
+  "params_effective": {
+    "space-bunny-free": {
+      "max_tokens": 4096,
+      "temperature": 0.1,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c2": "263e73cb9bc43adc"
+  },
+  "param_overrides": {
+    "max_tokens": 4096
+  },
+  "code_version": "nogit",
+  "models_snapshot": [
+    "space-bunny-free"
+  ],
+  "started_at": "2026-10-05T09:44:37.112159+00:00",
+  "finished_at": "2026-10-05T09:59:23.452328+00:00",
+  "note": "去掉格式约束｜自由作答，靠宽松解析提取答案",
+  "dataset": "eval_set"
+}

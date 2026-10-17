@@ -1,0 +1,29 @@
+{
+  "run_id": "c2-qwen-smoke",
+  "configs": [
+    "c2"
+  ],
+  "arms": [
+    "qwen3.8-flash"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c2": "ee56581df3f7ba5a"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash"
+  ],
+  "started_at": "2026-10-05T04:23:17.787998+00:00",
+  "finished_at": "2026-10-05T04:23:39.197315+00:00",
+  "note": "去掉格式约束｜自由作答，靠宽松解析提取答案｜limit=3",
+  "dataset": "eval_set"
+}

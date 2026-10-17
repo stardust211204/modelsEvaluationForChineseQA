@@ -1,0 +1,6 @@
+{"instance_id": "prox-zh-77", "arm": "qwen3.8-flash", "config": "c2", "rep": 0, "mode": "strict", "tier": "invalid", "answer_index": null, "tier_step": "none", "invalid_reason": "unparsable", "attribution": null}
+{"instance_id": "prox-zh-77", "arm": "qwen3.8-flash", "config": "c2", "rep": 0, "mode": "lenient", "tier": "correct", "answer_index": 1, "tier_step": "answer-marker", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-70", "arm": "qwen3.8-flash", "config": "c2", "rep": 0, "mode": "strict", "tier": "invalid", "answer_index": null, "tier_step": "none", "invalid_reason": "unparsable", "attribution": null}
+{"instance_id": "prox-zh-70", "arm": "qwen3.8-flash", "config": "c2", "rep": 0, "mode": "lenient", "tier": "correct", "answer_index": 8, "tier_step": "answer-marker", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-73", "arm": "qwen3.8-flash", "config": "c2", "rep": 0, "mode": "strict", "tier": "truncated", "answer_index": null, "tier_step": "none", "invalid_reason": "finish_reason=length", "attribution": null}
+{"instance_id": "prox-zh-73", "arm": "qwen3.8-flash", "config": "c2", "rep": 0, "mode": "lenient", "tier": "truncated", "answer_index": null, "tier_step": "none", "invalid_reason": "finish_reason=length", "attribution": null}

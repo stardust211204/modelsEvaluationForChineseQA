@@ -1,0 +1,31 @@
+{
+  "run_id": "c2-full-hi-qwen",
+  "configs": [
+    "c2"
+  ],
+  "arms": [
+    "qwen3.8-flash"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 2048,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c2": "ee56581df3f7ba5a"
+  },
+  "param_overrides": {
+    "max_tokens": 2048
+  },
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash"
+  ],
+  "started_at": "2026-10-05T04:52:51.573643+00:00",
+  "finished_at": "2026-10-05T05:03:14.937853+00:00",
+  "note": "去掉格式约束｜自由作答，靠宽松解析提取答案",
+  "dataset": "eval_set"
+}

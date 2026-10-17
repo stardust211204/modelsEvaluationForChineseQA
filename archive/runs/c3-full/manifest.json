@@ -1,0 +1,40 @@
+{
+  "run_id": "c3-full",
+  "configs": [
+    "c3"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "code_version": "nogit",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "started_at": "2026-10-03T13:09:09.743371+00:00",
+  "finished_at": "2026-10-03T13:52:36.701274+00:00",
+  "note": "重复采样｜与 C1 完全相同，同题重复 10 次"
+}

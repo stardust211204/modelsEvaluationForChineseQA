@@ -1,0 +1,402 @@
+{
+  "generated_at": "2026-10-12T17:47:13.680176+00:00",
+  "run_id": "c4-5arm-nothink",
+  "judge_model": "deepseek-v4-pro",
+  "judge_endpoint": "https://api.deepseek.com",
+  "source_run": "c1-5arm-v2",
+  "arms": {
+    "deepseek-v4-pro": {
+      "n_shared": 150,
+      "binary": {
+        "n": 150,
+        "excluded_non_binary": 0,
+        "coverage": 1.0,
+        "confusion": {
+          "TP": 83,
+          "FN": 0,
+          "FP": 0,
+          "TN": 67
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.5533,
+        "prevalence_pred": 0.5533,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            83,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            67,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 83,
+        "wrong": 67,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 83,
+        "wrong": 67,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_disagreements": []
+    },
+    "deepseek-v4.1-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 150,
+        "excluded_non_binary": 0,
+        "coverage": 1.0,
+        "confusion": {
+          "TP": 98,
+          "FN": 0,
+          "FP": 0,
+          "TN": 52
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.6533,
+        "prevalence_pred": 0.6533,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            98,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            52,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 98,
+        "wrong": 52,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 98,
+        "wrong": 52,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_disagreements": []
+    },
+    "longcat-2.5-preview-free": {
+      "n_shared": 150,
+      "binary": {
+        "n": 147,
+        "excluded_non_binary": 3,
+        "coverage": 0.98,
+        "confusion": {
+          "TP": 91,
+          "FN": 0,
+          "FP": 1,
+          "TN": 55
+        },
+        "accuracy": 0.9932,
+        "precision": 0.9891,
+        "recall": 1.0,
+        "f1": 0.9945,
+        "cohen_kappa": 0.9855,
+        "phi_mcc": 0.9856,
+        "kappa_minus_phi": -0.0001,
+        "prevalence_ref": 0.619,
+        "prevalence_pred": 0.6259,
+        "prevalence_drift": 0.0068
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            91,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            55,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 91,
+        "wrong": 56,
+        "invalid": 2,
+        "truncated": 1
+      },
+      "judge_tier_counts": {
+        "correct": 94,
+        "wrong": 55,
+        "invalid": 1,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-136",
+          "rule": "wrong",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-473",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-618",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-634",
+          "rule": "truncated",
+          "judge": "invalid"
+        }
+      ]
+    },
+    "mimo-v2.6-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 149,
+        "excluded_non_binary": 1,
+        "coverage": 0.9933,
+        "confusion": {
+          "TP": 68,
+          "FN": 0,
+          "FP": 0,
+          "TN": 81
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.4564,
+        "prevalence_pred": 0.4564,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            68,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            81,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 68,
+        "wrong": 82,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 68,
+        "wrong": 81,
+        "invalid": 1,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-634",
+          "rule": "wrong",
+          "judge": "invalid"
+        }
+      ]
+    },
+    "qwen3.8-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 150,
+        "excluded_non_binary": 0,
+        "coverage": 1.0,
+        "confusion": {
+          "TP": 93,
+          "FN": 0,
+          "FP": 0,
+          "TN": 57
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.62,
+        "prevalence_pred": 0.62,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            93,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            57,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 93,
+        "wrong": 57,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 93,
+        "wrong": 57,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_disagreements": []
+    }
+  },
+  "note": "judge 与 deepseek-v4.1-flash 同家族；分臂报一致率以暴露 self-preference"
+}

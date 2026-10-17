@@ -1,0 +1,36 @@
+{
+  "run_id": "smoke-fp2",
+  "configs": [
+    "c1"
+  ],
+  "arms": [
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4-pro": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c1": "2c22fbc0b667a70f"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-05T07:17:22.451077+00:00",
+  "finished_at": "2026-10-05T07:17:35.938360+00:00",
+  "note": "基线｜强格式约束 + 0-shot + 关思考｜limit=20",
+  "dataset": "eval_set"
+}

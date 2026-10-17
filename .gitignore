@@ -3,14 +3,37 @@
 .env
 *.key
 
-# ---- 跑批产物（体积大、可重生成；证据单独保留在 data/raw_evidence/）----
-runs/
-figures/*.png
+# ---- 跑批产物 ----
+# 分工原则：**判分台账入库、原始响应不入库**。
+#   runs/*/tallies/ + manifest.json  入库 —— 报告全部指标都由它算出，缺了就无法复算
+#   runs/*/raw/                      忽略 —— 75 MB，打成 zip 走 GitHub Release 附件
+# git 对 blob 内部做 zlib 压缩，18.8 MB 的 JSONL 入库后 .git 只增约 0.5 MB。
+runs/*/raw/
+runs/_*
+# tallies 的旧版备份（解析器修复前的快照）。tallies 本身可由 raw 重算，无需留档。
+*.pre-parserfix
 figures/*.pdf
 reports/*.pdf
 figures/latex/*.pdf
 figures/latex/*.aux
 figures/latex/*.log
+
+# ---- 图表：只忽略过程稿；报告实际引用的 14 张要进版本库 ----
+figures/*.png
+!figures/30_overall_barh.png
+!figures/31_domain_heatmap.png
+!figures/32_difficulty_spread.png
+!figures/33_cost_scatter.png
+!figures/34_refusal_twosided.png
+!figures/35_cross_dataset.png
+!figures/36_ceval_levels.png
+!figures/37_mix_sensitivity.png
+!figures/38_format_constraint.png
+!figures/40_pipeline_main.png
+!figures/41_pipeline_safety.png
+!figures/42_thinking_switch.png
+!figures/43_format_decomposition.png
+!figures/44_shot_gradient.png
 
 # ---- vendored 第三方包（30 MB，可由上游重新获取）----
 reports/Eisvogel-3.5.1/
@@ -41,8 +64,8 @@ COMMIT_MSG_TMP.txt
 data/_backup_*/
 
 
-# ---- 已归档的历史批次（不支撑报告结论）----
-archive/
+# ---- 已归档的历史批次（不支撑报告结论，但台账仍入库以备追溯）----
+archive/runs/*/raw/
 
 # ---- 排版调研目录里的 LaTeX 编译产物（源文件与预览图要留，这些不留）----
 # 说明：reports/_verify/web/ 存的是各中文期刊的模板原件与编译预览，

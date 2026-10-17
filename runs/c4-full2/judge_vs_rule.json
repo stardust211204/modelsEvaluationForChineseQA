@@ -1,0 +1,282 @@
+{
+  "generated_at": "2026-10-03T17:31:49.508161+00:00",
+  "run_id": "c4-full2",
+  "judge_model": "deepseek-v4-pro",
+  "judge_endpoint": "https://api.deepseek.com",
+  "source_run": "c1-full",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 149,
+        "excluded_non_binary": 1,
+        "coverage": 0.9933,
+        "confusion": {
+          "TP": 98,
+          "FN": 0,
+          "FP": 0,
+          "TN": 51
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.6577,
+        "prevalence_pred": 0.6577,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            98,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            51,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 98,
+        "wrong": 51,
+        "invalid": 0,
+        "truncated": 1
+      },
+      "judge_tier_counts": {
+        "correct": 98,
+        "wrong": 51,
+        "invalid": 1,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-622",
+          "rule": "truncated",
+          "judge": "invalid"
+        }
+      ]
+    },
+    "longcat-2.5-preview-free": {
+      "n_shared": 150,
+      "binary": {
+        "n": 146,
+        "excluded_non_binary": 4,
+        "coverage": 0.9733,
+        "confusion": {
+          "TP": 89,
+          "FN": 0,
+          "FP": 1,
+          "TN": 56
+        },
+        "accuracy": 0.9932,
+        "precision": 0.9889,
+        "recall": 1.0,
+        "f1": 0.9944,
+        "cohen_kappa": 0.9856,
+        "phi_mcc": 0.9857,
+        "kappa_minus_phi": -0.0001,
+        "prevalence_ref": 0.6096,
+        "prevalence_pred": 0.6164,
+        "prevalence_drift": 0.0068
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            89,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            56,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 89,
+        "wrong": 57,
+        "invalid": 2,
+        "truncated": 2
+      },
+      "judge_tier_counts": {
+        "correct": 92,
+        "wrong": 56,
+        "invalid": 2,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-136",
+          "rule": "wrong",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-473",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-618",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-634",
+          "rule": "truncated",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-650",
+          "rule": "truncated",
+          "judge": "invalid"
+        }
+      ]
+    },
+    "mimo-v2.6-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 146,
+        "excluded_non_binary": 4,
+        "coverage": 0.9733,
+        "confusion": {
+          "TP": 75,
+          "FN": 0,
+          "FP": 1,
+          "TN": 70
+        },
+        "accuracy": 0.9932,
+        "precision": 0.9868,
+        "recall": 1.0,
+        "f1": 0.9934,
+        "cohen_kappa": 0.9863,
+        "phi_mcc": 0.9864,
+        "kappa_minus_phi": -0.0001,
+        "prevalence_ref": 0.5137,
+        "prevalence_pred": 0.5205,
+        "prevalence_drift": 0.0068
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            75,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            70,
+            0,
+            0
+          ],
+          [
+            2,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 75,
+        "wrong": 71,
+        "invalid": 4,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 78,
+        "wrong": 71,
+        "invalid": 1,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-136",
+          "rule": "wrong",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-458",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-536",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-634",
+          "rule": "invalid",
+          "judge": "wrong"
+        }
+      ]
+    }
+  },
+  "note": "judge 与 deepseek-v4.1-flash 同家族；分臂报一致率以暴露 self-preference"
+}

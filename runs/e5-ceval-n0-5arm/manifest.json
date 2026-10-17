@@ -1,0 +1,61 @@
+{
+  "run_id": "e5-ceval-n0-5arm",
+  "configs": [
+    "c2"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4-pro": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "bda88b1f9e8d1f5b",
+  "prompt_fingerprints": {
+    "c2": "7864476c43539af9"
+  },
+  "param_overrides": {},
+  "code_version": "000b4d7",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-12T19:12:03.272892+00:00",
+  "finished_at": "2026-10-12T19:15:03.997361+00:00",
+  "note": "去掉格式约束｜自由作答，靠宽松解析提取答案",
+  "dataset": "ceval_set",
+  "reps": 1,
+  "param_arms": null
+}

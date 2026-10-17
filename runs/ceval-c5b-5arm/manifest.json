@@ -1,0 +1,59 @@
+{
+  "run_id": "ceval-c5b-5arm",
+  "configs": [
+    "c5b"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4-pro": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "bda88b1f9e8d1f5b",
+  "prompt_fingerprints": {
+    "c5b": "b3b31fe273a476fc"
+  },
+  "param_overrides": {},
+  "code_version": "3c01282",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-07T10:37:53.641806+00:00",
+  "finished_at": "2026-10-07T10:42:13.675371+00:00",
+  "note": "5-shot（示例选项数匹配目标）｜5-shot，两组数据集各用与目标题选项数接近的示例",
+  "dataset": "ceval_set"
+}

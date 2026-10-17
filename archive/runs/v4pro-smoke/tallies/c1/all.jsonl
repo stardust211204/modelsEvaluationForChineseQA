@@ -1,0 +1,10 @@
+{"instance_id": "prox-zh-71", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": 9, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-71", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "lenient", "tier": "correct", "answer_index": 9, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-70", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "strict", "tier": "invalid", "answer_index": null, "tier_step": "none", "invalid_reason": "unparsable", "attribution": null}
+{"instance_id": "prox-zh-70", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "lenient", "tier": "invalid", "answer_index": null, "tier_step": "none", "invalid_reason": "unparsable", "attribution": null}
+{"instance_id": "prox-zh-73", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": 3, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-73", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "lenient", "tier": "correct", "answer_index": 3, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-72", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "strict", "tier": "wrong", "answer_index": 5, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-72", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "lenient", "tier": "wrong", "answer_index": 5, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-74", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "strict", "tier": "wrong", "answer_index": 1, "tier_step": "bare", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-74", "arm": "deepseek-v4-pro", "config": "c1", "rep": 0, "mode": "lenient", "tier": "wrong", "answer_index": 1, "tier_step": "bare", "invalid_reason": "", "attribution": null}

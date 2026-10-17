@@ -1,0 +1,25 @@
+{
+  "run_id": "badcase-judge",
+  "configs": [],
+  "arms": [
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "deepseek-v4-pro": {
+      "max_tokens": 512,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {},
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-04T09:42:30.901302+00:00",
+  "finished_at": "2026-10-04T09:43:21.625486+00:00",
+  "note": "badcase 归因第二标注者｜源 run=c2-full｜198 次（2 遍）｜judge=deepseek-v4-pro",
+  "dataset": "eval_set"
+}

@@ -1,0 +1,58 @@
+{
+  "base": {
+    "run_id": "c1-full",
+    "config": "c1"
+  },
+  "other": {
+    "run_id": "c2-full-hi",
+    "config": "c2"
+  },
+  "generated_at": "2026-10-05T05:16:48.540645+00:00",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "lenient": {
+        "n_shared": 150,
+        "n_paired": 145,
+        "n_tie_reps": 0,
+        "n_offscale": 5,
+        "coverage": 0.9667,
+        "acc_base": 0.6577,
+        "acc_other": 0.8219,
+        "delta_pp": 16.42,
+        "base_correct_other_not": 7,
+        "base_not_other_correct": 30,
+        "mcnemar_p": 0.000191
+      }
+    },
+    "longcat-2.5-preview-free": {
+      "lenient": {
+        "n_shared": 150,
+        "n_paired": 148,
+        "n_tie_reps": 0,
+        "n_offscale": 2,
+        "coverage": 0.9867,
+        "acc_base": 0.6149,
+        "acc_other": 0.8255,
+        "delta_pp": 21.06,
+        "base_correct_other_not": 5,
+        "base_not_other_correct": 37,
+        "mcnemar_p": 0.0
+      }
+    },
+    "mimo-v2.6-flash": {
+      "lenient": {
+        "n_shared": 150,
+        "n_paired": 149,
+        "n_tie_reps": 0,
+        "n_offscale": 1,
+        "coverage": 0.9933,
+        "acc_base": 0.5168,
+        "acc_other": 0.74,
+        "delta_pp": 22.32,
+        "base_correct_other_not": 10,
+        "base_not_other_correct": 43,
+        "mcnemar_p": 6e-06
+      }
+    }
+  }
+}

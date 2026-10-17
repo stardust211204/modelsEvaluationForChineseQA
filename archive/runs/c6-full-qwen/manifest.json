@@ -1,0 +1,29 @@
+{
+  "run_id": "c6-full-qwen",
+  "configs": [
+    "c6"
+  ],
+  "arms": [
+    "qwen3.8-flash"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c6": "c62302b40fdaf361"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash"
+  ],
+  "started_at": "2026-10-05T05:11:20.734719+00:00",
+  "finished_at": "2026-10-05T05:14:36.542364+00:00",
+  "note": "选项乱序｜与 C1 完全相同，只重排选项顺序；rep 即「第几个排列」",
+  "dataset": "eval_set"
+}

@@ -1,0 +1,42 @@
+{
+  "judge_model": "deepseek-v4-pro",
+  "n_items": 99,
+  "self_agreement": 0.9394,
+  "self_kappa": 0.914,
+  "human_vs_llm_n": 6,
+  "distribution": {
+    "reasoning_error": 39,
+    "knowledge_gap": 22,
+    "format_parse": 10,
+    "option_confusion": 26,
+    "detail_omission": 1,
+    "question_misread": 1
+  },
+  "skipped": [
+    {
+      "instance_id": "prox-zh-183",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-626",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-132",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-528",
+      "arm": "longcat-2.5-preview-free",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-536",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    }
+  ]
+}

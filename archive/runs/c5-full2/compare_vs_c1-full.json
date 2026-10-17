@@ -1,0 +1,97 @@
+{
+  "base": {
+    "run_id": "c1-full",
+    "config": "c1"
+  },
+  "other": {
+    "run_id": "c5-full2",
+    "config": "c5"
+  },
+  "generated_at": "2026-10-03T15:47:01.678604+00:00",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "strict": {
+        "n_shared": 150,
+        "n_paired": 149,
+        "n_tie_reps": 0,
+        "n_offscale": 1,
+        "coverage": 0.9933,
+        "acc_base": 0.6577,
+        "acc_other": 0.6667,
+        "delta_pp": 0.89,
+        "base_correct_other_not": 6,
+        "base_not_other_correct": 8,
+        "mcnemar_p": 0.790527
+      },
+      "lenient": {
+        "n_shared": 150,
+        "n_paired": 149,
+        "n_tie_reps": 0,
+        "n_offscale": 1,
+        "coverage": 0.9933,
+        "acc_base": 0.6577,
+        "acc_other": 0.6667,
+        "delta_pp": 0.89,
+        "base_correct_other_not": 6,
+        "base_not_other_correct": 8,
+        "mcnemar_p": 0.790527
+      }
+    },
+    "longcat-2.5-preview-free": {
+      "strict": {
+        "n_shared": 150,
+        "n_paired": 146,
+        "n_tie_reps": 0,
+        "n_offscale": 4,
+        "coverage": 0.9733,
+        "acc_base": 0.6096,
+        "acc_other": 0.62,
+        "delta_pp": 1.04,
+        "base_correct_other_not": 6,
+        "base_not_other_correct": 9,
+        "mcnemar_p": 0.607239
+      },
+      "lenient": {
+        "n_shared": 150,
+        "n_paired": 148,
+        "n_tie_reps": 0,
+        "n_offscale": 2,
+        "coverage": 0.9867,
+        "acc_base": 0.6149,
+        "acc_other": 0.62,
+        "delta_pp": 0.51,
+        "base_correct_other_not": 7,
+        "base_not_other_correct": 9,
+        "mcnemar_p": 0.803619
+      }
+    },
+    "mimo-v2.6-flash": {
+      "strict": {
+        "n_shared": 150,
+        "n_paired": 136,
+        "n_tie_reps": 0,
+        "n_offscale": 14,
+        "coverage": 0.9067,
+        "acc_base": 0.5137,
+        "acc_other": 0.4892,
+        "delta_pp": -2.45,
+        "base_correct_other_not": 18,
+        "base_not_other_correct": 14,
+        "mcnemar_p": 0.596615
+      },
+      "lenient": {
+        "n_shared": 150,
+        "n_paired": 148,
+        "n_tie_reps": 0,
+        "n_offscale": 2,
+        "coverage": 0.9867,
+        "acc_base": 0.5168,
+        "acc_other": 0.4899,
+        "delta_pp": -2.68,
+        "base_correct_other_not": 21,
+        "base_not_other_correct": 17,
+        "mcnemar_p": 0.627103
+      }
+    }
+  }
+}

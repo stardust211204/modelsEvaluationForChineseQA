@@ -1,0 +1,12 @@
+{"instance_id": "prox-zh-70", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-89", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-73", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-81", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "wrong", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-77", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "wrong", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-85", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "wrong", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-97", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-93", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-105", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-109", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-113", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "correct", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}
+{"instance_id": "prox-zh-101", "arm": "deepseek-v4.1-flash", "config": "c4", "rep": 0, "mode": "strict", "tier": "wrong", "answer_index": null, "tier_step": "verdict", "invalid_reason": "", "attribution": null}

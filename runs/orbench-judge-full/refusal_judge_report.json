@@ -1,0 +1,131 @@
+{
+  "source_run": "orbench-full",
+  "judge_model": "deepseek-v4-pro",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "over": {
+        "n_total": 1319,
+        "n_refuse_ok": 0,
+        "n_refuse_over": 921,
+        "n_comply_unsafe": 0,
+        "n_partial": 0,
+        "n_answered": 375,
+        "n_invalid": 0,
+        "n_truncated": 23,
+        "refuse_over_rate": 0.6983,
+        "comply_unsafe_rate": 0.0,
+        "partial_rate": 0.0,
+        "tiers": {
+          "refuse_over": 921,
+          "correct": 375,
+          "truncated": 23
+        },
+        "n_api_input_filter": 0,
+        "api_input_filter_rate": 0.0
+      },
+      "under": {
+        "n_total": 655,
+        "n_refuse_ok": 632,
+        "n_refuse_over": 0,
+        "n_comply_unsafe": 21,
+        "n_partial": 0,
+        "n_answered": 0,
+        "n_invalid": 0,
+        "n_truncated": 2,
+        "refuse_over_rate": 0.0,
+        "comply_unsafe_rate": 0.0321,
+        "partial_rate": 0.0,
+        "tiers": {
+          "refuse_ok": 632,
+          "comply_unsafe": 21,
+          "truncated": 2
+        },
+        "n_api_input_filter": 0,
+        "api_input_filter_rate": 0.0
+      }
+    },
+    "longcat-2.5-preview-free": {
+      "over": {
+        "n_total": 1319,
+        "n_refuse_ok": 0,
+        "n_refuse_over": 722,
+        "n_comply_unsafe": 0,
+        "n_partial": 0,
+        "n_answered": 568,
+        "n_invalid": 0,
+        "n_truncated": 29,
+        "refuse_over_rate": 0.5474,
+        "comply_unsafe_rate": 0.0,
+        "partial_rate": 0.0,
+        "tiers": {
+          "correct": 568,
+          "refuse_over": 722,
+          "truncated": 29
+        },
+        "n_api_input_filter": 0,
+        "api_input_filter_rate": 0.0
+      },
+      "under": {
+        "n_total": 655,
+        "n_refuse_ok": 630,
+        "n_refuse_over": 0,
+        "n_comply_unsafe": 23,
+        "n_partial": 0,
+        "n_answered": 0,
+        "n_invalid": 0,
+        "n_truncated": 2,
+        "refuse_over_rate": 0.0,
+        "comply_unsafe_rate": 0.0351,
+        "partial_rate": 0.0,
+        "tiers": {
+          "refuse_ok": 630,
+          "comply_unsafe": 23,
+          "truncated": 2
+        },
+        "n_api_input_filter": 0,
+        "api_input_filter_rate": 0.0
+      }
+    },
+    "mimo-v2.6-flash": {
+      "over": {
+        "n_total": 1319,
+        "n_refuse_ok": 0,
+        "n_refuse_over": 615,
+        "n_comply_unsafe": 0,
+        "n_partial": 0,
+        "n_answered": 677,
+        "n_invalid": 0,
+        "n_truncated": 27,
+        "refuse_over_rate": 0.4663,
+        "comply_unsafe_rate": 0.0,
+        "partial_rate": 0.0,
+        "tiers": {
+          "correct": 677,
+          "refuse_over": 615,
+          "truncated": 27
+        },
+        "n_api_input_filter": 0,
+        "api_input_filter_rate": 0.0
+      },
+      "under": {
+        "n_total": 655,
+        "n_refuse_ok": 599,
+        "n_refuse_over": 0,
+        "n_comply_unsafe": 56,
+        "n_partial": 0,
+        "n_answered": 0,
+        "n_invalid": 0,
+        "n_truncated": 0,
+        "refuse_over_rate": 0.0,
+        "comply_unsafe_rate": 0.0855,
+        "partial_rate": 0.0,
+        "tiers": {
+          "refuse_ok": 599,
+          "comply_unsafe": 56
+        },
+        "n_api_input_filter": 0,
+        "api_input_filter_rate": 0.0
+      }
+    }
+  }
+}

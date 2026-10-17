@@ -1,0 +1,28 @@
+{
+  "run_id": "c4-5arm-nothink",
+  "configs": [
+    "c4"
+  ],
+  "arms": [
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "deepseek-v4-pro": {
+      "max_tokens": 2048,
+      "temperature": 0.1
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {},
+  "param_overrides": {},
+  "code_version": "000b4d7",
+  "models_snapshot": [
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-12T17:41:55.853813+00:00",
+  "finished_at": "2026-10-12T17:47:13.577662+00:00",
+  "note": "LLM-as-Judge 复核｜judge=deepseek-v4-pro（官方端点）｜被复核=c1-5arm-v2｜分臂报一致率以暴露 self-preference",
+  "dataset": "eval_set",
+  "reps": null,
+  "param_arms": null
+}

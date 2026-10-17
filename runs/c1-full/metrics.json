@@ -1,0 +1,1099 @@
+{
+  "run_id": "c1-full",
+  "config": "c1",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "strict": {
+        "arm": "deepseek-v4.1-flash",
+        "config": "c1",
+        "n_requests": 588,
+        "n_failed": 0,
+        "n_total": 588,
+        "n_correct": 373,
+        "n_wrong": 211,
+        "n_invalid": 1,
+        "n_truncated": 3,
+        "acc": 0.6387,
+        "acc_ci_low": 0.5993,
+        "acc_ci_high": 0.6781,
+        "ci_width_pp": 7.88,
+        "wilson_low": 0.5989,
+        "wilson_high": 0.6766,
+        "invalid_rate": 0.0017,
+        "truncated_rate": 0.0051,
+        "tokens_in": 129561,
+        "tokens_out": 7110,
+        "total_tokens": 136671,
+        "cost_cny": 0.158,
+        "cost_per_1k_correct": 0.424,
+        "median_latency_s": 1.741,
+        "mean_latency_s": 1.99,
+        "p95_latency_s": 3.196,
+        "total_latency_s": 1169.9,
+        "median_reasoning_len": 0,
+        "tier_steps": {
+          "bare": 584,
+          "empty": 3,
+          "none": 1
+        },
+        "mode": "strict",
+        "by_stratum": {
+          "subject": {
+            "business": {
+              "n": 40,
+              "correct": 24,
+              "acc": 0.6
+            },
+            "law": {
+              "n": 47,
+              "correct": 26,
+              "acc": 0.5532
+            },
+            "psychology": {
+              "n": 40,
+              "correct": 34,
+              "acc": 0.85
+            },
+            "biology": {
+              "n": 36,
+              "correct": 28,
+              "acc": 0.7778
+            },
+            "chemistry": {
+              "n": 56,
+              "correct": 30,
+              "acc": 0.5357
+            },
+            "history": {
+              "n": 19,
+              "correct": 13,
+              "acc": 0.6842
+            },
+            "other": {
+              "n": 46,
+              "correct": 26,
+              "acc": 0.5652
+            },
+            "health": {
+              "n": 35,
+              "correct": 24,
+              "acc": 0.6857
+            },
+            "economics": {
+              "n": 42,
+              "correct": 33,
+              "acc": 0.7857
+            },
+            "math": {
+              "n": 67,
+              "correct": 47,
+              "acc": 0.7015
+            },
+            "physics": {
+              "n": 65,
+              "correct": 36,
+              "acc": 0.5538
+            },
+            "computer science": {
+              "n": 19,
+              "correct": 12,
+              "acc": 0.6316
+            },
+            "philosophy": {
+              "n": 25,
+              "correct": 17,
+              "acc": 0.68
+            },
+            "engineering": {
+              "n": 47,
+              "correct": 23,
+              "acc": 0.4894
+            }
+          },
+          "difficulty": {
+            "unknown": {
+              "n": 584,
+              "correct": 373,
+              "acc": 0.6387
+            }
+          },
+          "n_options": {
+            "opt_ge8": {
+              "n": 544,
+              "correct": 345,
+              "acc": 0.6342
+            },
+            "opt_5_7": {
+              "n": 13,
+              "correct": 6,
+              "acc": 0.4615
+            },
+            "opt_le4": {
+              "n": 27,
+              "correct": 22,
+              "acc": 0.8148
+            }
+          }
+        },
+        "by_source": {
+          "public": {
+            "n": 584,
+            "correct": 373,
+            "acc": 0.6387
+          }
+        }
+      },
+      "lenient": {
+        "arm": "deepseek-v4.1-flash",
+        "config": "c1",
+        "n_requests": 588,
+        "n_failed": 0,
+        "n_total": 588,
+        "n_correct": 374,
+        "n_wrong": 211,
+        "n_invalid": 0,
+        "n_truncated": 3,
+        "acc": 0.6393,
+        "acc_ci_low": 0.6,
+        "acc_ci_high": 0.6786,
+        "ci_width_pp": 7.86,
+        "wilson_low": 0.5996,
+        "wilson_high": 0.6772,
+        "invalid_rate": 0.0,
+        "truncated_rate": 0.0051,
+        "tokens_in": 129561,
+        "tokens_out": 7110,
+        "total_tokens": 136671,
+        "cost_cny": 0.158,
+        "cost_per_1k_correct": 0.422,
+        "median_latency_s": 1.741,
+        "mean_latency_s": 1.99,
+        "p95_latency_s": 3.196,
+        "total_latency_s": 1169.9,
+        "median_reasoning_len": 0,
+        "tier_steps": {
+          "bare": 584,
+          "empty": 3,
+          "phrase": 1
+        },
+        "mode": "lenient",
+        "by_stratum": {
+          "subject": {
+            "business": {
+              "n": 40,
+              "correct": 24,
+              "acc": 0.6
+            },
+            "law": {
+              "n": 47,
+              "correct": 26,
+              "acc": 0.5532
+            },
+            "psychology": {
+              "n": 40,
+              "correct": 34,
+              "acc": 0.85
+            },
+            "biology": {
+              "n": 36,
+              "correct": 28,
+              "acc": 0.7778
+            },
+            "chemistry": {
+              "n": 56,
+              "correct": 30,
+              "acc": 0.5357
+            },
+            "history": {
+              "n": 19,
+              "correct": 13,
+              "acc": 0.6842
+            },
+            "other": {
+              "n": 46,
+              "correct": 26,
+              "acc": 0.5652
+            },
+            "health": {
+              "n": 35,
+              "correct": 24,
+              "acc": 0.6857
+            },
+            "economics": {
+              "n": 42,
+              "correct": 33,
+              "acc": 0.7857
+            },
+            "math": {
+              "n": 68,
+              "correct": 48,
+              "acc": 0.7059
+            },
+            "physics": {
+              "n": 65,
+              "correct": 36,
+              "acc": 0.5538
+            },
+            "computer science": {
+              "n": 19,
+              "correct": 12,
+              "acc": 0.6316
+            },
+            "philosophy": {
+              "n": 25,
+              "correct": 17,
+              "acc": 0.68
+            },
+            "engineering": {
+              "n": 47,
+              "correct": 23,
+              "acc": 0.4894
+            }
+          },
+          "difficulty": {
+            "unknown": {
+              "n": 585,
+              "correct": 374,
+              "acc": 0.6393
+            }
+          },
+          "n_options": {
+            "opt_ge8": {
+              "n": 545,
+              "correct": 346,
+              "acc": 0.6349
+            },
+            "opt_5_7": {
+              "n": 13,
+              "correct": 6,
+              "acc": 0.4615
+            },
+            "opt_le4": {
+              "n": 27,
+              "correct": 22,
+              "acc": 0.8148
+            }
+          }
+        },
+        "by_source": {
+          "public": {
+            "n": 585,
+            "correct": 374,
+            "acc": 0.6393
+          }
+        }
+      },
+      "strict_lenient": {
+        "n": 588,
+        "agreement": 0.9983,
+        "kappa": 0.9964,
+        "strict_invalid_lenient_parsed": 1,
+        "rescued_rate": 0.0017
+      },
+      "judge_agreement": {
+        "reference": "strict（严格口径：整段回复必须是单个字母）",
+        "candidate": "lenient（宽松口径：三级阶梯回退）",
+        "judgment_scale": "含弃权的名义量表（correct / wrong / invalid / truncated）",
+        "abstention_handling": "invalid 与 truncated 视为弃权，独立成档；二元一致性只在两口径均判出 correct/wrong 的条目上计算",
+        "n_total": 588,
+        "binary": {
+          "n": 584,
+          "excluded_non_binary": 4,
+          "coverage": 0.9932,
+          "confusion": {
+            "TP": 373,
+            "FN": 0,
+            "FP": 0,
+            "TN": 211
+          },
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "cohen_kappa": 1.0,
+          "phi_mcc": 1.0,
+          "kappa_minus_phi": 0.0,
+          "prevalence_ref": 0.6387,
+          "prevalence_pred": 0.6387,
+          "prevalence_drift": 0.0
+        },
+        "all_tiers": {
+          "labels": [
+            "correct",
+            "wrong",
+            "invalid",
+            "truncated"
+          ],
+          "matrix": [
+            [
+              373,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              211,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              3
+            ]
+          ],
+          "off_scale": 0,
+          "n": 588,
+          "agreement": 0.9983,
+          "top_disagreements": [
+            {
+              "ref": "invalid",
+              "pred": "correct",
+              "n": 1
+            }
+          ]
+        }
+      }
+    },
+    "longcat-2.5-preview-free": {
+      "strict": {
+        "arm": "longcat-2.5-preview-free",
+        "config": "c1",
+        "n_requests": 588,
+        "n_failed": 0,
+        "n_total": 588,
+        "n_correct": 366,
+        "n_wrong": 211,
+        "n_invalid": 8,
+        "n_truncated": 3,
+        "acc": 0.6343,
+        "acc_ci_low": 0.5962,
+        "acc_ci_high": 0.6724,
+        "ci_width_pp": 7.63,
+        "wilson_low": 0.5942,
+        "wilson_high": 0.6726,
+        "invalid_rate": 0.0136,
+        "truncated_rate": 0.0051,
+        "tokens_in": 142202,
+        "tokens_out": 10029,
+        "total_tokens": 152231,
+        "cost_cny": 0.1823,
+        "cost_per_1k_correct": 0.498,
+        "median_latency_s": 2.877,
+        "mean_latency_s": 4.18,
+        "p95_latency_s": 10.3,
+        "total_latency_s": 2457.9,
+        "median_reasoning_len": 0,
+        "tier_steps": {
+          "bare": 577,
+          "none": 11
+        },
+        "mode": "strict",
+        "by_stratum": {
+          "subject": {
+            "business": {
+              "n": 39,
+              "correct": 21,
+              "acc": 0.5385
+            },
+            "law": {
+              "n": 48,
+              "correct": 23,
+              "acc": 0.4792
+            },
+            "psychology": {
+              "n": 40,
+              "correct": 29,
+              "acc": 0.725
+            },
+            "biology": {
+              "n": 36,
+              "correct": 30,
+              "acc": 0.8333
+            },
+            "chemistry": {
+              "n": 53,
+              "correct": 29,
+              "acc": 0.5472
+            },
+            "history": {
+              "n": 19,
+              "correct": 10,
+              "acc": 0.5263
+            },
+            "other": {
+              "n": 46,
+              "correct": 23,
+              "acc": 0.5
+            },
+            "health": {
+              "n": 35,
+              "correct": 27,
+              "acc": 0.7714
+            },
+            "economics": {
+              "n": 42,
+              "correct": 34,
+              "acc": 0.8095
+            },
+            "math": {
+              "n": 66,
+              "correct": 48,
+              "acc": 0.7273
+            },
+            "physics": {
+              "n": 65,
+              "correct": 39,
+              "acc": 0.6
+            },
+            "computer science": {
+              "n": 20,
+              "correct": 8,
+              "acc": 0.4
+            },
+            "philosophy": {
+              "n": 25,
+              "correct": 19,
+              "acc": 0.76
+            },
+            "engineering": {
+              "n": 43,
+              "correct": 26,
+              "acc": 0.6047
+            }
+          },
+          "difficulty": {
+            "unknown": {
+              "n": 577,
+              "correct": 366,
+              "acc": 0.6343
+            }
+          },
+          "n_options": {
+            "opt_ge8": {
+              "n": 537,
+              "correct": 345,
+              "acc": 0.6425
+            },
+            "opt_5_7": {
+              "n": 13,
+              "correct": 6,
+              "acc": 0.4615
+            },
+            "opt_le4": {
+              "n": 27,
+              "correct": 15,
+              "acc": 0.5556
+            }
+          }
+        },
+        "by_source": {
+          "public": {
+            "n": 577,
+            "correct": 366,
+            "acc": 0.6343
+          }
+        }
+      },
+      "lenient": {
+        "arm": "longcat-2.5-preview-free",
+        "config": "c1",
+        "n_requests": 588,
+        "n_failed": 0,
+        "n_total": 588,
+        "n_correct": 372,
+        "n_wrong": 213,
+        "n_invalid": 0,
+        "n_truncated": 3,
+        "acc": 0.6359,
+        "acc_ci_low": 0.5966,
+        "acc_ci_high": 0.6752,
+        "ci_width_pp": 7.86,
+        "wilson_low": 0.5961,
+        "wilson_high": 0.6739,
+        "invalid_rate": 0.0,
+        "truncated_rate": 0.0051,
+        "tokens_in": 142202,
+        "tokens_out": 10029,
+        "total_tokens": 152231,
+        "cost_cny": 0.1823,
+        "cost_per_1k_correct": 0.49,
+        "median_latency_s": 2.877,
+        "mean_latency_s": 4.18,
+        "p95_latency_s": 10.3,
+        "total_latency_s": 2457.9,
+        "median_reasoning_len": 0,
+        "tier_steps": {
+          "bare": 577,
+          "last-line": 5,
+          "phrase": 3,
+          "none": 3
+        },
+        "mode": "lenient",
+        "by_stratum": {
+          "subject": {
+            "business": {
+              "n": 40,
+              "correct": 22,
+              "acc": 0.55
+            },
+            "law": {
+              "n": 48,
+              "correct": 23,
+              "acc": 0.4792
+            },
+            "psychology": {
+              "n": 40,
+              "correct": 29,
+              "acc": 0.725
+            },
+            "biology": {
+              "n": 36,
+              "correct": 30,
+              "acc": 0.8333
+            },
+            "chemistry": {
+              "n": 56,
+              "correct": 31,
+              "acc": 0.5536
+            },
+            "history": {
+              "n": 19,
+              "correct": 10,
+              "acc": 0.5263
+            },
+            "other": {
+              "n": 46,
+              "correct": 23,
+              "acc": 0.5
+            },
+            "health": {
+              "n": 35,
+              "correct": 27,
+              "acc": 0.7714
+            },
+            "economics": {
+              "n": 42,
+              "correct": 34,
+              "acc": 0.8095
+            },
+            "math": {
+              "n": 67,
+              "correct": 49,
+              "acc": 0.7313
+            },
+            "physics": {
+              "n": 65,
+              "correct": 39,
+              "acc": 0.6
+            },
+            "computer science": {
+              "n": 20,
+              "correct": 8,
+              "acc": 0.4
+            },
+            "philosophy": {
+              "n": 25,
+              "correct": 19,
+              "acc": 0.76
+            },
+            "engineering": {
+              "n": 46,
+              "correct": 28,
+              "acc": 0.6087
+            }
+          },
+          "difficulty": {
+            "unknown": {
+              "n": 585,
+              "correct": 372,
+              "acc": 0.6359
+            }
+          },
+          "n_options": {
+            "opt_ge8": {
+              "n": 545,
+              "correct": 351,
+              "acc": 0.644
+            },
+            "opt_5_7": {
+              "n": 13,
+              "correct": 6,
+              "acc": 0.4615
+            },
+            "opt_le4": {
+              "n": 27,
+              "correct": 15,
+              "acc": 0.5556
+            }
+          }
+        },
+        "by_source": {
+          "public": {
+            "n": 585,
+            "correct": 372,
+            "acc": 0.6359
+          }
+        }
+      },
+      "strict_lenient": {
+        "n": 588,
+        "agreement": 0.9864,
+        "kappa": 0.9714,
+        "strict_invalid_lenient_parsed": 8,
+        "rescued_rate": 0.0136
+      },
+      "judge_agreement": {
+        "reference": "strict（严格口径：整段回复必须是单个字母）",
+        "candidate": "lenient（宽松口径：三级阶梯回退）",
+        "judgment_scale": "含弃权的名义量表（correct / wrong / invalid / truncated）",
+        "abstention_handling": "invalid 与 truncated 视为弃权，独立成档；二元一致性只在两口径均判出 correct/wrong 的条目上计算",
+        "n_total": 588,
+        "binary": {
+          "n": 577,
+          "excluded_non_binary": 11,
+          "coverage": 0.9813,
+          "confusion": {
+            "TP": 366,
+            "FN": 0,
+            "FP": 0,
+            "TN": 211
+          },
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "cohen_kappa": 1.0,
+          "phi_mcc": 1.0,
+          "kappa_minus_phi": 0.0,
+          "prevalence_ref": 0.6343,
+          "prevalence_pred": 0.6343,
+          "prevalence_drift": 0.0
+        },
+        "all_tiers": {
+          "labels": [
+            "correct",
+            "wrong",
+            "invalid",
+            "truncated"
+          ],
+          "matrix": [
+            [
+              366,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              211,
+              0,
+              0
+            ],
+            [
+              6,
+              2,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              3
+            ]
+          ],
+          "off_scale": 0,
+          "n": 588,
+          "agreement": 0.9864,
+          "top_disagreements": [
+            {
+              "ref": "invalid",
+              "pred": "correct",
+              "n": 6
+            },
+            {
+              "ref": "invalid",
+              "pred": "wrong",
+              "n": 2
+            }
+          ]
+        }
+      }
+    },
+    "mimo-v2.6-flash": {
+      "strict": {
+        "arm": "mimo-v2.6-flash",
+        "config": "c1",
+        "n_requests": 588,
+        "n_failed": 0,
+        "n_total": 588,
+        "n_correct": 286,
+        "n_wrong": 297,
+        "n_invalid": 5,
+        "n_truncated": 0,
+        "acc": 0.4906,
+        "acc_ci_low": 0.4494,
+        "acc_ci_high": 0.53,
+        "ci_width_pp": 8.06,
+        "wilson_low": 0.4502,
+        "wilson_high": 0.5311,
+        "invalid_rate": 0.0085,
+        "truncated_rate": 0.0,
+        "tokens_in": 151010,
+        "tokens_out": 2639,
+        "total_tokens": 153649,
+        "cost_cny": 0.1616,
+        "cost_per_1k_correct": 0.565,
+        "median_latency_s": 3.904,
+        "mean_latency_s": 5.479,
+        "p95_latency_s": 14.718,
+        "total_latency_s": 3221.8,
+        "median_reasoning_len": 0,
+        "tier_steps": {
+          "bare": 583,
+          "none": 5
+        },
+        "mode": "strict",
+        "by_stratum": {
+          "subject": {
+            "business": {
+              "n": 40,
+              "correct": 11,
+              "acc": 0.275
+            },
+            "law": {
+              "n": 47,
+              "correct": 15,
+              "acc": 0.3191
+            },
+            "psychology": {
+              "n": 40,
+              "correct": 29,
+              "acc": 0.725
+            },
+            "biology": {
+              "n": 36,
+              "correct": 27,
+              "acc": 0.75
+            },
+            "chemistry": {
+              "n": 56,
+              "correct": 20,
+              "acc": 0.3571
+            },
+            "history": {
+              "n": 19,
+              "correct": 12,
+              "acc": 0.6316
+            },
+            "other": {
+              "n": 46,
+              "correct": 21,
+              "acc": 0.4565
+            },
+            "health": {
+              "n": 35,
+              "correct": 19,
+              "acc": 0.5429
+            },
+            "economics": {
+              "n": 42,
+              "correct": 32,
+              "acc": 0.7619
+            },
+            "math": {
+              "n": 66,
+              "correct": 25,
+              "acc": 0.3788
+            },
+            "physics": {
+              "n": 64,
+              "correct": 25,
+              "acc": 0.3906
+            },
+            "computer science": {
+              "n": 20,
+              "correct": 13,
+              "acc": 0.65
+            },
+            "philosophy": {
+              "n": 25,
+              "correct": 15,
+              "acc": 0.6
+            },
+            "engineering": {
+              "n": 47,
+              "correct": 22,
+              "acc": 0.4681
+            }
+          },
+          "difficulty": {
+            "unknown": {
+              "n": 583,
+              "correct": 286,
+              "acc": 0.4906
+            }
+          },
+          "n_options": {
+            "opt_ge8": {
+              "n": 544,
+              "correct": 264,
+              "acc": 0.4853
+            },
+            "opt_5_7": {
+              "n": 12,
+              "correct": 4,
+              "acc": 0.3333
+            },
+            "opt_le4": {
+              "n": 27,
+              "correct": 18,
+              "acc": 0.6667
+            }
+          }
+        },
+        "by_source": {
+          "public": {
+            "n": 583,
+            "correct": 286,
+            "acc": 0.4906
+          }
+        }
+      },
+      "lenient": {
+        "arm": "mimo-v2.6-flash",
+        "config": "c1",
+        "n_requests": 588,
+        "n_failed": 0,
+        "n_total": 588,
+        "n_correct": 289,
+        "n_wrong": 298,
+        "n_invalid": 1,
+        "n_truncated": 0,
+        "acc": 0.4923,
+        "acc_ci_low": 0.4514,
+        "acc_ci_high": 0.5332,
+        "ci_width_pp": 8.18,
+        "wilson_low": 0.4521,
+        "wilson_high": 0.5327,
+        "invalid_rate": 0.0017,
+        "truncated_rate": 0.0,
+        "tokens_in": 151010,
+        "tokens_out": 2639,
+        "total_tokens": 153649,
+        "cost_cny": 0.1616,
+        "cost_per_1k_correct": 0.559,
+        "median_latency_s": 3.904,
+        "mean_latency_s": 5.479,
+        "p95_latency_s": 14.718,
+        "total_latency_s": 3221.8,
+        "median_reasoning_len": 0,
+        "tier_steps": {
+          "bare": 583,
+          "last-line": 2,
+          "none": 1,
+          "phrase": 2
+        },
+        "mode": "lenient",
+        "by_stratum": {
+          "subject": {
+            "business": {
+              "n": 40,
+              "correct": 11,
+              "acc": 0.275
+            },
+            "law": {
+              "n": 48,
+              "correct": 16,
+              "acc": 0.3333
+            },
+            "psychology": {
+              "n": 40,
+              "correct": 29,
+              "acc": 0.725
+            },
+            "biology": {
+              "n": 36,
+              "correct": 27,
+              "acc": 0.75
+            },
+            "chemistry": {
+              "n": 56,
+              "correct": 20,
+              "acc": 0.3571
+            },
+            "history": {
+              "n": 19,
+              "correct": 12,
+              "acc": 0.6316
+            },
+            "other": {
+              "n": 46,
+              "correct": 21,
+              "acc": 0.4565
+            },
+            "health": {
+              "n": 35,
+              "correct": 19,
+              "acc": 0.5429
+            },
+            "economics": {
+              "n": 42,
+              "correct": 32,
+              "acc": 0.7619
+            },
+            "math": {
+              "n": 67,
+              "correct": 26,
+              "acc": 0.3881
+            },
+            "physics": {
+              "n": 65,
+              "correct": 26,
+              "acc": 0.4
+            },
+            "computer science": {
+              "n": 20,
+              "correct": 13,
+              "acc": 0.65
+            },
+            "philosophy": {
+              "n": 25,
+              "correct": 15,
+              "acc": 0.6
+            },
+            "engineering": {
+              "n": 48,
+              "correct": 22,
+              "acc": 0.4583
+            }
+          },
+          "difficulty": {
+            "unknown": {
+              "n": 587,
+              "correct": 289,
+              "acc": 0.4923
+            }
+          },
+          "n_options": {
+            "opt_ge8": {
+              "n": 548,
+              "correct": 267,
+              "acc": 0.4872
+            },
+            "opt_5_7": {
+              "n": 12,
+              "correct": 4,
+              "acc": 0.3333
+            },
+            "opt_le4": {
+              "n": 27,
+              "correct": 18,
+              "acc": 0.6667
+            }
+          }
+        },
+        "by_source": {
+          "public": {
+            "n": 587,
+            "correct": 289,
+            "acc": 0.4923
+          }
+        }
+      },
+      "strict_lenient": {
+        "n": 588,
+        "agreement": 0.9932,
+        "kappa": 0.9865,
+        "strict_invalid_lenient_parsed": 4,
+        "rescued_rate": 0.0068
+      },
+      "judge_agreement": {
+        "reference": "strict（严格口径：整段回复必须是单个字母）",
+        "candidate": "lenient（宽松口径：三级阶梯回退）",
+        "judgment_scale": "含弃权的名义量表（correct / wrong / invalid / truncated）",
+        "abstention_handling": "invalid 与 truncated 视为弃权，独立成档；二元一致性只在两口径均判出 correct/wrong 的条目上计算",
+        "n_total": 588,
+        "binary": {
+          "n": 583,
+          "excluded_non_binary": 5,
+          "coverage": 0.9915,
+          "confusion": {
+            "TP": 286,
+            "FN": 0,
+            "FP": 0,
+            "TN": 297
+          },
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "cohen_kappa": 1.0,
+          "phi_mcc": 1.0,
+          "kappa_minus_phi": 0.0,
+          "prevalence_ref": 0.4906,
+          "prevalence_pred": 0.4906,
+          "prevalence_drift": 0.0
+        },
+        "all_tiers": {
+          "labels": [
+            "correct",
+            "wrong",
+            "invalid",
+            "truncated"
+          ],
+          "matrix": [
+            [
+              286,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              297,
+              0,
+              0
+            ],
+            [
+              3,
+              1,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "off_scale": 0,
+          "n": 588,
+          "agreement": 0.9932,
+          "top_disagreements": [
+            {
+              "ref": "invalid",
+              "pred": "correct",
+              "n": 3
+            },
+            {
+              "ref": "invalid",
+              "pred": "wrong",
+              "n": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}

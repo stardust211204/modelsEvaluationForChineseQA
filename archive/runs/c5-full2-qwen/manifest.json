@@ -1,0 +1,29 @@
+{
+  "run_id": "c5-full2-qwen",
+  "configs": [
+    "c5"
+  ],
+  "arms": [
+    "qwen3.8-flash"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c5": "02d618d2db12ada4"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash"
+  ],
+  "started_at": "2026-10-05T05:22:15.881845+00:00",
+  "finished_at": "2026-10-05T05:23:21.435075+00:00",
+  "note": "5-shot｜5-shot，示例固定取自 validation split",
+  "dataset": "eval_set"
+}

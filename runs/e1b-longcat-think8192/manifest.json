@@ -1,0 +1,33 @@
+{
+  "run_id": "e1b-longcat-think8192",
+  "configs": [
+    "c3"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 8192,
+      "temperature": 0.1
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c3": "5e5b82ecfb4c0fd6"
+  },
+  "param_overrides": {
+    "max_tokens": 8192,
+    "thinking": "<dropped>"
+  },
+  "code_version": "000b4d7",
+  "models_snapshot": [
+    "longcat-2.5-preview-free"
+  ],
+  "started_at": "2026-10-13T13:32:42.571427+00:00",
+  "finished_at": "2026-10-13T13:45:01.733056+00:00",
+  "note": "重复采样｜与 C1 完全相同，同题重复 10 次",
+  "dataset": "eval_set",
+  "reps": 1,
+  "param_arms": null
+}

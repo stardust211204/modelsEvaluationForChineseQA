@@ -1,0 +1,134 @@
+{
+  "run_id": "c1-full",
+  "n_common": 570,
+  "pairs": {
+    "deepseek-v4.1-flash|longcat-2.5-preview-free": {
+      "pi_d": 0.2298,
+      "observed_delta": 0.0053,
+      "delta_min_detectable": 0.0562,
+      "detectable": false
+    },
+    "deepseek-v4.1-flash|mimo-v2.6-flash": {
+      "pi_d": 0.2825,
+      "observed_delta": 0.1456,
+      "delta_min_detectable": 0.0623,
+      "detectable": true
+    },
+    "longcat-2.5-preview-free|mimo-v2.6-flash": {
+      "pi_d": 0.3123,
+      "observed_delta": 0.1404,
+      "delta_min_detectable": 0.0655,
+      "detectable": true
+    }
+  },
+  "by_subject": {
+    "math": {
+      "n": 64,
+      "pi_d": 0.4062,
+      "observed_delta": 0.3438,
+      "delta_min_detectable": 0.2231,
+      "n_needed_for_10pp": 318
+    },
+    "physics": {
+      "n": 64,
+      "pi_d": 0.4062,
+      "observed_delta": 0.2188,
+      "delta_min_detectable": 0.2231,
+      "n_needed_for_10pp": 318
+    },
+    "chemistry": {
+      "n": 53,
+      "pi_d": 0.2453,
+      "observed_delta": 0.1698,
+      "delta_min_detectable": 0.1905,
+      "n_needed_for_10pp": 192
+    },
+    "other": {
+      "n": 46,
+      "pi_d": 0.3478,
+      "observed_delta": 0.0435,
+      "delta_min_detectable": 0.2435,
+      "n_needed_for_10pp": 273
+    },
+    "law": {
+      "n": 46,
+      "pi_d": 0.3478,
+      "observed_delta": 0.1739,
+      "delta_min_detectable": 0.2435,
+      "n_needed_for_10pp": 273
+    },
+    "economics": {
+      "n": 42,
+      "pi_d": 0.1429,
+      "observed_delta": 0.0476,
+      "delta_min_detectable": 0.1633,
+      "n_needed_for_10pp": 112
+    },
+    "engineering": {
+      "n": 42,
+      "pi_d": 0.3571,
+      "observed_delta": 0.119,
+      "delta_min_detectable": 0.2582,
+      "n_needed_for_10pp": 280
+    },
+    "psychology": {
+      "n": 40,
+      "pi_d": 0.25,
+      "observed_delta": 0.0,
+      "delta_min_detectable": 0.2214,
+      "n_needed_for_10pp": 196
+    },
+    "business": {
+      "n": 39,
+      "pi_d": 0.359,
+      "observed_delta": 0.2564,
+      "delta_min_detectable": 0.2686,
+      "n_needed_for_10pp": 281
+    },
+    "biology": {
+      "n": 36,
+      "pi_d": 0.1944,
+      "observed_delta": 0.0833,
+      "delta_min_detectable": 0.2058,
+      "n_needed_for_10pp": 152
+    },
+    "health": {
+      "n": 35,
+      "pi_d": 0.2857,
+      "observed_delta": 0.2286,
+      "delta_min_detectable": 0.253,
+      "n_needed_for_10pp": 224
+    },
+    "philosophy": {
+      "n": 25,
+      "pi_d": 0.24,
+      "observed_delta": 0.16,
+      "delta_min_detectable": 0.2743,
+      "n_needed_for_10pp": 188
+    },
+    "computer science": {
+      "n": 19,
+      "pi_d": 0.4737,
+      "observed_delta": 0.2632,
+      "delta_min_detectable": 0.4421,
+      "n_needed_for_10pp": 371
+    },
+    "history": {
+      "n": 19,
+      "pi_d": 0.2105,
+      "observed_delta": 0.1053,
+      "delta_min_detectable": 0.2947,
+      "n_needed_for_10pp": 165
+    }
+  },
+  "representative_pair": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash"
+  ],
+  "recommendation": {
+    "mean_pi_d": 0.2749,
+    "n_subjects": 14,
+    "n_for_10pp_per_subject": 3017,
+    "n_current": 570
+  }
+}

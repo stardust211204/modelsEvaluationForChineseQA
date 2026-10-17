@@ -1,0 +1,25 @@
+{
+  "run_id": "gold-audit",
+  "configs": [],
+  "arms": [
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "deepseek-v4-pro": {
+      "max_tokens": 512,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {},
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-04T09:47:24.542579+00:00",
+  "finished_at": "2026-10-04T09:47:35.322207+00:00",
+  "note": "标准答案审计（stage 2）｜题集 61 题｜judge=deepseek-v4-pro",
+  "dataset": "eval_set"
+}

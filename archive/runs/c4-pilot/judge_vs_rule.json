@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-10-03T17:08:04.943124+00:00",
+  "run_id": "c4-pilot",
+  "judge_model": "deepseek-v4-pro",
+  "judge_endpoint": "https://api.deepseek.com",
+  "source_run": "c1-full",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "n_shared": 6,
+      "binary": {
+        "n": 6,
+        "excluded_non_binary": 0,
+        "coverage": 1.0,
+        "confusion": {
+          "TP": 3,
+          "FN": 0,
+          "FP": 0,
+          "TN": 3
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.5,
+        "prevalence_pred": 0.5,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 6
+      },
+      "rule_tier_counts": {
+        "correct": 3,
+        "wrong": 3,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 3,
+        "wrong": 3,
+        "invalid": 0,
+        "truncated": 0
+      },
+      "judge_disagreements": []
+    }
+  },
+  "note": "judge 与 deepseek-v4.1-flash 同家族；分臂报一致率以暴露 self-preference"
+}

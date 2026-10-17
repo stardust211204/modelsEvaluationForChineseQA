@@ -1,0 +1,61 @@
+{
+  "run_id": "e2-relabel-5arm",
+  "configs": [
+    "c1"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4-pro": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "e301f94717aaf855",
+  "prompt_fingerprints": {
+    "c1": "e8eac7986f9c8aa9"
+  },
+  "param_overrides": {},
+  "code_version": "000b4d7",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.8-flash",
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-12T17:54:09.840616+00:00",
+  "finished_at": "2026-10-12T17:55:47.430934+00:00",
+  "note": "基线｜强格式约束 + 0-shot + 关思考",
+  "dataset": "e2_relabel_set",
+  "reps": 1,
+  "param_arms": null
+}

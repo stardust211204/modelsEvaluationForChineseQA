@@ -1,0 +1,7 @@
+﻿arm,config,n_requests,n_failed,n_total,n_correct,n_wrong,n_invalid,n_truncated,acc,acc_ci_low,acc_ci_high,ci_width_pp,wilson_low,wilson_high,invalid_rate,truncated_rate,tokens_in,tokens_out,total_tokens,cost_cny,cost_per_1k_correct,median_latency_s,mean_latency_s,p95_latency_s,total_latency_s,median_reasoning_len,tier_steps,mode
+deepseek-v4.1-flash,c2,150,0,150,0,0,142,8,,,,,,,0.9467,0.0533,32141,37271,69412,0.1812,,3.204,4.12,8.641,618.0,0,"{""none"": 149, ""empty"": 1}",strict
+deepseek-v4.1-flash,c2,150,0,150,120,24,0,6,0.8333,0.7708,0.8889,11.81,0.764,0.8854,0.0,0.04,32141,37271,69412,0.1812,1.51,3.204,4.12,8.641,618.0,0,"{""phrase"": 144, ""empty"": 1, ""none"": 5}",lenient
+longcat-2.5-preview-free,c2,150,0,150,0,0,140,10,,,,,,,0.9333,0.0667,35641,59780,95421,0.2748,,9.602,12.073,24.288,1810.9,0,"{""none"": 150}",strict
+longcat-2.5-preview-free,c2,150,0,150,109,32,0,9,0.773,0.7021,0.8369,13.48,0.6972,0.8344,0.0,0.06,35641,59780,95421,0.2748,2.521,9.602,12.073,24.288,1810.9,0,"{""phrase"": 141, ""none"": 9}",lenient
+mimo-v2.6-flash,c2,150,0,150,0,0,128,22,,,,,,,0.8533,0.1467,37844,78978,116822,0.3538,,15.678,18.625,38.878,2793.7,0,"{""none"": 150}",strict
+mimo-v2.6-flash,c2,150,0,150,90,48,0,12,0.6522,0.5725,0.7319,15.94,0.5696,0.7265,0.0,0.08,37844,78978,116822,0.3538,3.931,15.678,18.625,38.878,2793.7,0,"{""phrase"": 138, ""none"": 12}",lenient

@@ -1,0 +1,29 @@
+{
+  "run_id": "c3-full-qwen",
+  "configs": [
+    "c3"
+  ],
+  "arms": [
+    "qwen3.8-flash"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c3": "dad76f4444007062"
+  },
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash"
+  ],
+  "started_at": "2026-10-05T05:03:16.772110+00:00",
+  "finished_at": "2026-10-05T05:11:18.878844+00:00",
+  "note": "重复采样｜与 C1 完全相同，同题重复 10 次",
+  "dataset": "eval_set"
+}

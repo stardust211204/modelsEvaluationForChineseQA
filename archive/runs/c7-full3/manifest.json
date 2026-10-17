@@ -1,0 +1,41 @@
+{
+  "run_id": "c7-full3",
+  "configs": [],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "f4d9b1ed91d12f24",
+  "prompt_fingerprints": {},
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "started_at": "2026-10-04T02:40:55.740967+00:00",
+  "finished_at": "2026-10-04T02:58:22.497016+00:00",
+  "note": "C7 拒答评测（双向）｜题集 300 条（过度拒答 150 + 应拒 150）｜900 条请求",
+  "dataset": "refusal_set"
+}

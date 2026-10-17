@@ -1,0 +1,46 @@
+{
+  "run_id": "c2-full-hi",
+  "configs": [
+    "c2"
+  ],
+  "arms": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "params_effective": {
+    "longcat-2.5-preview-free": {
+      "max_tokens": 2048,
+      "temperature": 0.1,
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "mimo-v2.6-flash": {
+      "max_tokens": 2048,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    },
+    "deepseek-v4.1-flash": {
+      "max_tokens": 2048,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "85fcf41db5a5e42d",
+  "prompt_fingerprints": {
+    "c2": "ee56581df3f7ba5a"
+  },
+  "param_overrides": {
+    "max_tokens": 2048
+  },
+  "code_version": "nogit",
+  "models_snapshot": [
+    "longcat-2.5-preview-free",
+    "mimo-v2.6-flash",
+    "deepseek-v4.1-flash"
+  ],
+  "started_at": "2026-10-03T17:13:13.517600+00:00",
+  "finished_at": "2026-10-03T17:23:52.684750+00:00",
+  "note": "去掉格式约束｜自由作答，靠宽松解析提取答案"
+}

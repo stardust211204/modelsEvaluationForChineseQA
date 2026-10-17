@@ -1,0 +1,33 @@
+{
+  "run_id": "sb-c2hi-ceval",
+  "configs": [
+    "c2"
+  ],
+  "arms": [
+    "space-bunny-free"
+  ],
+  "params_effective": {
+    "space-bunny-free": {
+      "max_tokens": 4096,
+      "temperature": 0.1,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  },
+  "data_hash": "bda88b1f9e8d1f5b",
+  "prompt_fingerprints": {
+    "c2": "94b2043fe52829c6"
+  },
+  "param_overrides": {
+    "max_tokens": 4096
+  },
+  "code_version": "nogit",
+  "models_snapshot": [
+    "space-bunny-free"
+  ],
+  "started_at": "2026-10-05T09:59:25.829375+00:00",
+  "finished_at": "2026-10-05T10:14:50.930027+00:00",
+  "note": "去掉格式约束｜自由作答，靠宽松解析提取答案",
+  "dataset": "ceval_set"
+}

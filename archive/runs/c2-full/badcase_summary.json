@@ -1,0 +1,59 @@
+{
+  "run_id": "c2-full",
+  "config": "c2",
+  "mode": "lenient",
+  "n_wrong": 104,
+  "by_arm": {
+    "deepseek-v4.1-flash": {
+      "reasoning": 9,
+      "factual": 13,
+      "option_confusion": 2
+    },
+    "longcat-2.5-preview-free": {
+      "factual": 4,
+      "reasoning": 21,
+      "option_confusion": 7
+    },
+    "mimo-v2.6-flash": {
+      "reasoning": 39,
+      "option_confusion": 6,
+      "factual": 3
+    }
+  },
+  "by_subject": {
+    "law": 19,
+    "psychology": 8,
+    "biology": 6,
+    "chemistry": 6,
+    "history": 3,
+    "other": 17,
+    "health": 9,
+    "economics": 8,
+    "math": 6,
+    "physics": 10,
+    "computer science": 5,
+    "engineering": 5,
+    "business": 2
+  },
+  "n_review": 104,
+  "review_stratified_by": [
+    "arm",
+    "subject"
+  ],
+  "forced_included": {
+    "mentions_gold_text": 18,
+    "adjacent_to_gold": 14
+  },
+  "label_options": [
+    "knowledge_gap",
+    "reasoning_error",
+    "option_confusion",
+    "question_misread",
+    "detail_omission",
+    "gold_error",
+    "format_parse",
+    "cannot_tell"
+  ],
+  "confirmed": false,
+  "note": "启发式归因**未经人工确认**，不得写进报告结论。复核清单见 badcase_review.jsonl（confirmed_attribution 待回填）。回填后需按 docs/badcase_method.md 步骤 3 先报一致率（κ/α）再报分布。"
+}

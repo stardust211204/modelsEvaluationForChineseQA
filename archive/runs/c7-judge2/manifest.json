@@ -1,0 +1,25 @@
+{
+  "run_id": "c7-judge2",
+  "configs": [],
+  "arms": [
+    "deepseek-v4-pro"
+  ],
+  "params_effective": {
+    "deepseek-v4-pro": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "9afc95d581868e6b",
+  "prompt_fingerprints": {},
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "deepseek-v4-pro"
+  ],
+  "started_at": "2026-10-04T03:08:42.266443+00:00",
+  "finished_at": "2026-10-04T03:12:06.594849+00:00",
+  "note": "C7 拒答 judge 判定（权威）｜被判 run=c7-full3｜900 条｜judge=deepseek-v4-pro",
+  "dataset": "refusal_set"
+}

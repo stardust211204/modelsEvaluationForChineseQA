@@ -1,0 +1,41 @@
+{
+  "judge_model": "deepseek-v4-pro",
+  "n_items": 99,
+  "self_agreement": 0.899,
+  "self_kappa": 0.838,
+  "human_vs_llm_n": 6,
+  "distribution": {
+    "format_parse": 9,
+    "reasoning_error": 24,
+    "gold_error": 53,
+    "option_confusion": 11,
+    "knowledge_gap": 2
+  },
+  "skipped": [
+    {
+      "instance_id": "prox-zh-183",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-626",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-132",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-528",
+      "arm": "longcat-2.5-preview-free",
+      "why": "截断/空回复"
+    },
+    {
+      "instance_id": "prox-zh-536",
+      "arm": "mimo-v2.6-flash",
+      "why": "截断/空回复"
+    }
+  ]
+}

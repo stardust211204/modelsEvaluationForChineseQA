@@ -1,0 +1,25 @@
+{
+  "run_id": "orbench-qwen",
+  "configs": [],
+  "arms": [
+    "qwen3.8-flash"
+  ],
+  "params_effective": {
+    "qwen3.8-flash": {
+      "max_tokens": 1024,
+      "temperature": 0.1,
+      "reasoning_effort": "none"
+    }
+  },
+  "data_hash": "e88cbab190b462ba",
+  "prompt_fingerprints": {},
+  "param_overrides": {},
+  "code_version": "nogit",
+  "models_snapshot": [
+    "qwen3.8-flash"
+  ],
+  "started_at": "2026-10-04T07:52:26.937996+00:00",
+  "finished_at": "2026-10-04T08:53:42.870097+00:00",
+  "note": "C7 拒答评测（双向）｜题集 1974 条（过度拒答 1319 + 应拒 655）｜1974 条请求",
+  "dataset": "or-bench"
+}

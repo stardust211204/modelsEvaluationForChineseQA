@@ -1,0 +1,477 @@
+{
+  "generated_at": "2026-10-03T17:26:02.505178+00:00",
+  "run_id": "c4-full",
+  "judge_model": "deepseek-v4-pro",
+  "judge_endpoint": "https://api.deepseek.com",
+  "source_run": "c1-full",
+  "arms": {
+    "deepseek-v4.1-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 138,
+        "excluded_non_binary": 12,
+        "coverage": 0.92,
+        "confusion": {
+          "TP": 97,
+          "FN": 0,
+          "FP": 0,
+          "TN": 41
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.7029,
+        "prevalence_pred": 0.7029,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            97,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            41,
+            10,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 98,
+        "wrong": 51,
+        "invalid": 0,
+        "truncated": 1
+      },
+      "judge_tier_counts": {
+        "correct": 97,
+        "wrong": 41,
+        "invalid": 12,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-148",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-269",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-316",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-348",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-450",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-493",
+          "rule": "correct",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-516",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-536",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-552",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-579",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-622",
+          "rule": "truncated",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-634",
+          "rule": "wrong",
+          "judge": "invalid"
+        }
+      ]
+    },
+    "longcat-2.5-preview-free": {
+      "n_shared": 150,
+      "binary": {
+        "n": 133,
+        "excluded_non_binary": 17,
+        "coverage": 0.8867,
+        "confusion": {
+          "TP": 89,
+          "FN": 0,
+          "FP": 0,
+          "TN": 44
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.6692,
+        "prevalence_pred": 0.6692,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            89,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            44,
+            13,
+            0
+          ],
+          [
+            2,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            2,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 89,
+        "wrong": 57,
+        "invalid": 2,
+        "truncated": 2
+      },
+      "judge_tier_counts": {
+        "correct": 91,
+        "wrong": 44,
+        "invalid": 15,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-101",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-136",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-148",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-207",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-211",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-473",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-489",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-493",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-516",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-540",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-548",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-575",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-579",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-618",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-634",
+          "rule": "truncated",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-650",
+          "rule": "truncated",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-97",
+          "rule": "wrong",
+          "judge": "invalid"
+        }
+      ]
+    },
+    "mimo-v2.6-flash": {
+      "n_shared": 150,
+      "binary": {
+        "n": 128,
+        "excluded_non_binary": 22,
+        "coverage": 0.8533,
+        "confusion": {
+          "TP": 75,
+          "FN": 0,
+          "FP": 0,
+          "TN": 53
+        },
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "cohen_kappa": 1.0,
+        "phi_mcc": 1.0,
+        "kappa_minus_phi": 0.0,
+        "prevalence_ref": 0.5859,
+        "prevalence_pred": 0.5859,
+        "prevalence_drift": 0.0
+      },
+      "all_tiers": {
+        "labels": [
+          "correct",
+          "wrong",
+          "invalid",
+          "truncated"
+        ],
+        "matrix": [
+          [
+            75,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            53,
+            18,
+            0
+          ],
+          [
+            2,
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "off_scale": 0,
+        "n": 150
+      },
+      "rule_tier_counts": {
+        "correct": 75,
+        "wrong": 71,
+        "invalid": 4,
+        "truncated": 0
+      },
+      "judge_tier_counts": {
+        "correct": 77,
+        "wrong": 53,
+        "invalid": 20,
+        "truncated": 0
+      },
+      "judge_disagreements": [
+        {
+          "instance_id": "prox-zh-132",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-136",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-148",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-183",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-211",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-269",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-281",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-316",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-450",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-458",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-481",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-489",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-505",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-516",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-520",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-536",
+          "rule": "invalid",
+          "judge": "correct"
+        },
+        {
+          "instance_id": "prox-zh-540",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-548",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-579",
+          "rule": "wrong",
+          "judge": "invalid"
+        },
+        {
+          "instance_id": "prox-zh-610",
+          "rule": "wrong",
+          "judge": "invalid"
+        }
+      ]
+    }
+  },
+  "note": "judge 与 deepseek-v4.1-flash 同家族；分臂报一致率以暴露 self-preference"
+}
