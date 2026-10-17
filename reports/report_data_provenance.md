@@ -5,9 +5,13 @@
 > 表图编号为索引。该版本已于 2026-10-17 **冻结归档**；对外报告已改为精简版
 > [`report_external_helm_polished.md`](report_external_helm_polished.md)（6 章 / 27 表 / 14 图）。
 >
-> 精简版是完整版的**子集** —— 同一张表 / 同一张图在两版中的数据来源与算法完全一致，
+> 精简版以完整版为主体，同一张表 / 同一张图在两版中的数据来源与算法完全一致，
 > 只是**章节编号不同**。因此本清单仍是精简版全部数字的有效复算依据；
 > 查表时请按**表的内容**（而非章节号）对应。
+>
+> **例外（2026-10-18 补）**：精简版后来**新增了若干数字**（`invalid` 率、qwen 的网关拦截拆分、
+> 合并口径的权重、剔除题的学科分布、方法学结论收口表），这些在完整版里没有。
+> 它们逐条登记在文末 **§六**。
 
 > 逐条记录 [报告](_archive/report_external_helm_full.md) 中**全部 35 张表、14 张图、52 处含数字正文**的
 > 数据来源与计算过程。
@@ -823,4 +827,64 @@ python scripts/build_pdf.py              # pandoc + xelatex + Eisvogel
 | 3 | L503 | 「落后 6.5」用的是 93 题逐模型口径，与同节表格的 76 题共同集不一致 | 待改（应为 10.5）|
 | 4 | T8 的 5-shot 行 | 「1/3/5/10」与 T24 的「原设置 5-shot」所指不同 | 待定 |
 | 5 | T1 模型规格 | 来自厂商公开资料，未标注出处与查询日期 | 待补 |
+
+---
+
+# 六、精简版新增数字的溯源（完整版没有）
+
+以下数字是 2026-10-18 一并补入精简版的，**完整版报告中没有对应表格**，故单列。
+
+### 6.1 `invalid` 与 `truncated` 率（精简版 §2.4）
+
+> 五个模型在 MMLU-ProX 上的 `invalid` 最多 1 条（1/546，0.18%）、C-Eval 上最多 1 条（1/583，0.17%），
+> 其余三个模型两集均为 0 条。
+
+**来源**：`runs/c1-5arm-v2/tallies/c1/all.jsonl` 与 `runs/ceval-c1-5arm-v2/tallies/c1/all.jsonl`，
+严格口径、按 `tier` 分档计数（含被剔除的 42 题之外的全部题）。
+
+```bash
+python scripts/_compute_invalid_merge.py      # 输出各模型分题集的 invalid / truncated 计数与占比
+```
+
+**说明**：报告 §2.4 承诺 `invalid` 与 `truncated` 「单独统计」，此前正文未给数值，本次补齐。
+
+### 6.2 qwen 过度拒答率中的云网关拦截（精简版 §3.3）
+
+> `qwen3.8-flash` 的 82.5% 中，19 条（1.44%）来自云网关入站拦截；Toxic 子集另有 7 条（1.07%）。
+
+**来源**：`runs/orbench-judge-qwen/refusal_judge_report.json` 的 `n_api_input_filter` 字段
+（Hard 侧 19、Toxic 侧 7）。扣除 19 条后的自身拒答率 = (1088 − 19) / 1319 = **81.1%**。
+
+```bash
+cat runs/orbench-judge-qwen/refusal_judge_report.json
+```
+
+### 6.3 合并准确率的权重（精简版 §2.2）
+
+> 合并准确率按微观加权：两集实际权重 48.4% / 51.6%（546 题 : 583 题）。
+
+**来源**：`scripts/_verify_polished_numbers.py:72` 即该口径的实现
+（`merged = (cm + cc) / (cm + wm + cc + wc) * 100`）。宏观等权平均与微观加权相差约 0.4 个百分点，
+两种口径下前三名的间距都是 1.1 个百分点，**排序不变**。
+
+```bash
+python scripts/_verify_polished_numbers.py
+```
+
+### 6.4 被剔除题目的学科分布（精简版 §2.2）
+
+> 150 题抽样中，数学 / 工程 / 物理的剔除率为 23.5% / 25.0% / 17.6%，总体 9.3%。
+
+**来源**：对比 `metrics.load_tallies(run, Config(cfg), drop_excluded=True/False)` 两次读数的差集，
+用 `data/eval_set.jsonl` 的 `stratum.subject` 字段归类。
+
+```bash
+python scripts/_verify_sample_balance.py
+```
+
+### 6.5 方法学结论收口表（精简版 §5.2）
+
+该表**不引入新数字**，逐格引用 §2.4、§3.1、§4.1、§4.2、§4.5、§5.1 已有的数值，
+仅按 §1.2 提出的四个方法学问题重新组织。各数字的溯源见本清单对应各条。
+
 
