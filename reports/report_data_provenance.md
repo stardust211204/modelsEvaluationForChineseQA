@@ -1,6 +1,15 @@
 # 报告数据溯源清单
 
-> 逐条记录 [report_external_helm.md](report_external_helm.md) 中**全部 35 张表、14 张图、52 处含数字正文**的
+> **★ 适用范围（2026-10-17 补注）**：本清单以 **完整版报告**
+> [`_archive/report_external_helm_full.md`](_archive/report_external_helm_full.md) 的
+> 表图编号为索引。该版本已于 2026-10-17 **冻结归档**；对外报告已改为精简版
+> [`report_external_helm_polished.md`](report_external_helm_polished.md)（6 章 / 26 表 / 14 图）。
+>
+> 精简版是完整版的**子集** —— 同一张表 / 同一张图在两版中的数据来源与算法完全一致，
+> 只是**章节编号不同**。因此本清单仍是精简版全部数字的有效复算依据；
+> 查表时请按**表的内容**（而非章节号）对应。
+
+> 逐条记录 [报告](_archive/report_external_helm_full.md) 中**全部 35 张表、14 张图、52 处含数字正文**的
 > 数据来源与计算过程。
 >
 > **命名**：`T` = 表格（按出现顺序编号）、`F` = 图件、`L` = 正文行号。

@@ -225,7 +225,8 @@ Copy-Item .env.example .env    # 填入真实 key
 | 路径 | 内容 |
 |---|---|
 | [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md) | **对外报告**（精简版，25 表 / 14 图 / 22 页 PDF） |
-| [`reports/report_external_helm.md`](reports/report_external_helm.md) | **完整版报告**（35 表 / 14 图，含全部推导） |
+| [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md) | **对外报告（唯一权威版）**：6 章 / 26 表 / 14 图 / 24 页 PDF |
+| `reports/_archive/report_external_helm_full.md` | 完整版报告（35 表，含全部明细与推导；已冻结归档，仅供技术参考） |
 | [`reports/report_data_provenance.md`](reports/report_data_provenance.md) | **数据溯源清单**：35 表 / 14 图 / 52 处含数字正文的来源与复算命令 |
 | [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) | 37 个权威批次总表 |
 | [`reports/polished_report_review.md`](reports/polished_report_review.md) | 精简版逐项核校清单（含已修 / 待修） |
