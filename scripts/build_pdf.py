@@ -146,6 +146,21 @@ def count_captions(pdf: Path) -> int:
     return len(re.findall(r"(?:Figure|图)\s*\d+\s*[:：]", r.stdout or ""))
 
 
+def count_embedded_images(pdf: Path) -> int:
+    """数 PDF 里**真正内嵌**的图片对象数。返回 -1 表示没有 pdfimages 可用。
+
+    为什么需要它：`count_captions` 数的是 `图 N:` 这段**文字**，
+    而 pandoc 找不到图片文件时**照样输出图注** —— 于是「图注 14/14」可以在
+    「14 张图一张都没进去」的情况下成立。这个函数才是那段检查的补集。
+    """
+    if not shutil.which("pdfimages"):
+        return -1
+    r = subprocess.run(["pdfimages", "-list", str(pdf)],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    # 输出前两行是表头（页码行 + 列名行）
+    return max(0, len([ln for ln in (r.stdout or "").splitlines()[2:] if ln.strip()]))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Markdown 报告 -> PDF（Eisvogel）")
     ap.add_argument("--src", default="reports/report_external_helm_polished.md")
@@ -297,6 +312,29 @@ def main() -> int:
         shown = out
     print(f"  产出 : {shown}  ({out.stat().st_size / 1024:,.0f} KB)")
     print(f"  图注 : {n_fig} / {n_img}{flag}")
+
+    # ★ 图注数**证明不了图片被嵌进去了**（2026-10-17 实测）：
+    #   pandoc 找不到图片文件时只打一行 warning，**图注照输出** ——
+    #   实测把路径写错一层后，count_captions 仍报 14/14，而 PDF 从 1,329 KB 掉到 407 KB、
+    #   内嵌图片从 52 掉到 20。也就是说这道检查对「图全没了」完全无感。
+    #   所以另加两道：
+    #   ① 构建前式的**路径可解析性**检查：图片路径必须能相对**源文件所在目录**解析 ——
+    #      这正是 GitHub 的解析规则。写 `figures/x.png` 时 pandoc 从仓库根跑得通，
+    #      但 GitHub 上整页裂图（本项目踩过）。
+    #   ② 内嵌图片数（pdfimages）与文件体积，作为「图确实进去了」的旁证。
+    src_dir = src.parent
+    unresolved = [p for p in re.findall(r"!\[[^\]]*\]\(([^)\s]+)\)", md)
+                  if not p.startswith(("http", "/")) and not (src_dir / p).exists()]
+    if unresolved:
+        print(f"  ★ 图片路径 {len(unresolved)} 处无法相对源文件目录解析（pandoc 仍可能靠"
+              f" resource-path 找到，但 **GitHub 预览会裂图**）：")
+        for p in dict.fromkeys(unresolved):
+            print(f"      {p}")
+    n_embed = count_embedded_images(out)
+    if n_embed >= 0:
+        # 正常时应 ≳ 图片引用数（Eisvogel 封面底图与部分 PNG 会拆成多个对象）
+        warn = "" if n_embed >= n_img else f"   ★ 只有 {n_embed} 个，疑似图片未嵌入"
+        print(f"  内嵌图: {n_embed} 个（来源 {n_img} 张）{warn}")
     return 0
 
 
