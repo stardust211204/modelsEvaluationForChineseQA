@@ -60,6 +60,7 @@ r"""把 Markdown 报告转成 PDF（pandoc + xelatex + Eisvogel 模板）。
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -210,7 +211,12 @@ def main() -> int:
         "pandoc", str(src), "-o", str(out),
         "--template", str(TEMPLATE),
         "--pdf-engine=xelatex",
-        "--resource-path", str(paths.ROOT),
+        # ★ 图片路径要同时满足两个读者，所以 resource-path 必须给两条：
+        #   - **GitHub 预览**按文件所在目录解析，所以 markdown 里写 `../figures/x.png`
+        #     （写 `figures/x.png` 在仓库根跑得通，但 GitHub 上 14 张图全是裂的）；
+        #   - **pandoc** 从仓库根跑，靠 resource-path 把 `../figures/x.png` 折回来 ——
+        #     给 <ROOT> 与 <源文件目录> 两条，后者拼出 `reports/../figures/x.png` 即命中。
+        "--resource-path", os.pathsep.join([str(paths.ROOT), str(src.parent)]),
         "-V", f"mainfont={args.mainfont}",
         "-V", f"monofont={args.monofont}",
         # ★ 中文字体分三档传。以前 mainfont 同时兼作 CJKmainfont（都用雅黑），
