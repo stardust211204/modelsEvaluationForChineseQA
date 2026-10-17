@@ -31,7 +31,7 @@
 
 | 文件 | 内容 |
 |---|---|
-| [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（及同名 PDF） | **对外评测报告 —— 唯一权威版**，6 章 / 26 表 / 14 图 |
+| [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（及同名 PDF） | **对外评测报告 —— 唯一权威版**，6 章 / 27 表 / 14 图 |
 | [`reports/report_data_provenance.md`](reports/report_data_provenance.md) | 数据溯源清单：报告全部数字的来源与复算命令 |
 | [`reports/RUN_AUDIT.md`](reports/RUN_AUDIT.md) · [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) | 批次台账：全库 85 批次分类 · 37 个权威批次与数据可用性核查 |
 | [`docs/design.md`](docs/design.md) | 评测方案设计，含对 HELM 判分契约的三处修正 |
