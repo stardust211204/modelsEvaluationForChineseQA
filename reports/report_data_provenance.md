@@ -176,7 +176,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
 「思考默认开启且无法关闭」——**证据来自 T29 的两个批次**：`sb-c1-eval` 588 条中 91% 有推理内容、
 `sb-c1-ceval` 583 条中 75%，且生效参数均为 `chat_template_kwargs: {enable_thinking: false}`。
 
-**复算**：读 `runs/sb-*/raw/` 的 `reasoning` 字段长度 + `manifest.json` 的 `params_effective`。
+**复算**：读 `runs/sb-*/raw/` 的 `reasoning` 字段长度 + `runs/sb-*/manifest.json` 的 `params_effective`。
 
 ---
 
@@ -184,7 +184,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
 
 ### F1 `40_pipeline_main.png` / F2 `41_pipeline_safety.png`
 **无数据**，是管线定义图。
-- 源文件：`figures/latex/pipeline_main_v10.tex` / `pipeline_safety_v13.tex`
+- 源文件：`figures/latex/pipeline_main_v10.tex` / `figures/latex/pipeline_safety_v13.tex`
 - 编译：`xelatex <file>.tex` → `pdftoppm -png -r 150 <file>.pdf` → 复制到 `figures/`
 - 图上的「思考关闭」标注对应 §3.9 的结论
 
@@ -313,7 +313,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
   qwen 侧有 26 条源响应请求失败、未送判。
 
 ### L200 judge 思考状态（正文）
-- 来源：`orbench-judge-full` / `orbench-judge-qwen` 的 `manifest.json`
+- 来源：`runs/orbench-judge-full/manifest.json` 与 `runs/orbench-judge-qwen/manifest.json`
 - 证据：`params_effective` 含 `reasoning_effort: "none"`；`raw/` 里 `reasoning` 非空占比 0%
 - 「12% 判不出」来自 `c4-5arm`（思考未关）的覆盖率 85–89%
 

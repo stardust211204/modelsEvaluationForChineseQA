@@ -12,6 +12,11 @@ runs/*/raw/
 runs/_*
 # tallies 的旧版备份（解析器修复前的快照）。tallies 本身可由 raw 重算，无需留档。
 *.pre-parserfix
+# 派生产物：metrics.csv / json 由 `report_metrics.py` 从 tallies/ 重算得到，
+# 随时可再生成，不入库。（runs/c1-full 与 archive/ 下的几份是早期留存，
+# git 对已跟踪文件优先，它们会继续留在版本库里。）
+runs/*/metrics.csv
+runs/*/metrics.json
 figures/*.pdf
 reports/*.pdf
 figures/latex/*.pdf
