@@ -169,13 +169,19 @@ def fig43() -> None:
                 linewidth=1.4, color=COOL5[j], label=a, alpha=0.85)
     ax.plot(x, mean, marker="s", markersize=9, linewidth=3, color=WARM,
             label="五臂均值", zorder=5)
-    for i in range(len(G) - 1):
-        d = mean[i + 1] - mean[i]
-        # 标注放在两点的**较高处**上方，避免压在折线上
-        y = max(mean[i], mean[i + 1]) + 4
-        ax.annotate(f"{d:+.1f}", ((x[i] + x[i + 1]) / 2, y),
-                    ha="center", fontsize=11, fontweight="bold",
-                    color=WARM if abs(d) > 1 else "#888888")
+    # ★ 本图**不标注数值**（2026-10-17 起）——
+    #   本图的阶梯是「各臂在自己的可判集上的均值」（四组共同子集，n = 255），
+    #   与报告表里的「逐对配对子集」（n = 276/267/594）口径不同，数值因此有差异：
+    #   图上是 +16.5/+10.4/+0.5，表里是 +15.9/+10.0/−0.4。
+    #   两个口径各自成立，但把两套数字并排放进同一份报告，读者会以为其中一处是错的。
+    #   故图只讲结论（形状与趋势），数值一律以表为准。
+    #   详见 docs/reports-fix.md §6.1。
+    #
+    #   历史实现（保留备查，勿启用）：
+    #   for i in range(len(G) - 1):
+    #       d = mean[i + 1] - mean[i]
+    #       y = max(mean[i], mean[i + 1]) + 4
+    #       ax.annotate(f"{d:+.1f}", ((x[i] + x[i + 1]) / 2, y), ...)
     ax.set_xticks(x)
     ax.set_xticklabels([f"{l}\n{d}" for l, _, d in G], fontsize=9.5)
     ax.set_ylabel("准确率 ↑（宽松口径）")
