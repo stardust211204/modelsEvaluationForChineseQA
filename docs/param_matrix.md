@@ -146,7 +146,7 @@
 >    错误信息却像网络问题。已固化为 `tests/test_client_params.py`，
 >    并记入 README §三 缺陷 6。
 
-已选定并**完成逐模型探测**（`scripts/probe_arms.py`，39 次调用；原始记录 `data/raw_evidence/probe_arms.jsonl`）：
+已选定并**完成逐模型探测**（39 次调用，原始记录 `data/raw_evidence/probe_arms.jsonl`）：
 
 | 模型 | 厂商 | 温度生效 | 关思考参数（实测有效） | `max_tokens` 下限 | 冻结 params |
 |---|---|---|---|---|---|

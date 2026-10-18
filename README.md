@@ -118,7 +118,6 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 | `scripts/probe_params.py` | 实测各模型的**参数生效边界**（温度是否生效、思考模式如何关闭、`max_tokens` 下限） |
 | `scripts/probe_distinct.py` | **伪别名行为指纹** —— 针对 `resp_model` 仅回显请求名的问题，用 30 题 × 各模型的答案一致率矩阵反查底层是否为同一模型 |
 | `scripts/compare_endpoints.py` | 同一模型在不同 API 端点下的输出一致性核查 |
-| `scripts/probe_alias.py` / `probe_new_arm.py` | 新增模型接入前的定点兼容性探测 |
 
 探测结果回填至 [docs/param\_matrix.md](docs/param_matrix.md) 并**冻结**进 `configs/arms.yaml`——不做全局统一参数假设，因为实测证明参数行为跨厂商不可约。
 
@@ -171,7 +170,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 | [reports/report\_data\_provenance.md](reports/report_data_provenance.md) | **数据溯源清单**：全部表格、14 张图件与正文数字的来源批次及复算命令 |
 | [reports/RUN\_AUDIT.md](reports/RUN_AUDIT.md) · [reports/RUN\_INVENTORY.md](reports/RUN_INVENTORY.md) | **批次审计台账**：全库 85 批次分类台账 · 37 个权威批次可用性核查 |
 | [docs/design.md](docs/design.md) · [docs/param\_matrix.md](docs/param_matrix.md) | **方案设计与参数矩阵**：架构契约设计（含对 HELM 的三处修正）· 各模型参数生效实测表 |
-| [docs/open\_issues.md](docs/open_issues.md) · [docs/limitations.md](docs/limitations.md) | **缺陷记录与结论边界**：全周期问题修复台账 · 统计与外推边界说明 |
+| [docs/limitations.md](docs/limitations.md) | **结论边界**：统计与外推的适用条件、未闭合项与已知风险 |
 | [docs/badcase\_method.md](docs/badcase_method.md) · [docs/reproduce.md](docs/reproduce.md) | **错题归因与复现指南**：LLM Judge 双次自一致率核查方案 · 环境搭建与门禁读数说明 |
 
 </details>

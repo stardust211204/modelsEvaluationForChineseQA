@@ -84,7 +84,7 @@ scripts/         入口、实验与分析脚本、核校工具（241 个 .py）
 configs/         arms.yaml（五个模型 + 各自生效参数）· matrix.yaml · exclusions.json
 data/            eval_set.jsonl · ceval_set.jsonl · orbench_set.jsonl · frozen.json
 prompts/         c1_strict / c2_free / c5_fewshot / e2_labelshuffle / e6_* / judge_*
-docs/            design.md · limitations.md · open_issues.md · param_matrix.md · badcase_method.md
+docs/            design.md · limitations.md · param_matrix.md · badcase_method.md
 figures/         14 张正式图 + latex/（管线图源码与 HOWTO.md）
 runs/            每次跑批：manifest + raw（未入库） + tallies（已入库，可直接复算）
 reports/         对外报告 · 溯源清单 · 批次台账 · 专项实验报告

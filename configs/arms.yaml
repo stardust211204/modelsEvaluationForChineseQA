@@ -3,7 +3,7 @@
 # ★ 纪律：params 是「该模型实测生效后」冻结的字典，不是全局一套。
 #   实测已证明参数跨厂商不可约（见 docs/param_matrix.md §5）。
 #
-# 已由 scripts/probe_arms.py 于 2026-10-03 逐模型探测并回填（39 次调用）。
+# 已于 2026-10-03 逐模型探测并回填（39 次调用，原始记录 data/raw_evidence/probe_arms.jsonl）。
 # 探测结论：
 #   * 三个模型温度**全部失效**（temp=1.0 同题 6 次仅 1 种输出）
 #   * 关思考参数各不相同：LongCat 用 thinking，MiMo/DeepSeek 用 reasoning_effort
@@ -68,7 +68,7 @@ arms:
   # 未选 qwen3.8-max：那是旗舰档，混进来会让"谁更强"被"谁更贵"解释掉。
   #
   # ★★ 本模型是本项目**第一个温度真正生效**的模型（6 次 @temp=1.0 得到 6 种不同输出）。
-  #    现有三个模型温度全部失效（见 probe_arms 结论），所以 C3 只能说
+  #    现有三个模型温度全部失效（见 docs/param_matrix.md 的逐模型探测表），所以 C3 只能说
   #    「temperature 被忽略 ≠ 输出可复现」。有了本模型，**温度这条轴第一次可直接测** ——
   #    同题 temp=0.1 vs 1.0 的对照，能回答"可复现性到底由什么决定"。
   - name: "qwen3.8-flash"

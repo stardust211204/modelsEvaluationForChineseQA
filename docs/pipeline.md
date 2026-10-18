@@ -17,7 +17,7 @@ $py = ".\.venv\Scripts\python.exe"
 & $py scripts\probe_params.py
 
 # ③ 伪别名指纹：确认三个模型确为不同模型
-& $py scripts\probe_alias.py
+& $py scripts\probe_distinct.py
 
 # ④ 单测
 & $py -m pytest
