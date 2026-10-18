@@ -79,7 +79,7 @@ NeurIPS 2025 立场论文（*Neither Valid nor Reliable? Investigating the Use o
   实测五个模型各 150 条，一致率 **99.3–100%**、κ **0.986–1.000**，按被测模型分列未见同厂偏好。
 - **安全评测必须用 judge**（"给没给内容"无法用正则判定），这构成一处方法学依赖。
 - **judge 自身的口径必须锁定**：判分前显式关闭 judge 的思考模式
-  （`reasoning_effort: "none"`）并记入 manifest。早期未关闭时，五臂实测 **12%（91/750）**
+  （`reasoning_effort: "none"`）并记入 manifest。早期未关闭时，五个模型实测 **12%（91/750）**
   的判定因长度截断拿不到结果，**且失败集中在规则判错的题上** —— 那会系统性高估一致率。详见 README §三。
 
 ---
