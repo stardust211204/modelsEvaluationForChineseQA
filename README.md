@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/%E5%8D%95%E6%B5%8B-168%20passed-brightgreen.svg)](tests/)
 
-> [评测规模](#一评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六类评测失真](#三六大评测失真与修复) · [四层自动化校验](#四四层自动化校验) · [复现](#六复现) · [成果物映射](reports/PROJECT_SUMMARY.md)
+> [评测规模](#一评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六类评测失真](#三六大评测失真与修复) · [四层自动化校验](#四四层自动化校验) · [复现](#五复现) · [成果物映射](reports/PROJECT_SUMMARY.md)
 
 ---
 
@@ -70,7 +70,7 @@ src/meval/
 4. **准确率只允许一个分母**：分母恒为 `correct + wrong`，结算收口在 `metrics.tier_accounting()` 一处，跑批日志与图表脚本都不得另算一份。
 5. **跨模型对比用统一共同集**：截断率高时强制收敛到所有模型共同完成的交集，且在所有模型上剔同一批。
 
-> 第 4 条来自一次实际故障：早期跑批日志自己算过 `correct / 全部`，同一批数据因此出现两套准确率 —— **两套分母共存比单个错值更难发现**，两个数都「有来源」，谁也不会觉得它错。
+> 第 4 条防的是**分母漂移**：一旦下游日志或绘图脚本各自另算一份，同一批数据就会出现两套准确率 —— **两套分母共存比单个错值更难发现**，两个数都「有来源」，谁也不会觉得它错。
 
 ### 核心工程决策：`raw` 与 `tally` 分离
 
@@ -133,33 +133,22 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | 项 | 当前状态 |
 |---|---|
 | `tests/` | **13 个模块 / 168 个用例**（判分阶梯、配对检验、截断偏倚、难度、位置还原、参数分流、断点续跑……） |
-| `scripts/ci_gate.py` | **210 项**运行完整性与数据契约检查 —— **PASS 203 / FAIL 1 / WARN 6** |
+| `scripts/ci_gate.py` | **210 项**运行完整性与数据契约检查（两种工作区状态下的完整读数见 [`docs/reproduce.md`](docs/reproduce.md)） |
 | `scripts/exp_smoke.py` | **124 项**补充实验冒烟，**124/124** |
 
-> 那 1 项 FAIL 是 `longcat` 的**上游连接失败**（间歇性路由缺陷，客户端无法修复），与口径无关。
-
-### ④ 报告逐格自检
+### ④ 报告数字逐格复算
 
 | 脚本 | 查什么 |
 |---|---|
-| `scripts/_check_polished_report.py` | **对外报告**：图序与图表索引一致、宽度沿用原报告、表格结构、章节引用可解析、不可渲染字符 |
-| `scripts/_check_external_report.py` | 完整版报告的同类检查（**27/27**） |
-| `scripts/_check_render_safe.py` | 反引号内含 CJK、字体缺失符号、代码块含中文 —— 这些在 PDF 里**静默渲染成空白，不报错** |
-| `scripts/report_metrics.py` | 从 `tallies/` 逐格重算报告正文与表格数字 |
+| `scripts/report_metrics.py` | **从 `tallies/` 逐格重算报告正文与表格里的每一个数字** |
+| `scripts/_check_polished_report.py` · `_check_external_report.py` | 图序与图表索引一致、表格结构、章节引用可解析（完整版 **27/27**） |
+| `scripts/_check_render_safe.py` | 反引号内含 CJK、字体缺失符号、代码块含中文 —— 这些在 PDF 里**静默渲染成空白，不报错**，属排版侧兜底 |
 
 配合 [`reports/report_data_provenance.md`](reports/report_data_provenance.md)，**报告中的数字均可逐格复算**。
 
 ---
 
-## 五、已知局限与工程边界
-
-- **badcase 归因由 LLM judge 完成，未做人工复核。** 归因逻辑已实现并跑完（`scripts/run_badcase_judge.py`）：**99/104** 条错题可标，用 `deepseek-v4-pro`（关思考、temp 0.1）**跑两遍**测自一致率，得 **93.9%（κ = 0.914）** —— 这是标签稳定性的证据，**不等于人工一致率**。因此归因分布属于「单标注者 + 自一致率佐证」的强度，**不作为强结论使用**。标准答案审计独立进行（`scripts/run_gold_audit.py`）：61 题中 **56 题（91.8%）无缺陷**。
-  > 其中一条待查线索的抽样背景较易被误读（20 条子集取自「多模型共错」的高危候选池，比例不能外推到全库），完整说明见 [`docs/limitations.md`](docs/limitations.md) 的 badcase 归因条目。
-- 完整局限、`manifest.params_effective` 的 13 处登记不符等细节，见 [`docs/limitations.md`](docs/limitations.md) 与 [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) §4.6。
-
----
-
-## 六、复现
+## 五、复现
 
 `runs/*/tallies/` 判分台账已随仓库入库，原始响应（约 75 MB）另以 Release 数据包发布。
 **clone 后无需任何 API key 即可复算报告里的全部指标** —— 例如
