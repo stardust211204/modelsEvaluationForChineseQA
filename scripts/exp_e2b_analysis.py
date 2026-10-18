@@ -15,6 +15,13 @@
     所以「偏好字母 A」与「偏好第 k 个槽位」的模型在两个条件下命中率**完全相同**。
     唯一变化的是**其余选项的标签乱不乱**。
 
+★★ 基线必须限到**同一批题**
+    C1 是 546 题的全量批次，而 E2b / E2 只在同一批 100 题（剔 7 题源缺陷后 93 题）上跑过。
+    直接拿 C1 的全量准确率当基线，等于用两个不同题集的差当「效应」——
+    实测会把排版效应从 −2.2pp 抬到 −7.1pp（五模型均值 −2.6 → −8.5）。
+    所以 C1 那一支要用 E2b 的实例集**限题**，见 `RUNS` 的第四项。
+    （42 题源缺陷剔除清单两侧都要过，这一点原本就对。）
+
 ★ 判分必须重判
     两个实验的 `options`/`gold_indices` 都保持原样，tally 的 `tier` 判的是
     「答的字母下标 == 金标下标」，而字母是乱序贴在槽位上的 ⇒ 必须用
@@ -42,16 +49,22 @@ LETTERS = "ABCDEFGHIJ"
 DROP = exclusions.load()
 
 RUNS = {
-    "C1": ("c1-5arm-v2", "c1", None),
-    "E2b": ("e2b-relabel-5arm", "c1", "e2b_relabel_set.meta.json"),
-    "E2": ("e2-relabel-5arm", "c1", "e2_relabel_set.meta.json"),
+    # (run_id, config, 判分重映射用的 meta, 限题用的 meta)
+    # ★ C1 是 546 题全量，必须限到 E2b 的同一批题，否则「效应」= 两个题集之差
+    "C1": ("c1-5arm-v2", "c1", None, "e2b_relabel_set.meta.json"),
+    "E2b": ("e2b-relabel-5arm", "c1", "e2b_relabel_set.meta.json", None),
+    "E2": ("e2-relabel-5arm", "c1", "e2_relabel_set.meta.json", None),
 }
 # 全部用 eval_set 的题面与金标做判分基准（两个实验的 options/gold 都未改）
 POOL = {i.id: i for i in build_set.load_frozen(paths.data() / "eval_set.jsonl")}
 
 
-def load(run, cfg, metafile):
-    """(arm, iid) -> (tier, answer_index)，已按 label_order 重映射并重判。"""
+def load(run, cfg, metafile, limitfile=None):
+    """(arm, iid) -> (tier, answer_index)，已按 label_order 重映射并重判。
+
+    `limitfile` 给出时，只保留该 meta 的 `label_order` 里出现的实例
+    —— C1 靠它限到与 E2b/E2 完全相同的题集。
+    """
     ans = {}
     for fp in (paths.ROOT / "runs" / run / "raw" / cfg).glob("*.jsonl"):
         for ln in fp.read_text(encoding="utf-8").splitlines():
@@ -66,6 +79,10 @@ def load(run, cfg, metafile):
     L = None
     if metafile:
         L = json.loads((paths.data() / metafile).read_text(encoding="utf-8"))["label_order"]
+    KEEP = None
+    if limitfile:
+        KEEP = set(json.loads(
+            (paths.data() / limitfile).read_text(encoding="utf-8"))["label_order"])
     out = {}
     for ln in tp.read_text(encoding="utf-8").splitlines():
         if not ln.strip():
@@ -77,6 +94,8 @@ def load(run, cfg, metafile):
             continue
         iid = t["instance_id"]
         if iid not in POOL:
+            continue
+        if KEEP is not None and iid not in KEEP:
             continue
         inst = POOL[iid]
         ai = t["answer_index"]
