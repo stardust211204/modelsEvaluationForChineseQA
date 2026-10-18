@@ -121,7 +121,11 @@ def fig42() -> None:
     ax.set_ylim(0, 108)
     ax.set_title(f"思考开关的效应：开启后五模型一致大幅上升 ↑（同一批 {len(keep)} 题，"
                  f"关闭思考为基线）")
-    ax.legend(frameon=True, loc="upper left")
+    # ★ 图例原先放在 upper left，正好压住第一组柱（ds-pro）上方的 Δ 标注（+36.8，
+    #   也就是效应区间上界），图上只剩四个 Δ。改放**坐标区内的右上角** ——
+    #   那一块没有柱子也没有标注（最高的 mimo 组 Δ 在 86 附近，图例在 96 以上），
+    #   只是换位置，不动图的整体设计。
+    ax.legend(frameon=True, loc="upper right")
     ax.grid(axis="x", visible=False)
     fig.savefig(OUT / "42_thinking_switch.png")
     plt.close(fig)

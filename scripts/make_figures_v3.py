@@ -110,7 +110,7 @@ def fig01() -> None:
 
     # 分别取两个评测集 + 合并
     res: dict[str, dict[str, float]] = {}
-    for label, run, cfg, ds in (("合并（1171 实例）", None, None, None),
+    for label, run, cfg, ds in (("合并（1,129 实例）", None, None, None),
                                 ("MMLU-ProX", "c1-5arm-v2", "c1", "eval_set"),
                                 ("C-Eval", "ceval-c1-5arm-v2", "c1", "ceval_set")):
         m: dict[str, float] = {}
@@ -128,22 +128,22 @@ def fig01() -> None:
                 m[a] = acc_of({str(i): t for i, t in enumerate(rows)})
         res[label] = m
     mt = merged_tiers()
-    res["合并（1171 实例）"] = {a: acc_of(mt[a]) for a in ARMS}
+    res["合并（1,129 实例）"] = {a: acc_of(mt[a]) for a in ARMS}
 
-    order = sorted(ARMS, key=lambda a: -res["合并（1171 实例）"][a])
+    order = sorted(ARMS, key=lambda a: -res["合并（1,129 实例）"][a])
     y = np.arange(len(order))
     fig, ax = plt.subplots(figsize=(5 * 1.6, 3.5 * 1.4))
-    ax.barh(y, [res["合并（1171 实例）"][a] for a in order],
+    ax.barh(y, [res["合并（1,129 实例）"][a] for a in order],
             color=[COLOR[a] for a in order], height=0.62)
     for i, a in enumerate(order):
-        v = res["合并（1171 实例）"][a]
+        v = res["合并（1,129 实例）"][a]
         ax.text(v + 0.6, i, f"{v:.1f}", va="center", fontsize=11)
     ax.set_yticks(y)
     ax.set_yticklabels(order, fontsize=10.5)
     ax.invert_yaxis()
     ax.set_xlabel(f"准确率 {UP}（%）", fontsize=11)
     ax.set_xlim(0, 88)
-    ax.set_title("总体准确率 · 合并 1171 实例", fontsize=12)
+    ax.set_title("总体准确率 · 合并 1,129 实例", fontsize=12)
     fig.savefig(OUT / "30_overall_barh.png")
     plt.close(fig)
 
@@ -226,7 +226,8 @@ def fig03() -> None:
             spread.append(max(vals) - min(vals))
     fig, ax = plt.subplots(figsize=(5 * 1.4, 3.5 * 1.2))
     ax.plot(xs, spread, "o-", color=COOL_DARK, lw=2, ms=8)
-    ax.set_xlabel("实例难度（其余四模型平均正确率，%）", fontsize=11)
+    # ★ 横轴画的是 0~1 的比例，标题原先写「，%」与刻度对不上 —— 只改文字，刻度不动
+    ax.set_xlabel("实例难度（其余四模型平均正确率）", fontsize=11)
     ax.set_ylabel("模型间最大差距（百分点）", fontsize=11)
     ax.set_title("难度与模型间差距", fontsize=12)
     fig.savefig(OUT / "32_difficulty_spread.png")
@@ -335,7 +336,7 @@ def fig06() -> None:
         ax.axhline(v, color="#c00", ls=":", lw=1, alpha=0.6)
     ax.set_xlabel("MMLU-ProX 上的差值（百分点）", fontsize=11)
     ax.set_ylabel("C-Eval 上的差值（百分点）", fontsize=11)
-    ax.set_title("两评测集配对差值（绿=同向，红叉=翻转）", fontsize=12)
+    ax.set_title("两评测集配对差值（圆点=同向，叉号=翻转）", fontsize=12)
     fig.savefig(OUT / "35_cross_dataset.png")
     plt.close(fig)
 
