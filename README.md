@@ -1,10 +1,8 @@
-# modelsEvaluation
+# modelsEvaluationForChineseQA
 
 **大模型中文问答能力的评测工程实践** —— 以 HELM 的「场景 × 适配 × 指标」三元组为口径基准，自建轻量级双管线评测框架，完整覆盖「评测方案设计 → 评测集构建与清洗 → 双口径判分体系 → 独立裁判抽检复核 → 错题归因与金标审计 → 可复算评测报告」六个工程环节。
 
-[Python](pyproject.toml)
-[Tests](tests/)
-[Report](reports/report_external_helm_polished.md)
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 
 > **核心文档直达**：[对外评测报告](reports/report_external_helm_polished.md) · [数据逐格溯源清单](reports/report_data_provenance.md) · [全库 85 批次审计台账](reports/RUN_AUDIT.md) · [闭环成果物映射](reports/PROJECT_SUMMARY.md) · [复现与门禁指南](docs/reproduce.md)
 
