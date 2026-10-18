@@ -110,13 +110,13 @@ ErrorMap 的关键贡献是把「答错」拆成互斥的原因。移植到我�
 ### 步骤 4 · 递归分层，形成「失败签名」
 
 ErrorMap 第二阶段是**递归分组**构造分层分类法。对我们的规模（120 条）不必做完整递归，
-但要产出一张**每臂一张的失败签名表**：
+但要产出一张**每个模型一张的失败签名表**：
 
 ```
-臂 X：knowledge_gap 12 | reasoning_error 9 | option_confusion 5 | question_misread 2 | gold_error 3 | …
+模型 X：knowledge_gap 12 | reasoning_error 9 | option_confusion 5 | question_misread 2 | gold_error 3 | …
 ```
 
-★ 价值不在总数，在**形状差异**：若某臂 `option_confusion` 显著偏高，
+★ 价值不在总数，在**形状差异**：若某模型 `option_confusion` 显著偏高，
 说明它的问题在"选项辨析"而非"知识"——这直接指导该补什么数据。
 
 ### 步骤 5 · 金标准审计（独立产出）

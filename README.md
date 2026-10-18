@@ -106,7 +106,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | **3** | **示例的示范作用压倒正文指令**；跨集选项数错配 | 首轮示例写成 `答案：X`，模型照抄这个外形，**87%** 的输出无法严格解析 —— 当时算出的那轮「增益」其实来自格式顺从。另有 C-Eval 的 4 选项题沿用了 10 选项示例 | 示例改为示范目标输出格式本身；选项数量严格对齐；模板改动前做指纹比对，不一致即拒绝跑批 | `tests/test_prompt_letters.py` · `src/meval/adapt.py` |
 | **4** | **分母不一致时直接相减** | 放宽格式后各档的可判条目数差一倍以上（**276 对 635**），直接相减会得出方向相反的结论 | 跨配置比较一律限制在双方均可判的**配对交集**上，做配对 McNemar 检验 | `tests/test_paired.py` · `scripts/exp_e6_paired.py` |
 | **5** | **两个指标其实不可比**；乱序未还原坐标系 | 「是否翻转过」随观测次数单调上升，观测次数不同的实验不能直接相除；选项乱序若不还原原题坐标系，会算出虚假翻转 | 改用与次数无关的「逐对不一致率」；乱序后强制还原坐标系再比 | `tests/test_position_refusal.py` · `scripts/_ratio_pairwise.py` |
-| **6** | **温度设了也不等于可复现**；厂商私有参数冲突 | 探针实测部分厂商直接忽略温度参数；而即便忽略，同题重复 10 次的全同率最低也只有 **28%** | 放弃全局统一参数，接入新模型前先跑探针，把各臂生效的参数冻结进配置；私有参数走 `extra_body` | `tests/test_client_params.py` · `docs/param_matrix.md` |
+| **6** | **温度设了也不等于可复现**；厂商私有参数冲突 | 探针实测部分厂商直接忽略温度参数；而即便忽略，同题重复 10 次的全同率最低也只有 **28%** | 放弃全局统一参数，接入新模型前先跑探针，把各模型生效的参数冻结进配置；私有参数走 `extra_body` | `tests/test_client_params.py` · `docs/param_matrix.md` |
 
 ---
 
@@ -118,11 +118,11 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 | 脚本 | 查什么 |
 |---|---|
-| `scripts/smoke_arms.py` | 各臂连通性与最小可用性 |
-| `scripts/probe_params.py` | 各臂的**参数生效边界**（温度是否有效、思考怎么关、`max_tokens` 下限） |
-| `scripts/probe_distinct.py` | **伪别名行为指纹** —— `resp_model` 只回显请求名，故用 30 题 × 各臂的答案一致率反查是否同一后端 |
+| `scripts/smoke_arms.py` | 各模型连通性与最小可用性 |
+| `scripts/probe_params.py` | 各模型的**参数生效边界**（温度是否有效、思考怎么关、`max_tokens` 下限） |
+| `scripts/probe_distinct.py` | **伪别名行为指纹** —— `resp_model` 只回显请求名，故用 30 题 × 各模型的答案一致率反查是否同一后端 |
 | `scripts/compare_endpoints.py` | 同模型不同端点的一致性 |
-| `scripts/probe_alias.py` / `probe_new_arm.py` | 新增臂接入前的定点探测 |
+| `scripts/probe_alias.py` / `probe_new_arm.py` | 新增模型接入前的定点探测 |
 
 结果回填 `docs/param_matrix.md`，**冻结**进 `configs/arms.yaml` —— 不做全局统一参数，因为实测证明参数跨厂商不可约。
 

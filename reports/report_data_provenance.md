@@ -83,7 +83,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
 
 ### 2.1 MMLU-ProX 能力线
 
-| run_id | 配置 | 题数×臂 | 调用 | 用途 | 报告位置 |
+| run_id | 配置 | 题数×模型 | 调用 | 用途 | 报告位置 |
 |---|---|---:|---:|---|---|
 | `c1-5arm-v2` | c1 | 588×5 | 2,940 | **主口径**（限制格式） | T12, F3, F4, F5 |
 | `c2hi-5arm-v2` | c2 | 150×5 | 750 | 自由作答 | T20, F7 |
@@ -107,7 +107,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
 
 ### 2.2 C-Eval 能力线
 
-| run_id | 配置 | 题数×臂 | 调用 | 用途 | 报告位置 |
+| run_id | 配置 | 题数×模型 | 调用 | 用途 | 报告位置 |
 |---|---|---:|---:|---|---|
 | `ceval-c1-5arm-v2` | c1 | 583×5 | 2,915 | **主口径** | T12, F3, F4, F6 |
 | `ceval-c2hi-5arm-v2` | c2 | 150×5 | 750 | 自由作答 | T20, F7 |
@@ -122,7 +122,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
 
 | run_id | 题集 | 调用 | 用途 | 报告位置 |
 |---|---|---:|---|---|
-| `orbench-full` | or-bench | 5,922 | 3 臂源响应 | F10 |
+| `orbench-full` | or-bench | 5,922 | 3 个模型源响应 | F10 |
 | `orbench-qwen` | or-bench | 1,974 | qwen 源响应（26 条失败） | F10 |
 | `orbench-judge-full` | refusal_set | 5,922 | **judge 判定** | T25, F10 |
 | `orbench-judge-qwen` | refusal_set | 1,948 | judge 判定（qwen） | T25, F10 |
@@ -583,7 +583,7 @@ C-Eval 结果与本仓另一独立实现一致。
 | 中位延迟 | 同上 | `raw/` 的 `latency_s` **中位数** |
 
 **复算**：`python scripts/competitive_analysis.py`（行 99 `sum(...)`、行 105 中位数）
-★ **易错点**：token 列是**合计**不是均值。实测五臂合计为
+★ **易错点**：token 列是**合计**不是均值。实测五个模型合计为
 30,113 / 39,682 / 64,439 / 89,953 / 144,322；对应的**均值**是
 200.8 / 264.5 / 429.6 / 599.7 / 962.1 ——
 后者正是正文 L341「平均输出为 200 至 962 token」的来源，两处不要混。
@@ -676,12 +676,12 @@ C-Eval 结果与本仓另一独立实现一致。
 ### T30 其余结论边界表（行 548）
 | 行 | 数据 | 来源 |
 |---|---|---|
-| 1 | 安全维度仅覆盖 4 个模型 | `orbench-*` 只有 3+1 臂；`deepseek-v4-pro` 是判卷方 |
+| 1 | 安全维度仅覆盖 4 个模型 | `orbench-*` 只有 3+1 个模型；`deepseek-v4-pro` 是判卷方 |
 | 2 | C-Eval 单学科题目数 5–24 | `data/ceval_set.jsonl` 按学科计数 |
 | 3 | 选项顺序不变性排序两集不一致 | T16 第二列的 MMLU-ProX 与 C-Eval 排序对照 |
 
 **行 3 的复算**：`python scripts/analyze_position.py --c6-run c6-5arm-v2 --c3-run c3-5arm-v2`
-（MMLU-ProX）与 `--c6-run ceval-c6-5arm --c3-run ceval-c3-5arm`（C-Eval），比较两次输出的臂序。
+（MMLU-ProX）与 `--c6-run ceval-c6-5arm --c3-run ceval-c3-5arm`（C-Eval），比较两次输出的模型序。
 
 ---
 

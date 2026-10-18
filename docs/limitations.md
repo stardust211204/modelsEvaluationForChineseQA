@@ -4,13 +4,13 @@
 > 本文件是报告结论的必读前置 —— 不读本文的结论不要引用。
 >
 > **时效**：本文与对外报告（[`../reports/report_external_helm_polished.md`](../reports/report_external_helm_polished.md)）
-> 同步，覆盖 **5 臂期**的最终状态。早期三臂期的局限记录见 git 历史。
+> 同步，覆盖 **5 个模型期**的最终状态。早期三模型阶段的局限记录见 git 历史。
 
 ---
 
-## 1. 接入方式：4 臂走聚合端点，1 臂走官方
+## 1. 接入方式：4 个模型走聚合端点，1 个模型走官方
 
-5 个正式臂中，**4 个**经 **opencode 聚合端点**接入（`longcat-2.5-preview-free`、
+5 个正式模型中，**4 个**经 **opencode 聚合端点**接入（`longcat-2.5-preview-free`、
 `mimo-v2.6-flash`、`deepseek-v4.1-flash`、`qwen3.8-flash`），
 **`deepseek-v4-pro` 走官方端点**（`api.deepseek.com`）—— 旗舰档所以单列。
 
@@ -86,7 +86,7 @@ NeurIPS 2025 立场论文（*Neither Valid nor Reliable? Investigating the Use o
 
 ## 5. 数据污染无法排除
 
-无法确认任何臂的训练语料是否包含 MMLU-ProX / C-Eval 或其同源数据。
+无法确认任何模型的训练语料是否包含 MMLU-ProX / C-Eval 或其同源数据。
 
 **本项目没有自建抗污染题集**（早期设计过 50 题边界样本，最终未采用 —— 这是范围裁剪，
 不是遗漏）。可用的间接证据有两条：
@@ -107,9 +107,9 @@ NeurIPS 2025 立场论文（*Neither Valid nor Reliable? Investigating the Use o
 | --- | --- |
 | **HELM 口径的 robustness**（typo / 对抗改写 / contrast sets） | 有意的范围裁剪：方向已从鲁棒性切到准确性；中文扰动集构建依赖人工，与窗口期冲突 |
 | **多语言对照** | 早期 JD 抽样中跨语言要求覆盖仅 4/105，不值得占窗口 |
-| **多模态与长上下文** | 5 臂中可确认 **3 个**支持多模态、**4 个**上下文 ≥256K（`longcat-2.5` 规格未公开），本次**均未覆盖** —— 纯文本单轮问答 |
+| **多模态与长上下文** | 5 个模型中可确认 **3 个**支持多模态、**4 个**上下文 ≥256K（`longcat-2.5` 规格未公开），本次**均未覆盖** —— 纯文本单轮问答 |
 | **开放生成** | 项目定位为 MCQ 判分 |
-| **`space-bunny-free` 臂** | 探测到**无法关闭思考**，与其余五臂口径不同，且厂商未公开 —— 记录在 `configs/arms.yaml` 的 `excluded` 段，不进正式排名 |
+| **`space-bunny-free` 模型** | 探测到**无法关闭思考**，与其余五个模型口径不同，且厂商未公开 —— 记录在 `configs/arms.yaml` 的 `excluded` 段，不进正式排名 |
 | **SQL 数据仓库** | 早期 JD 抽样中覆盖仅 6/105 |
 
 > **已撤销的一条裁剪**：早期曾以「position bias 已降至 ≤0.04、测它 ROI 过低」为由
@@ -149,14 +149,14 @@ NeurIPS 2025 立场论文（*Neither Valid nor Reliable? Investigating the Use o
 
 ## 8. 工程层面的诚实声明
 
-- **`temperature` 在本池子上被忽略**（实测：三个臂同题 ×6 @ `temperature=1.0`
+- **`temperature` 在本池子上被忽略**（实测：三个模型同题 ×6 @ `temperature=1.0`
   均只产生 1 种输出）。因此「固定温度 = 可复现」**不成立**：
   同题重复 10 次，答案全同率最低的模型只有 **28.0%**。
   重复采样是唯一能量化确定性的手段，且它衡量的是**模型属性，不是抽样误差**。
-  （`deepseek-v4-pro` 与 `qwen3.8-flash` 未做该探测，五臂的 `temperature=0.1` 是冻结值而非实测结论。）
+  （`deepseek-v4-pro` 与 `qwen3.8-flash` 未做该探测，五个模型的 `temperature=0.1` 是冻结值而非实测结论。）
 - **`resp_model` 字段只是回显请求名**，不含后端信息，**不能用于别名检测**；
-  本项目改用行为指纹（30 题 × 各臂答案一致率，阈值 80%）。
-  ⚠️ 该检测**必须先剔除空响应** —— 曾出现"三臂 93–100% 一致"的假象，
+  本项目改用行为指纹（30 题 × 各模型答案一致率，阈值 80%）。
+  ⚠️ 该检测**必须先剔除空响应** —— 曾出现"三个模型 93–100% 一致"的假象，
   全部由共同返回空 `content` 造成。
 - **`manifest.params_effective` 有 13 处与实际请求参数不符**（3 处在权威批次上）。
   报告结论不受影响 —— **raw 记录里的 `params` 才是真值**，问题字段不能单独作证据。

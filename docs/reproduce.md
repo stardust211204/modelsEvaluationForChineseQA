@@ -66,7 +66,7 @@ Copy-Item .env.example .env    # 填入真实 key
 | **完整工作区**（raw 已下载） | PASS **203** / FAIL **1** / WARN 6 | **124/124** |
 | **刚 clone**（raw 未下载） | PASS 162 / FAIL **0** / **SKIP 42** | **123/123**（跳过 1 项） |
 
-被跳过的是**输入不存在**的检查（「raw 完整性」「judge tally 完整性」「被复核 run 含 5 臂」等），
+被跳过的是**输入不存在**的检查（「raw 完整性」「judge tally 完整性」「被复核 run 含 5 个模型」等），
 脚本会写明原因 —— **这些是跳过项，不计为失败**。
 
 完整工作区的那 1 项 FAIL 是 `longcat` 的**上游连接失败**（间歇性路由缺陷，客户端侧无法修复），
@@ -81,7 +81,7 @@ Copy-Item .env.example .env    # 填入真实 key
 ```
 src/meval/       管线本体（见 README §二）
 scripts/         入口、实验与分析脚本、核校工具（~190 个）
-configs/         arms.yaml（五臂 + 各自生效参数）· matrix.yaml · exclusions.json
+configs/         arms.yaml（五个模型 + 各自生效参数）· matrix.yaml · exclusions.json
 data/            eval_set.jsonl · ceval_set.jsonl · orbench_set.jsonl · frozen.json
 prompts/         c1_strict / c2_free / c5_fewshot / e2_labelshuffle / e6_* / judge_*
 docs/            design.md · limitations.md · open_issues.md · param_matrix.md · badcase_method.md

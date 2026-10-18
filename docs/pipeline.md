@@ -10,13 +10,13 @@
 cd <workspace>\modelsEvaluation
 $py = ".\.venv\Scripts\python.exe"
 
-# ① 冒烟：确认三臂连通
+# ① 冒烟：确认三个模型连通
 & $py scripts\smoke_arms.py
 
-# ② 参数探测：逐臂确认温度/思考开关/max_tokens（★ 必做，结果回填 configs\arms.yaml）
+# ② 参数探测：逐模型确认温度/思考开关/max_tokens（★ 必做，结果回填 configs\arms.yaml）
 & $py scripts\probe_params.py
 
-# ③ 伪别名指纹：确认三臂确为不同模型
+# ③ 伪别名指纹：确认三个模型确为不同模型
 & $py scripts\probe_alias.py
 
 # ④ 单测
@@ -59,9 +59,9 @@ arms.yaml 参数回填 ──┐
 
 | 步骤 | 验收 |
 |---|---|
-| ① 冒烟 | □ 三臂各 3 题 HTTP 200　□ 无空 `content`（若空 → 回 ② 调 `max_tokens`/思考开关） |
-| ② 参数探测 | □ 每臂记录：温度是否生效、思考关闭用哪个参数、`max_tokens` 下限　□ 结果回填 `arms.yaml` + `docs/param_matrix.md` |
-| ③ 别名指纹 | □ 三臂两两答案完全一致率 **< 80%**（且已剔除空响应） |
+| ① 冒烟 | □ 三个模型各 3 题 HTTP 200　□ 无空 `content`（若空 → 回 ② 调 `max_tokens`/思考开关） |
+| ② 参数探测 | □ 每个模型记录：温度是否生效、思考关闭用哪个参数、`max_tokens` 下限　□ 结果回填 `arms.yaml` + `docs/param_matrix.md` |
+| ③ 别名指纹 | □ 三个模型两两答案完全一致率 **< 80%**（且已剔除空响应） |
 | ④ 单测 | □ 全绿。**判分单测是唯一能拦住「静默空 content」的地方，不能跳过** |
 | ⑤ 造题 | □ `eval_set.jsonl` 588 条　□ 哈希已记入 manifest　□ **抽样保真度自检**通过（学科/选项数 max_gap ≤15pp） |
 | C1 跑批 | □ 1,800 条全部落盘　□ `truncated` 率 < 5%（否则说明 `max_tokens` 仍偏小） |
@@ -83,12 +83,12 @@ arms.yaml 参数回填 ──┐
 
 ## 4. 口径冻结清单（跑批前逐项打勾，跑批中不得改动）
 
-- [ ] `configs/arms.yaml` 的每臂 `params` 已由探测回填
+- [ ] `configs/arms.yaml` 的每个模型 `params` 已由探测回填
 - [ ] prompt 模板已定稿（`prompts/c1_strict.txt` 等）
 - [ ] 解析阶梯与四档判级已单测通过
 - [ ] `eval_set.jsonl` 已冻结并记录哈希
 - [ ] C5 的 5 条 few-shot 示例已从 **validation** 选定并固定顺序（写进 manifest）
-- [ ] C4 的 judge 臂已选定，且**与被评模型不同家族**
+- [ ] C4 的 judge 模型已选定，且**与被评模型不同家族**
 - [ ] C2 / C5 的题集已确认是 C1 的子集
 
 > **跑批中途改任何一个，前面的数据作废。** 要改就新开一个 `run_id`。
