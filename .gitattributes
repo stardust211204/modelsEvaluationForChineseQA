@@ -6,10 +6,17 @@
 # 几百个文件以 CRLF 写进历史，之后所有人的 diff 都变成整文件变红。
 #
 # 入库侧实测（写这份文件时）：git ls-files --eol → i/crlf 0 / i/lf 715 / i/-text 40。
-# 所以 `text=auto eol=lf` 对索引是**幂等的**，不会产生一次性的规范化大 diff。
+# 所以 `text=auto` 对索引是**幂等的**，不会产生一次性的规范化大 diff。
 
-# 默认：git 自行探测文本文件，入库一律 LF，检出也一律 LF。
-* text=auto eol=lf
+# 默认：git 自行探测文本文件，**入库一律 LF**；检出时按平台（Windows 得 CRLF）。
+#
+# ★ 这里**不能**写 `eol=lf` —— 2026-10-18 实测踩到：`eol=lf` 会把检出也强制成 LF，
+#   而 `data/frozen.json` 冻结的题集哈希是按**工作区的 CRLF 字节**算的
+#   （`test_dataset_file_hash_is_untouched` 直接把 fences 的哈希与磁盘字节比）。
+#   加了 eol=lf 之后，全新 clone 的题集变 LF ⇒ 哈希对不上 ⇒ 单测与门禁齐挂。
+#   `text=auto` 已经能保证「换台机器提交也不会把 CRLF 写进历史」这个目标，
+#   检出形态交给平台，不额外约束。
+* text=auto
 
 # 二进制：明确声明，避免 git 对它们做换行探测或文本 diff。
 *.png  binary
