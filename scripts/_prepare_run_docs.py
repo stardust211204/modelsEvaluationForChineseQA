@@ -45,8 +45,8 @@ USE15 = {
     "ceval-c5-5arm-v3": "5-shot / C-Eval 150 题（用于论证不采用）",
     "ceval-c5b-5arm": "5-shot 对照 / C-Eval 150 题（选项数匹配）",
     "ceval-c6-5arm": "选项乱序 / C-Eval 100×4",
-    "orbench-full": "安全 / 源响应 3 臂",
-    "orbench-judge-full": "安全 / judge 判定 3 臂",
+    "orbench-full": "安全 / 源响应 3 个模型",
+    "orbench-judge-full": "安全 / judge 判定 3 个模型",
     "orbench-judge-qwen": "安全 / judge 判定 qwen",
     "orbench-qwen": "安全 / 源响应 qwen",
 }
@@ -134,7 +134,7 @@ print()
 print("=" * 118)
 print(" ② RUN_AUDIT.md · A 类新表（37 行，时间按 manifest 重算）")
 print("=" * 118)
-print("| run_id | 调用 | 失败 | 臂 | 数据集 | 时间 | 说明 |")
+print("| run_id | 调用 | 失败 | 模型 | 数据集 | 时间 | 说明 |")
 print("| --- | ---: | ---: | ---: | --- | --- | --- |")
 for rid in OLD15 + NEW22:
     i = info(rid)
@@ -145,7 +145,7 @@ print()
 print("=" * 118)
 print(" ③ RUN_INVENTORY.md · §1.4 补充实验（22 行）")
 print("=" * 118)
-print("| run_id | 配置 | 臂 | 实例数 | 调用 | 北京时间 | prompt 指纹 | 用途 |")
+print("| run_id | 配置 | 模型 | 实例数 | 调用 | 北京时间 | prompt 指纹 | 用途 |")
 print("| --- | ---: | ---: | ---: | ---: | --- | --- | --- |")
 for rid in NEW22:
     i = info(rid)

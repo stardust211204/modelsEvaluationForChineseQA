@@ -14,7 +14,7 @@
     * 冷色调 5 级色阶
 
 ★ 数据口径（三张图各自的题集都经过统一）
-    42：E1/E1b 的**同一批 76 题**（剔除任一臂在 8192 下没做完的题）
+    42：E1/E1b 的**同一批 76 题**（剔除任一个模型在 8192 下没做完的题）
     43：E6 四组的**共同可判集 255 条**（四组落在完全相同的题上）
     44：E5 各档的原始可判集（分母差异已在正文注明）
 
@@ -145,11 +145,11 @@ def fig43() -> None:
         {(a, i) for a in ARMS for i, v in T[l][a].items() if v in JUDG}
         for l, _, _ in G])
     common = sorted(common)
-    # ★ 口径限制：E6 的 B 组里「五臂都可判」的题是 **0 道** ——
-    #   因为 B 不要求末行答案，总有个别臂解析不出。
-    #   ⇒ 不存在「所有臂 × 所有组」的共同题集。
-    #   这里用 **(臂,题) 交集**：每一臂在四组之间题集一致（可比阶梯），
-    #   但不同臂的题集不同 ⇒ 均值线只是各臂值的平均，不是共同题集上的测量。
+    # ★ 口径限制：E6 的 B 组里「五个模型都可判」的题是 **0 道** ——
+    #   因为 B 不要求末行答案，总有个别模型解析不出。
+    #   ⇒ 不存在「所有模型 × 所有组」的共同题集。
+    #   这里用 **(模型,题) 交集**：每一个模型在四组之间题集一致（可比阶梯），
+    #   但不同模型的题集不同 ⇒ 均值线只是各模型值的平均，不是共同题集上的测量。
     per_arm_n = {a: sum(1 for (a2, _) in common if a2 == a) for a in ARMS}
     ns = sorted(set(per_arm_n.values()))
 
@@ -158,7 +158,7 @@ def fig43() -> None:
         w = sum(1 for (a2, i) in common if a2 == a and T[l][a].get(i) == "wrong")
         return c / (c + w) * 100 if c + w else float("nan")
 
-    # 五臂在各组的准确率（共同题集）
+    # 五个模型在各组的准确率（共同题集）
     per = {l: [acc(l, a) for a in ARMS] for l, _, _ in G}
     mean = [float(np.mean(per[l])) for l, _, _ in G]
 
@@ -168,9 +168,9 @@ def fig43() -> None:
         ax.plot(x, [per[l][j] for l, _, _ in G], marker="o", markersize=5,
                 linewidth=1.4, color=COOL5[j], label=a, alpha=0.85)
     ax.plot(x, mean, marker="s", markersize=9, linewidth=3, color=WARM,
-            label="五臂均值", zorder=5)
+            label="五个模型均值", zorder=5)
     # ★ 本图**不标注数值**（2026-10-17 起）——
-    #   本图的阶梯是「各臂在自己的可判集上的均值」（四组共同子集，n = 255），
+    #   本图的阶梯是「各模型在自己的可判集上的均值」（四组共同子集，n = 255），
     #   与报告表里的「逐对配对子集」（n = 276/267/594）口径不同，数值因此有差异：
     #   图上是 +16.5/+10.4/+0.5，表里是 +15.9/+10.0/−0.4。
     #   两个口径各自成立，但把两套数字并排放进同一份报告，读者会以为其中一处是错的。
@@ -185,19 +185,19 @@ def fig43() -> None:
     ax.set_xticks(x)
     ax.set_xticklabels([f"{l}\n{d}" for l, _, d in G], fontsize=9.5)
     ax.set_ylabel("准确率 ↑（宽松口径）")
-    # ★ 标题**不引用具体数字** —— 本图的阶梯是「各臂在自己的可判集上的均值」，
+    # ★ 标题**不引用具体数字** —— 本图的阶梯是「各模型在自己的可判集上的均值」，
     #   与报告 §3.5 表里的「逐对配对子集」口径不同（+15.9/+10.0/−0.4 vs
     #   +16.5/+10.4/+0.5）。引用数字会造成两处不一致，故只讲结论。
     ax.set_title("自由作答增益的拆解：允许写理由与要求末行两步贡献相当，"
                  "显式要求逐步推理无额外收益\n"
-                 f"（各臂在自己的可判集上，每臂 {ns[0]}~{ns[-1]} 题；"
-                 "B 组不存在五臂共同可判的题，故均值线为各臂值的平均）",
+                 f"（各模型在自己的可判集上，每个模型 {ns[0]}~{ns[-1]} 题；"
+                 "B 组不存在五个模型共同可判的题，故均值线为各模型值的平均）",
                  fontsize=10.5)
     ax.legend(frameon=True, loc="lower right", fontsize=9)
     ax.grid(axis="x", visible=False)
     fig.savefig(OUT / "43_format_decomposition.png")
     plt.close(fig)
-    print(f"  ✅ 43_format_decomposition.png  每臂 {ns[0]}~{ns[-1]} 题  均值 "
+    print(f"  ✅ 43_format_decomposition.png  每个模型 {ns[0]}~{ns[-1]} 题  均值 "
           + " → ".join(f"{m:.1f}" for m in mean))
 
 
@@ -231,7 +231,7 @@ def fig44() -> None:
                     color=COOL5[j], label=a, alpha=0.85)
         m = [float(np.mean([curves[a][i] for a in ARMS])) for i in range(len(ns))]
         ax.plot(ns, m, marker="s", markersize=7, linewidth=2.6, color=WARM,
-                label="五臂均值", zorder=5)
+                label="五个模型均值", zorder=5)
         ax.set_title(f"{ds}（0→10 shot：{m[-1]-m[0]:+.1f} 个百分点）", fontsize=11)
         ax.set_xlabel("示例数量 →")
         ax.set_xticks(ns)

@@ -48,7 +48,7 @@ PROMPT_TMPL = (
 )
 
 # 本地 qwen3.5 是推理模型：默认会把 token 预算烧在 thinking 上，
-# 导致 content 为空、finish_reason=length（与云端臂同一个坑）。
+# 导致 content 为空、finish_reason=length（与云端模型同一个坑）。
 # 实测 Ollama 的 OpenAI 兼容层对 `think: false` 不稳定，因此靠**放大预算 + 宽松解析**兜底。
 GEN_PARAMS = {
     "max_tokens": 2048,

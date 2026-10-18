@@ -145,10 +145,10 @@ def test_scan_done_distinguishes_reps(isolated_runs):
 
 
 def test_scan_done_distinguishes_target_arm(isolated_runs):
-    """★ C4 judge：同一 judge 模型对三臂的**同一题**各判一次。
+    """★ C4 judge：同一 judge 模型对三个模型的**同一题**各判一次。
 
     三次调用的 (config, arm, instance_id, rep) 完全相同（arm 都是 judge 模型），
-    只有 target_arm 不同。键里不带它就会三臂互相覆盖、只剩最后一个臂
+    只有 target_arm 不同。键里不带它就会三个模型互相覆盖、只剩最后一个模型
     —— 与 docs/HANDOFF.md §4 坑 6 是同一类错误。
     """
     write_raw(isolated_runs, "r1", "c4", "judge",
@@ -156,7 +156,7 @@ def test_scan_done_distinguishes_target_arm(isolated_runs):
                for a in ("armA", "armB", "armC")])
     done = execute.scan_done("r1")
     assert done == {("c4", "judge", "q1", 0, a) for a in ("armA", "armB", "armC")}
-    assert len(done) == 3, "三臂的 judge 请求必须是三个不同的键，不能塌成一个"
+    assert len(done) == 3, "三个模型的 judge 请求必须是三个不同的键，不能塌成一个"
 
 
 def test_run_specs_skips_everything_when_done(isolated_runs):

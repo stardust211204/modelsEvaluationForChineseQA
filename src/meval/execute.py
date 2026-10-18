@@ -33,9 +33,9 @@ Key = tuple[str, str, str, int, str]  # (config, arm, instance_id, rep, target_a
 def _key_of(d: dict) -> Key:
     """去重键。
 
-    ★ 含 `target_arm`：C4 要对三臂的同一批题各判一次，而三次调用的
+    ★ 含 `target_arm`：C4 要对三个模型的同一批题各判一次，而三次调用的
       (config, arm, instance_id, rep) 完全相同（arm 都是 judge 模型）。
-      键里不带 target_arm 就会三臂互相覆盖、只剩最后一个臂 ——
+      键里不带 target_arm 就会三个模型互相覆盖、只剩最后一个模型 ——
       与 docs/HANDOFF.md §4 坑 6 是同一类错误。
     """
     return (str(d.get("config")), str(d.get("arm")), str(d.get("instance_id")),
@@ -129,12 +129,12 @@ def run_specs(
 ) -> dict[str, object]:
     """执行一批 PromptSpec，返回统计摘要。
 
-    arms_concurrency: {arm_model: 并发度}。不同臂可以不同（免费档保守、付费档放开）。
+    arms_concurrency: {arm_model: 并发度}。不同模型可以不同（免费档保守、付费档放开）。
 
-    arm_endpoints: {arm_model: (base_url, key_env)}。**仅当某臂需要走与全局不同的端点时**才传。
-        ★ 为什么按臂而非按 run：旗舰档走官方端点、其余臂走聚合端点时，
-          若拆成两个 run，"臂"和"接入方式"就同时变了，违反单因子纪律；
-          合成一个 run + 臂级端点，至少让这个差异**显式记录在 manifest 里**。
+    arm_endpoints: {arm_model: (base_url, key_env)}。**仅当某模型需要走与全局不同的端点时**才传。
+        ★ 为什么按模型而非按 run：旗舰档走官方端点、其余模型走聚合端点时，
+          若拆成两个 run，"模型"和"接入方式"就同时变了，违反单因子纪律；
+          合成一个 run + 模型级端点，至少让这个差异**显式记录在 manifest 里**。
 
     timeout_s: 客户端超时（秒）。**默认 None ⇒ 用 ChatClient 的默认值（120s），
         与改动前逐字节相同。**
@@ -145,16 +145,16 @@ def run_specs(
           只是 `client.py` 的同值默认。
     """
     own_client = client is None
-    # ★ 臂级客户端池。没有 arm_endpoints / arm_timeouts / arm_retries 时
-    #   退化成"所有臂共用一个客户端"（即原行为），所以这是纯增量改动。
+    # ★ 模型级客户端池。没有 arm_endpoints / arm_timeouts / arm_retries 时
+    #   退化成"所有模型共用一个客户端"（即原行为），所以这是纯增量改动。
     _ckw = {"timeout_s": timeout_s} if timeout_s is not None else {}
     _pool: dict[str, ChatClient] = {}
     _shared = client if client is not None else ChatClient(**_ckw)
 
     def client_for(arm: str) -> ChatClient:
         ep = (arm_endpoints or {}).get(arm)
-        # 超时优先级：run 级 `timeout_s` 覆盖 > 臂级 `arm_timeouts` > ChatClient 默认。
-        # ★ 臂级这一路原先**根本不存在** —— `adapt.load_arms` 把 arms.yaml 的
+        # 超时优先级：run 级 `timeout_s` 覆盖 > 模型级 `arm_timeouts` > ChatClient 默认。
+        # ★ 模型级这一路原先**根本不存在** —— `adapt.load_arms` 把 arms.yaml 的
         #   `timeout_s` 弹出后丢弃，所以那个配置项改了没有任何效果。
         to = timeout_s if timeout_s is not None else (arm_timeouts or {}).get(arm)
         mr = (arm_retries or {}).get(arm)
@@ -167,7 +167,7 @@ def run_specs(
             if kenv:
                 key = paths.env(kenv)
                 if not key:
-                    raise RuntimeError(f"臂 {arm} 需要环境变量 {kenv}，但未设置")
+                    raise RuntimeError(f"模型 {arm} 需要环境变量 {kenv}，但未设置")
             kw = dict(_ckw)
             if to is not None:
                 kw["timeout_s"] = to
@@ -211,7 +211,7 @@ def run_specs(
 
     print(f"[execute] 总 {len(specs)} 条｜跳过已完成 {skipped} 条｜本次执行 {len(todo)} 条")
 
-    # 按臂各自限流：把任务按臂分组，每臂用一个独立线程池，最后统一等
+    # 按模型各自限流：把任务按模型分组，每个模型用一个独立线程池，最后统一等
     by_arm: dict[str, list[PromptSpec]] = {}
     for s in todo:
         by_arm.setdefault(s.arm, []).append(s)
@@ -245,7 +245,7 @@ def run_specs(
     try:
         futures = []
         with ThreadPoolExecutor(max_workers=sum(arms_concurrency.get(a, 4) for a in by_arm)) as pool:
-            # 用信号量把每个臂的并发压到各自上限
+            # 用信号量把每个模型的并发压到各自上限
             sems = {a: threading.Semaphore(arms_concurrency.get(a, 4)) for a in by_arm}
 
             def guarded(spec: PromptSpec) -> ModelResult:
@@ -292,12 +292,12 @@ def write_manifest(
 ) -> Path:
     """写跑批元数据。让每个数字可回溯到哪次跑批、哪版代码、哪版数据。
 
-    ★ 断点续跑时要**并入**已记录的臂，不能覆盖。
+    ★ 断点续跑时要**并入**已记录的模型，不能覆盖。
 
-      场景：`c1-4arm` 已跑完四臂，现在补第 5 臂（旗舰档）。若直接写，
-      `manifest.arms` 就只剩 `deepseek-v4-pro` —— 而 raw/tallies 里明明有五臂。
-      后果不是"报错"，而是**静默失真**：门禁的臂别名检查、后人的回溯
-      都会以为这个 run 只有一臂。数据在、记录不在，是最难查的一类不一致。
+      场景：`c1-4arm` 已跑完四个模型，现在补第 5 个模型（旗舰档）。若直接写，
+      `manifest.arms` 就只剩 `deepseek-v4-pro` —— 而 raw/tallies 里明明有五个模型。
+      后果不是"报错"，而是**静默失真**：门禁的模型别名检查、后人的回溯
+      都会以为这个 run 只有一个模型。数据在、记录不在，是最难查的一类不一致。
 
     `dataset` 声明本次跑批用的是**哪份题集**。默认 `eval_set`（即
     `data/eval_set.jsonl`，绝大多数 run 都是它）。
@@ -321,7 +321,7 @@ def write_manifest(
             if name not in merged_arms:
                 merged_arms.append(name)
         op = old.get("params_effective") or {}
-        merged_params = {**op, **merged_params}   # 新值覆盖旧值（同臂重跑时参数可能变了）
+        merged_params = {**op, **merged_params}   # 新值覆盖旧值（同模型重跑时参数可能变了）
         for mdl in old.get("models_snapshot") or []:
             if mdl not in merged_models:
                 merged_models.append(mdl)

@@ -1,4 +1,4 @@
-"""三臂连通性冒烟：N 题 × 各臂，仅作答、关思考、JSONL 落盘、双解析。
+"""三个模型连通性冒烟：N 题 × 各模型，仅作答、关思考、JSONL 落盘、双解析。
 
 产物：data/raw_evidence/smoke_{lang}_{n}.jsonl（探针证据，非主流程产物）
 运行：.venv\\Scripts\\python.exe scripts\\smoke.py --n 10 --lang zh

@@ -4,7 +4,7 @@
     # 缩量试跑（只跑前 30 条，验证并发与错误率）
     .venv\\Scripts\\python.exe scripts\\run_config.py --config c1 --limit 30
 
-    # 全量 C1（588 题 × 3 臂 = 1,764 条）
+    # 全量 C1（588 题 × 3 个模型 = 1,764 条）
     .venv\\Scripts\\python.exe scripts\\run_config.py --config c1
 
     # 断点续跑：同一 --run-id 再跑一次即可（已完成的会跳过）
@@ -38,12 +38,12 @@ def main() -> int:
     ap.add_argument("--config", default="c1", help="配置键：c1/c2/c3/c5")
     ap.add_argument("--run-id", default=None, help="不指定则新建")
     ap.add_argument("--limit", type=int, default=None, help="本次最多执行多少条（试跑用）")
-    ap.add_argument("--arms", default=None, help="逗号分隔的臂名，默认全部")
+    ap.add_argument("--arms", default=None, help="逗号分隔的模型名，默认全部")
     ap.add_argument("--no-tally", action="store_true", help="只跑批不判分")
     ap.add_argument("--dataset", default="eval_set",
                     help="题集名（data/<名>.jsonl）。默认 eval_set；跨题库验证用 ceval_set"),
     ap.add_argument("--param", action="append", default=None,
-                    help="覆盖臂参数（可重复）：--param max_tokens=2048")
+                    help="覆盖模型参数（可重复）：--param max_tokens=2048")
     # ---- 以下四项为**补充验证实验**新增，默认行为与新增前逐字节相同 ----------
     #   设计前提：`configs/matrix.yaml` 与 `src/meval/*` 一律不改动。
     #   门禁 `ci_gate.py` 会 `compute_fingerprints(pool, matrix)`，往 matrix.yaml
@@ -51,13 +51,13 @@ def main() -> int:
     ap.add_argument("--template", default=None,
                     help="覆盖 prompt 模板路径（如 prompts/e6_b_noreq.txt）")
     ap.add_argument("--drop-param", action="append", default=None,
-                    help="从全部臂的参数里删除某个键（可重复）：--drop-param reasoning_effort")
+                    help="从全部模型的参数里删除某个键（可重复）：--drop-param reasoning_effort")
     ap.add_argument("--fewshot-n", type=int, default=None,
                     help="覆盖 few_shot.n（示例数量梯度实验用）")
     ap.add_argument("--fewshot-ids", default=None,
                     help="覆盖 few_shot.fixed_ids，逗号分隔（受控 few-shot 用）")
     ap.add_argument("--param-arms", default=None,
-                    help="限定 --param 只作用于这些臂（逗号分隔），默认全部。"
+                    help="限定 --param 只作用于这些模型（逗号分隔），默认全部。"
                          "E1 用：longcat 的思考开关是 `thinking` 而非 "
                          "`reasoning_effort`，不能把后者发给它")
     ap.add_argument("--reps", type=int, default=None,
@@ -127,13 +127,13 @@ def main() -> int:
 
     arm_filter = [a.strip() for a in args.arms.split(",")] if args.arms else None
 
-    # ---- ★ 臂集合冻结：续跑时以 manifest 记录的臂为准 ----------------------
+    # ---- ★ 模型集合冻结：续跑时以 manifest 记录的模型为准 ----------------------
     # 修的是一个**静默**故障：`arms.yaml` 每次调用都重读，所以批次跑到一半时
-    # 往 arms.yaml 加一个臂，**后续 run 会悄悄多跑一个臂**。
-    # 实测发生过：给限时窗口的代号模型加臂后，正在排队的 `c3` 变成了 6 臂。
-    # 后果不是报错，而是"同名的 run 里臂集合不一样"—— 分析时按 run 取数就会串。
+    # 往 arms.yaml 加一个模型，**后续 run 会悄悄多跑一个模型**。
+    # 实测发生过：给限时窗口的代号模型加模型后，正在排队的 `c3` 变成了 6 个模型。
+    # 后果不是报错，而是"同名的 run 里模型集合不一样"—— 分析时按 run 取数就会串。
     #
-    # 处置原则：**已有的臂记录是权威**。续跑时默认沿用 manifest 里的臂集合，
+    # 处置原则：**已有的模型记录是权威**。续跑时默认沿用 manifest 里的模型集合，
     # 只有显式传 `--arms` 才能改。这样中途改 arms.yaml 对进行中的批次无害。
     recorded: list[str] | None = None
     mp_existing = paths.manifest_path(args.run_id) if args.run_id else None
@@ -146,10 +146,10 @@ def main() -> int:
         by_name = {a.name: a for a in arms}
         missing = [n for n in recorded if n not in by_name]
         if missing:
-            print(f"!! 该 run 记录的臂 {missing} 已不在 arms.yaml 中 —— 无法续跑")
+            print(f"!! 该 run 记录的模型 {missing} 已不在 arms.yaml 中 —— 无法续跑")
             return 2
         selected = [by_name[n] for n in recorded]
-        print(f"臂集合      : 沿用该 run 记录的 {len(selected)} 臂（忽略 arms.yaml 的后续改动）")
+        print(f"模型集合      : 沿用该 run 记录的 {len(selected)} 个模型（忽略 arms.yaml 的后续改动）")
         extra = [a.name for a in arms if a.name not in recorded]
         if extra:
             print(f"              ⚠️ arms.yaml 里另有 {extra}，**本次不会跑**"
@@ -159,7 +159,7 @@ def main() -> int:
         if recorded and arm_filter is not None:
             added = [a.name for a in selected if a.name not in recorded]
             if added:
-                print(f"              ⚠️ --arms 显式引入了该 run 原本没有的臂 {added}"
+                print(f"              ⚠️ --arms 显式引入了该 run 原本没有的模型 {added}"
                       f" —— 它会被并入 manifest，请注意可比性")
 
     # ---- 显式参数覆盖（稳健性重跑用，如 --param max_tokens=2048）-----------
@@ -185,7 +185,7 @@ def main() -> int:
         print(f"参数覆盖    : {overrides}"
               + (f"   仅作用于 {sorted(_tgt)}" if _tgt else ""))
 
-    # ---- --drop-param：从全部臂删除某个参数键（补充验证实验用）-------------
+    # ---- --drop-param：从全部模型删除某个参数键（补充验证实验用）-------------
     #   动机：`--param` 只能**设置**键，无法**删除**。而 E1「思考开关」的第三组
     #   要测的是「完全不传思考参数时端点的默认行为」—— 必须真的把键去掉。
     #   删除同样记进 manifest.param_overrides（值记成 "<dropped>"），
@@ -204,7 +204,7 @@ def main() -> int:
         instances = adapt.subset_from_c1(pool, spec_cfg.n_instances)
     print(f"题集        : {len(instances)} 题"
           + ("" if cfg_key is Config.C1 else f"（C1 子集，目标 {spec_cfg.n_instances}）"))
-    print(f"臂          : {', '.join(a.name for a in selected)}")
+    print(f"模型          : {', '.join(a.name for a in selected)}")
 
     # ---- few-shot（仅 C5）-------------------------------------------------
     demos = None
@@ -256,11 +256,11 @@ def main() -> int:
 
     # ---- ★ 执行**前**先落一次 manifest -------------------------------------
     # 原先只在跑完之后写，于是：
-    #   * 中断的 run **没有任何臂记录** ⇒ 续跑时无从判断"原本该跑哪些臂"，
-    #     只能重读 arms.yaml —— 这正是上面那个"中途加臂污染 run"的根源；
-    #   * 事后无法区分"这次跑了几臂"和"文件里恰好有几臂"。
-    # 提前写一次，臂集合从第一秒起就是**确定且可查**的。
-    # 跑完后会再写一次（并入已记录的臂 + 补齐 stats/耗时）。
+    #   * 中断的 run **没有任何模型记录** ⇒ 续跑时无从判断"原本该跑哪些模型"，
+    #     只能重读 arms.yaml —— 这正是上面那个"中途加模型污染 run"的根源；
+    #   * 事后无法区分"这次跑了几模型"和"文件里恰好有几模型"。
+    # 提前写一次，模型集合从第一秒起就是**确定且可查**的。
+    # 跑完后会再写一次（并入已记录的模型 + 补齐 stats/耗时）。
     data_hash_pre = _hash_of(eval_path)
     execute.write_manifest(
         run_id=run_id, configs=[cfg_key.value],
@@ -268,7 +268,7 @@ def main() -> int:
         data_hash=data_hash_pre,
         models_snapshot=[a.model for a in selected],
         note=f"{spec_cfg.name}｜{spec_cfg.desc}" + (f"｜limit={args.limit}" if args.limit else "")
-             + "｜（执行前预写：臂集合从此确定）",
+             + "｜（执行前预写：模型集合从此确定）",
         param_overrides=overrides,
         reps=spec_cfg.reps,
         param_arms=(sorted(_tgt) if _tgt else None),
@@ -276,20 +276,20 @@ def main() -> int:
     )
 
     # ---- 执行 --------------------------------------------------------------
-    # ★ 臂级端点：只有声明了 base_url 的臂才进这个表。
+    # ★ 模型级端点：只有声明了 base_url 的模型才进这个表。
     #   没有它，旗舰档会被发到聚合端点 —— 那正是它额度少、我们不用的地方。
     arm_eps = {a.name: (a.base_url, a.key_env) for a in selected if a.base_url}
     for _n, (_u, _k) in arm_eps.items():
         print(f"端点覆盖    : {_n} -> {_u}（key={_k}）")
-    # ★ 臂级客户端参数：只有**显式设置**的臂才进表（None 的走 ChatClient 默认）。
+    # ★ 模型级客户端参数：只有**显式设置**的模型才进表（None 的走 ChatClient 默认）。
     #   修的是 arms.yaml 的 `timeout_s` / `max_retries` 被 `load_arms` 弹出后丢弃、
     #   改了没有任何效果的问题。
     arm_tos = {a.name: a.timeout_s for a in selected if a.timeout_s is not None}
     arm_mrs = {a.name: a.max_retries for a in selected if a.max_retries is not None}
     if arm_tos:
-        print(f"臂级超时    : {arm_tos}" + ("（被 --timeout 覆盖）" if args.timeout else ""))
+        print(f"模型级超时    : {arm_tos}" + ("（被 --timeout 覆盖）" if args.timeout else ""))
     if arm_mrs:
-        print(f"臂级重试    : {arm_mrs}")
+        print(f"模型级重试    : {arm_mrs}")
     stats = execute.run_specs(
         run_id=run_id, specs=specs, arms_concurrency=conc, limit=args.limit,
         arm_endpoints=arm_eps or None,
@@ -363,7 +363,7 @@ def main() -> int:
     if n_trunc:
         print(f"\n  !! {n_trunc} 条 truncated —— 检查 max_tokens 与思考开关")
 
-    print("\n  分臂准确率（严格口径；分母 = correct + wrong，不含 invalid/truncated）：")
+    print("\n  按模型准确率（严格口径；分母 = correct + wrong，不含 invalid/truncated）：")
     for a in selected:
         ac = metrics.tier_accounting(
             [t.tier.value for t in rows if t.mode is ParseMode.STRICT and t.arm == a.model])

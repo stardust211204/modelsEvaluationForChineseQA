@@ -1,7 +1,7 @@
 """清点 runs/ 下所有批次：哪些支撑结论、哪些是重跑、哪些出错、哪些可归档。
 
 为什么要脚本
-    61 个目录、7 个维度（臂数、数据集、配置、记录数、时间、错误、被引用情况），
+    61 个目录、7 个维度（模型数、数据集、配置、记录数、时间、错误、被引用情况），
     靠人眼列一定会漏。而且「能不能归档」必须从**代码与报告的引用**反推，
     不能凭印象 —— 归档错了，图就重画不出来。
 
@@ -45,15 +45,15 @@ A_AUTHORITATIVE = {
     "c5-5arm-v3": "5-shot / MMLU-ProX 150 题",
     "ceval-c5-5arm-v3": "5-shot / C-Eval 150 题（用于论证不采用）",
     "ceval-c5b-5arm": "5-shot 对照 / C-Eval 150 题（选项数匹配）",
-    "orbench-full": "安全 / 源响应 3 臂",
+    "orbench-full": "安全 / 源响应 3 个模型",
     "orbench-qwen": "安全 / 源响应 qwen",
-    "orbench-judge-full": "安全 / judge 判定 3 臂",
+    "orbench-judge-full": "安全 / judge 判定 3 个模型",
     "orbench-judge-qwen": "安全 / judge 判定 qwen",
 }
 
 # ── B 支撑批次：支撑报告里的单项声明，不产结论 ────────────────────────────
 B_SUPPORTING = {
-    "c1-full": "c4 judge 复核的被判对象（早期 3 臂基线）",
+    "c1-full": "c4 judge 复核的被判对象（早期 3 个模型基线）",
     "c4-full2": "规则 vs judge 的 Kappa（报告 §2.1 的 0.99–1.00）",
     "c4-full": "同上，前一版",
     "endpoint-cmp": "端点一致性核查（报告 §5.3「旗舰档走独立端点」）",
@@ -207,7 +207,7 @@ def main() -> int:
             if not v:
                 continue
             L += [f"## {titles[k]}　（{len(v)} 个）", "",
-                  "| run_id | 调用 | 失败 | 臂 | 数据集 | 时间 | 说明 |",
+                  "| run_id | 调用 | 失败 | 模型 | 数据集 | 时间 | 说明 |",
                   "| --- | ---: | ---: | ---: | --- | --- | --- |"]
             for i in sorted(v, key=lambda x: x["name"]):
                 arms = len(i.get("arms_seen") or i.get("arms") or {})

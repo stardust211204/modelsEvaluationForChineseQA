@@ -53,7 +53,7 @@ archive/runs/{run_id}/raw/{config}/{arm}.jsonl  # 归档批次（含被作废的
 
 | 字段 | 含义 |
 | --- | --- |
-| `arm` | 臂名（被测模型） |
+| `arm` | 模型名（被测模型） |
 | `instance_id` | 题目 ID，可回连 `data/*.jsonl` |
 | `rep` | 第几次重复（重复采样用） |
 | `params` | **本次实际发出的参数** —— 参数是否生效以它为准，不以 manifest 为准 |

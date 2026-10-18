@@ -118,7 +118,7 @@ def main() -> int:
     print(f"  可归因素材: content 中位长度 "
           f"{sorted(c['content_len'] for c in cases)[n_wrong // 2]} 字符\n")
 
-    print(f"  {'臂':<28}{'错题':>6}  归因分布（启发式，**未人工确认**）")
+    print(f"  {'模型':<28}{'错题':>6}  归因分布（启发式，**未人工确认**）")
     by_arm: dict[str, Counter] = defaultdict(Counter)
     for c in cases:
         by_arm[c["arm"]][c["heuristic_attribution"]] += 1

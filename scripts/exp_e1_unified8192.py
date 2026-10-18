@@ -5,16 +5,16 @@
     2. 统计**所有**模型上被截断的题
     3. 在**所有**模型上剔除，保持剔除的题目一致
 
-为什么这比逐臂剔除更严谨
-    逐臂剔除时各臂分母不同（79 ~ 93），分母小的那个恰好剔掉了最难的题 ⇒ 虚高。
-    取**并集**后，凡是任何一个臂没做完的题，对所有臂都不计 ——
-    于是**五臂落在完全相同的题目上**，分母相同，可直接比较。
+为什么这比逐模型剔除更严谨
+    逐模型剔除时各模型分母不同（79 ~ 93），分母小的那个恰好剔掉了最难的题 ⇒ 虚高。
+    取**并集**后，凡是任何一个模型没做完的题，对所有模型都不计 ——
+    于是**五个模型落在完全相同的题目上**，分母相同，可直接比较。
 
 ★ 剔除集 = 截断（`finish_reason=length`）∪ 无响应（请求失败）
   —— 两者都属"没拿到答案"，且都不是模型答错。
 
 ★ 残留问题（必须声明）
-    共同剔除集解决了"题集不同"，但**没有解决"某些臂的缺失更多"**：
+    共同剔除集解决了"题集不同"，但**没有解决"某些模型的缺失更多"**：
     被剔除的题对 qwen 是"答了但不计"，对 ds-pro 是"根本没答出来"。
     前者无害，后者意味着 ds-pro 在这批题上的能力**未被观测**。
     所以仍给出留一法插补作为**稳健性检查**（不替换主表）。
@@ -59,15 +59,15 @@ def load(arm):
 T = {a: load(a) for a in ARMS}
 ALL = set.intersection(*[set(v) for v in T.values()])
 
-# ---- 共同剔除集 = 任一臂上被截断或无响应的题 --------------------------------
+# ---- 共同剔除集 = 任一个模型上被截断或无响应的题 --------------------------------
 DROPPED_UNION = {i for i in ALL for a in ARMS if T[a][i] in BAD}
 KEEP = sorted(ALL - DROPPED_UNION)
 
 print("=" * 104)
 print("  ① 共同剔除集的构成")
 print("=" * 104)
-print(f"  五臂共有计分题           {len(ALL)}")
-print(f"  ★ 共同剔除（任一臂没做完）{len(DROPPED_UNION)}")
+print(f"  五个模型共有计分题           {len(ALL)}")
+print(f"  ★ 共同剔除（任一个模型没做完）{len(DROPPED_UNION)}")
 print(f"  ★ 保留下来用于比较        {len(KEEP)}")
 print()
 print(f"  {'题':<16}" + "".join(f"{SH[a]:>10}" for a in ARMS) + f"{'剔除原因':>12}")
@@ -79,21 +79,21 @@ for i in sorted(DROPPED_UNION):
 # ---- 表：统一题集上的准确率 ------------------------------------------------
 print()
 print("=" * 104)
-print("  ② ★ 统一题集（{} 题）上的准确率 —— 五臂分母完全相同".format(len(KEEP)))
+print("  ② ★ 统一题集（{} 题）上的准确率 —— 五个模型分母完全相同".format(len(KEEP)))
 print("=" * 104)
-print(f"  {'臂':<10}{'正确':>6}{'错误':>6}{'分母':>6}{'准确率':>9}   与逐臂口径的对照")
+print(f"  {'模型':<10}{'正确':>6}{'错误':>6}{'分母':>6}{'准确率':>9}   与逐模型口径的对照")
 rows = {}
 for a in ARMS:
     c = sum(1 for i in KEEP if T[a][i] == "correct")
     w = sum(1 for i in KEEP if T[a][i] == "wrong")
     acc = c / (c + w) * 100 if c + w else float("nan")
     rows[a] = acc
-    # 逐臂口径（作对照）
+    # 逐模型口径（作对照）
     ca = Counter(T[a][i] for i in KEEP)          # 占位，下面单独算
     pc = sum(1 for i in ALL if T[a][i] == "correct")
     pw = sum(1 for i in ALL if T[a][i] == "wrong")
     old = pc / (pc + pw) * 100 if pc + pw else float("nan")
-    print(f"  {SH[a]:<10}{c:>6}{w:>6}{c+w:>6}{acc:>8.1f}%   逐臂 {old:.1f}%（{old-acc:+.1f}pp）")
+    print(f"  {SH[a]:<10}{c:>6}{w:>6}{c+w:>6}{acc:>8.1f}%   逐模型 {old:.1f}%（{old-acc:+.1f}pp）")
 
 order = sorted(ARMS, key=lambda a: -rows[a])
 print()
@@ -104,7 +104,7 @@ print()
 print("=" * 104)
 print("  ③ 稳健性检查：留一法插补（**估计值，不替换主表**）")
 print("=" * 104)
-print("  假设被剔除的题若做完，正确率 = 其余四臂在同题上的正确率。\n")
+print("  假设被剔除的题若做完，正确率 = 其余四个模型在同题上的正确率。\n")
 adj = {}
 for a in ARMS:
     c = sum(1 for i in KEEP if T[a][i] == "correct")

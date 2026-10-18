@@ -33,18 +33,18 @@ class Arm:
     model: str
     concurrency: int = 4
     params: dict[str, Any] = field(default_factory=dict)
-    # ★ 臂级端点覆盖（2026-10-05 加）。
+    # ★ 模型级端点覆盖（2026-10-05 加）。
     #   默认 None ⇒ 走 `paths.base_url()`（聚合端点）。
     #   为什么要它：旗舰档 `deepseek-v4-pro` 走**官方端点**（聚合端点该模型额度少），
-    #   于是同一批评测里**不同臂落在不同端点**。若客户端仍是全局单例，
-    #   这个差异就表达不出来 —— 只能拆成两个 run，那样臂之间又不可配对了。
+    #   于是同一批评测里**不同模型落在不同端点**。若客户端仍是全局单例，
+    #   这个差异就表达不出来 —— 只能拆成两个 run，那样模型之间又不可配对了。
     #
     #   ⚠️ 这会让"模型差异"与"端点差异"混在一起。已有的缓解证据：
     #      `runs/endpoint-cmp` 实测 官方 deepseek-flash ≈ 聚合 deepseek-v4.1-flash
     #      （96/100 token 完全一致）。但**那只验证了 flash 档**，
     #      v4-pro 的端点一致性未验证 —— 报告里必须声明。
     base_url: str | None = None
-    key_env: str | None = None      # 该臂用哪个环境变量取 key；None ⇒ OPENCODE_API_KEY
+    key_env: str | None = None      # 该模型用哪个环境变量取 key；None ⇒ OPENCODE_API_KEY
     # ★ 客户端参数（2026-10-10 修）：原先 `load_arms` 把这两个键从 params 里
     #   `pop` 出来**直接丢弃** ⇒ `configs/arms.yaml` 的 `timeout_s: 120` 一直是摆设，
     #   实际生效的只是 `client.py` 的同值默认。后果是**改了这个配置项没有任何效果**，
@@ -63,7 +63,7 @@ class Arm:
             d["base_url"] = self.base_url
         if self.key_env:
             d["key_env"] = self.key_env
-        # 只在**显式设置**时出现 ⇒ 未设置的臂与历史记录逐字节一致
+        # 只在**显式设置**时出现 ⇒ 未设置的模型与历史记录逐字节一致
         if self.timeout_s is not None:
             d["timeout_s"] = self.timeout_s
         if self.max_retries is not None:
@@ -95,7 +95,7 @@ class ConfigSpec:
 # --------------------------------------------------------------------------
 
 def load_arms(path: Path | None = None) -> tuple[dict[str, Any], list[Arm]]:
-    """返回 (全局配置, 臂列表)。臂的 params 已与 defaults 合并。"""
+    """返回 (全局配置, 模型列表)。模型的 params 已与 defaults 合并。"""
     cfg = yaml.safe_load((path or paths.configs() / "arms.yaml").read_text(encoding="utf-8"))
     defaults = cfg.get("defaults", {}) or {}
     arms: list[Arm] = []
@@ -157,7 +157,7 @@ def render_prompt(inst: Instance, template: str, demos: list[Instance] | None = 
 
     ★ `{last}` = 该题**实际**的最后一个选项字母（4 选项 → D，9 选项 → I）。
 
-      修的是一个会造成**臂间不公平**的提示词缺陷：三个模板原先都写死
+      修的是一个会造成**模型间不公平**的提示词缺陷：三个模板原先都写死
       「必须且只能是一个大写字母（**A 到 J** 之一）」，而 MMLU-ProX 有
       103/588 题选项数 <10、C-Eval 更是 583/583 题只有 4 个选项。
       于是提示词告诉模型"可以答 J"，而选项里根本没有 J。
@@ -167,8 +167,8 @@ def render_prompt(inst: Instance, template: str, demos: list[Instance] | None = 
           提示词「A 到 J」 -> J, J, J     （不存在的选项，判 invalid）
           提示词「A 到 I」 -> I, I, I     （★ 而且 I 正是标准答案）
 
-      ⇒ 受影响的是**严格照字面执行指令的臂**：旗舰 2.4% 越界，
-        而四个 flash 臂 0–1.5%（它们会自己看选项列表）。
+      ⇒ 受影响的是**严格照字面执行指令的模型**：旗舰 2.4% 越界，
+        而四个 flash 模型 0–1.5%（它们会自己看选项列表）。
         这不是"模型差异"，是**提示词把一部分模型带进了坑**。
 
     ★ `{demos}` 必须在 `.format()` **之后**才填进去。
@@ -255,10 +255,10 @@ def build_specs(
 ) -> list[PromptSpec]:
     """展开成待执行的 PromptSpec 列表。
 
-    ★ 顺序按「臂交错」（instance 在外层、arm 在内层），不是「臂在外层」。
-      原因：`--limit N` 是取列表前 N 条做缩量试跑。若按臂在外层排序，
-      前 N 条会全部落在第一个臂上 —— 试跑就验证不到跨臂并发，
-      各臂的错误率与延迟也拿不到。交错后前 N 条自然覆盖所有臂。
+    ★ 顺序按「模型交错」（instance 在外层、arm 在内层），不是「模型在外层」。
+      原因：`--limit N` 是取列表前 N 条做缩量试跑。若按模型在外层排序，
+      前 N 条会全部落在第一个模型上 —— 试跑就验证不到跨模型并发，
+      各模型的错误率与延迟也拿不到。交错后前 N 条自然覆盖所有模型。
 
     顺序仍是确定性的（同一输入必得同一顺序），因此 diff 与复现不受影响。
     """
@@ -304,7 +304,7 @@ def prompt_fingerprint(
 
     两个用途，都是"防静默失效"：
 
-    ① 门禁：题集哈希没变、臂参数没变，但**模板或渲染逻辑变了** ——
+    ① 门禁：题集哈希没变、模型参数没变，但**模板或渲染逻辑变了** ——
        跨 run 的配对比较同样失效，而单看任何一份产物都发现不了。
     ② 跑批：指纹写进 manifest，resume 时对不上就拒跑。原因见下。
 

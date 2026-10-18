@@ -44,9 +44,9 @@ BARE_RE = re.compile(r"^\s*\(?([A-J])\)?\s*[.!]?\s*$", re.IGNORECASE)
 #   于是"罗列了所有选项"的回答（如「(A) $7.00 (B) $5.00 … 答案：J」）会被判成 **A** ——
 #   因为第一次出现的「选项 (A)」命中了。
 #
-#   后果不是"错几道题"，而是**按臂不均匀地错**：话多、爱罗列选项的臂
+#   后果不是"错几道题"，而是**按模型不均匀地错**：话多、爱罗列选项的模型
 #   （实测 qwen 中位输出 739 token）被系统性判成 A，准确率被压到 48%；
-#   而话少的臂（deepseek 中位 123 token）几乎不受影响。
+#   而话少的模型（deepseek 中位 123 token）几乎不受影响。
 #   ⇒ **解析器缺陷伪装成了"模型能力差异"。** 竞品分析最怕的就是这个。
 #
 #   修法：① 强/弱标记拆开 —— `选项` 只表示"在讨论选项"，不等于"给出答案"
@@ -166,9 +166,9 @@ def parse_judge(text: str) -> tuple[Tier, str]:
 def tally_judge(judge_res: ModelResult, judged_arm: str, config: Config) -> Tally:
     """把一条 judge 输出变成 Tally。
 
-    ★ `arm` 记的是**被判的那个臂**，不是 judge 自己 ——
-      否则三臂的 judge 结论会挤在同一个键上，无法分臂报一致率，
-      而"分臂"恰恰是测 self-preference 的唯一手段。
+    ★ `arm` 记的是**被判的那个模型**，不是 judge 自己 ——
+      否则三个模型的 judge 结论会挤在同一个键上，无法按模型报一致率，
+      而"按模型"恰恰是测 self-preference 的唯一手段。
     """
     base = Tally(instance_id=judge_res.instance_id, arm=judged_arm,
                  config=config, rep=judge_res.rep)

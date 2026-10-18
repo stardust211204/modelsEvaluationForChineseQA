@@ -64,7 +64,7 @@ REPORT = {
 }
 for mode in ("strict", "lenient"):
     print(f"\n--- {mode} 口径 ---")
-    print(f"  {'臂':<10}{'MMLU':>9}{'C-Eval':>9}{'合并':>9}   {'报告(合并/MMLU/C-Eval)':>26}  判定")
+    print(f"  {'模型':<10}{'MMLU':>9}{'C-Eval':>9}{'合并':>9}   {'报告(合并/MMLU/C-Eval)':>26}  判定")
     print("  " + "-" * 92)
     for arm in ARMS:
         am, cm, wm, tm = acc("c1-5arm-v2", "c1", arm, mode)
@@ -81,7 +81,7 @@ for mode in ("strict", "lenient"):
 
 print()
 print("=" * 100)
-print(" §2.4 T6 两口径可判条目（e6 四组，150 题 × 5 臂）")
+print(" §2.4 T6 两口径可判条目（e6 四组，150 题 × 5 个模型）")
 print("=" * 100)
 E6 = {
     "只答一个字母(A)": ("e6-a-5arm", "c2"),
@@ -118,7 +118,7 @@ def stability(rid, cfg, arm):
 
     旧版写的是 `len(v) == len(set(v))` —— 判的是「10 次**全不相同**」，
     与报告口径（「解出的选项是否每次都一样」）正好相反，且额外要求 None 不出现，
-    导致五个臂一律返回 0.0%、下表五行全报 XX。
+    导致五个模型一律返回 0.0%、下表五行全报 XX。
     那是对报告 §3.2 稳定性的**长期误报**，不是报告有错。
     """
     c = metrics.consistency_c3(tallies(rid, cfg), arm)
@@ -147,7 +147,7 @@ def flip(rid, cfg, arm, permuted):
 
 
 print("  （翻转率需要还原坐标系，见 _ratio_pairwise.py；此处仅列稳定性）")
-print(f"  {'臂':<10}{'MMLU稳定性':>12}{'n':>5}{'C-Eval稳定性':>14}{'n':>5}   报告(MMLU/C-Eval)")
+print(f"  {'模型':<10}{'MMLU稳定性':>12}{'n':>5}{'C-Eval稳定性':>14}{'n':>5}   报告(MMLU/C-Eval)")
 for arm in ARMS:
     s1, n1 = stability("c3-5arm-v2", "c3", arm)
     s2, n2 = stability("ceval-c3-5arm", "c3", arm)

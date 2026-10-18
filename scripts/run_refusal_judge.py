@@ -22,7 +22,7 @@
       C4 首轮就是因为推理吃光 token 预算、content 为空，
       且失败**集中在最需要判的条目上**，造成选择性偏差。
     * 输出用 `判定：` + `理由：`，解析取**最后一个** `判定：`（judge 可能在理由里复述格式）。
-    * judge 与被评 deepseek 臂**同家族**，故一律**分臂报告**，暴露 self-preference。
+    * judge 与被评 deepseek 模型**同家族**，故一律**按模型报告**，暴露 self-preference。
 
 用法
     .venv\\Scripts\\python.exe scripts\\run_refusal_judge.py --limit 6      # 试跑
@@ -70,7 +70,7 @@ def load_items(items_file: str | None = None) -> dict[str, dict]:
     ★ 传入外部题集（如 OR-Bench）时必须走 `items_file` ——
       内置的规则法正则**是中文的**（`我无法`/`抱歉`），
       在英文题集上会把**全部**回复判成"没有拒答"：
-      实测 OR-Bench toxic 侧三臂全部显示 100% 危险服从 —— 纯属假象。
+      实测 OR-Bench toxic 侧三个模型全部显示 100% 危险服从 —— 纯属假象。
     """
     out: dict[str, dict] = {}
     if items_file:
@@ -123,7 +123,7 @@ def main() -> int:
             prompt_text=(tmpl.replace("{request}", items[r.instance_id]["prompt"])
                              .replace("{response}", r.content or "")),
             params=dict(params),
-            target_arm=r.arm,       # ★ 进键，否则三臂互相覆盖
+            target_arm=r.arm,       # ★ 进键，否则三个模型互相覆盖
         )
         for r in src if r.instance_id in items
     ]
@@ -164,7 +164,7 @@ def main() -> int:
                for r in execute.load_results(args.source_run, Config.C7)}
     print()
     print("=" * 78)
-    print("judge 判定 vs 规则判定（分臂）")
+    print("judge 判定 vs 规则判定（按模型）")
     print("=" * 78)
     arms = sorted({r.target_arm for r in judged if r.target_arm})
     report: dict = {"source_run": args.source_run, "judge_model": judge_model, "arms": {}}
@@ -176,7 +176,7 @@ def main() -> int:
                               ("under", "该拒（危险服从侧）", True)):
         ids = {k for k, v in items.items() if v["should_refuse"] is want}
         print(f"\n  【{label}】n={len(ids)}")
-        print(f"    {'臂':<28}{'judge 档位分布':<44}{'与规则不一致':>12}")
+        print(f"    {'模型':<28}{'judge 档位分布':<44}{'与规则不一致':>12}")
         for arm in arms:
             # ★ 遍历**全部**源请求（含失败的），而不是只遍历有 judge 结果的：
             #   被 API 层拦掉的请求没有 judge 结果，但语义上就是一次拒答。
@@ -226,8 +226,8 @@ def main() -> int:
     print()
     print("  读法：")
     print("   * judge 是**权威**判定；规则法只作预筛（实测假阳性+假阴性都有）。")
-    print("   * judge 与被评 deepseek 臂**同家族**，故必须分臂看 —— ")
-    print("     若 deepseek 臂的判定系统性更宽松，那就是 self-preference 的实测证据。")
+    print("   * judge 与被评 deepseek 模型**同家族**，故必须按模型看 —— ")
+    print("     若 deepseek 模型的判定系统性更宽松，那就是 self-preference 的实测证据。")
     print("   * `UNCLEAR` 与截断不计入任何一侧。")
 
     out = paths.ROOT / "runs" / args.run_id / "refusal_judge_report.json"

@@ -64,7 +64,7 @@ def main() -> int:
     specs = adapt.build_specs(
         run_id=args.run_id, config=c1, arms=arms, instances=instances, prompt_template=tmpl,
     )
-    print(f"② 构造      : {len(specs)} 条 PromptSpec（{len(arms)} 臂 × {len(instances)} 题）")
+    print(f"② 构造      : {len(specs)} 条 PromptSpec（{len(arms)} 个模型 × {len(instances)} 题）")
     assert len(specs) == len(arms) * len(instances)
 
     # 纯函数自检

@@ -1,12 +1,12 @@
 """C4 · LLM-as-Judge 复核：judge 独立判定 C1 的输出，与规则判分比对。
 
 为什么 judge 必须走**独立端点**
-    judge 与被评模型同源会引入 self-preference。本项目三臂都在聚合端点上，
+    judge 与被评模型同源会引入 self-preference。本项目三个模型都在聚合端点上，
     因此 judge 用 **DeepSeek 官方端点**的 `deepseek-v4-pro`。
 
     ⚠️ 但它仍与 `deepseek-v4.1-flash` **同家族**，违反 `configs/matrix.yaml`
-       原先写的"须与被评模型不同家族"。处理方式不是回避，而是**分臂**报一致率：
-       若 deepseek 臂的 judge-vs-规则一致率**显著高于**另两臂，那本身就是
+       原先写的"须与被评模型不同家族"。处理方式不是回避，而是**按模型**报一致率：
+       若 deepseek 模型的 judge-vs-规则一致率**显著高于**另两个模型，那本身就是
        self-preference 的实测证据 —— 把混淆变成观测量。
 
 为什么 judge 只作复核
@@ -19,8 +19,8 @@
 
 产物
     runs/{run_id}/raw/c4/{judge_model}.jsonl     原始 judge 输出
-    runs/{run_id}/tallies/c4/all.jsonl           judge 判定（arm = **被判的臂**）
-    runs/{run_id}/judge_vs_rule.json             分臂一致率报告
+    runs/{run_id}/tallies/c4/all.jsonl           judge 判定（arm = **被判的模型**）
+    runs/{run_id}/judge_vs_rule.json             按模型一致率报告
 """
 
 from __future__ import annotations
@@ -56,7 +56,7 @@ def load_instances() -> dict:
 def build_judge_specs(*, run_id: str, spec: adapt.ConfigSpec, pool: list,
                       source_run: str, source_cfg: Config, judge_model: str,
                       arms: list[str] | None, params: dict) -> tuple[list[PromptSpec], dict]:
-    """为「每个 (题, 被判臂)」各造一条 judge 请求。"""
+    """为「每个 (题, 被判模型)」各造一条 judge 请求。"""
     tmpl = (paths.ROOT / spec.prompt_template).read_text(encoding="utf-8")
     instances = adapt.subset_from_c1(pool, spec.n_instances)
     ids = {i.id for i in instances}
@@ -75,7 +75,7 @@ def build_judge_specs(*, run_id: str, spec: adapt.ConfigSpec, pool: list,
             instance_id=r.instance_id, rep=0,
             prompt_text=adapt.render_judge_prompt(inst, r.content, tmpl),
             params=dict(params),
-            target_arm=r.arm,          # ★ 进去重键，否则三臂互相覆盖
+            target_arm=r.arm,          # ★ 进去重键，否则三个模型互相覆盖
         ))
     meta = {"n_instances": len(instances), "n_source_results": len(src),
             "judged_arms": sorted({r.arm for r in src})}
@@ -83,7 +83,7 @@ def build_judge_specs(*, run_id: str, spec: adapt.ConfigSpec, pool: list,
 
 
 def judge_vs_rule(rule_rows: list[dict], judge_rows: list[dict], arm: str) -> dict:
-    """一个臂的 judge-vs-规则一致率。
+    """一个模型的 judge-vs-规则一致率。
 
     参考 = 规则判分（严格口径），待验证 = judge。
     非二元档位（invalid/truncated）由 `binary_agreement` 自动排除并如实报出。
@@ -113,7 +113,7 @@ def main() -> int:
     ap.add_argument("--source-run", default="c1-full", help="被复核的 run（默认 c1-full）")
     ap.add_argument("--source-config", default="c1")
     ap.add_argument("--run-id", default="c4-full")
-    ap.add_argument("--arms", default=None, help="逗号分隔，默认三臂全判")
+    ap.add_argument("--arms", default=None, help="逗号分隔，默认三个模型全判")
     ap.add_argument("--limit", type=int, default=None, help="本次最多执行多少条（试跑）")
     ap.add_argument("--concurrency", type=int, default=6)
     ap.add_argument("--max-tokens", type=int, default=2048,
@@ -152,8 +152,8 @@ def main() -> int:
         source_cfg=source_cfg, judge_model=judge_model, arms=arms,
         params=judge_params,
     )
-    print(f"  被判臂      : {meta['judged_arms']}")
-    print(f"  待执行      : {len(specs)} 条（{meta['n_instances']} 题 × {len(meta['judged_arms'])} 臂）")
+    print(f"  被判模型      : {meta['judged_arms']}")
+    print(f"  待执行      : {len(specs)} 条（{meta['n_instances']} 题 × {len(meta['judged_arms'])} 个模型）")
 
     if not specs:
         print("!! 没有可判条目：检查 --source-run 是否有 raw")
@@ -170,12 +170,12 @@ def main() -> int:
             data_hash=_hash_of(paths.data() / "eval_set.jsonl"),
             models_snapshot=[judge_model],
             note=f"LLM-as-Judge 复核｜judge={judge_model}（官方端点）｜"
-                 f"被复核={args.source_run}｜分臂报一致率以暴露 self-preference",
+                 f"被复核={args.source_run}｜按模型报一致率以暴露 self-preference",
             stats=stats,
         )
         print(f"  失败        : {stats.get('failed')}")
 
-    # ---- 判分（judge 输出 -> Tally，arm 记为**被判的臂**）------------------
+    # ---- 判分（judge 输出 -> Tally，arm 记为**被判的模型**）------------------
     results = [r for r in execute.load_results(args.run_id, Config.C4)]
     if not results:
         print("!! 没有 judge 结果可判")
@@ -195,13 +195,13 @@ def main() -> int:
         "run_id": args.run_id, "judge_model": judge_model,
         "judge_endpoint": paths.judge_base_url(),
         "source_run": args.source_run, "arms": {},
-        "note": "judge 与 deepseek-v4.1-flash 同家族；分臂报一致率以暴露 self-preference",
+        "note": "judge 与 deepseek-v4.1-flash 同家族；按模型报一致率以暴露 self-preference",
     }
     print()
     print("=" * 78)
     print("judge vs 规则判分（参考=规则严格口径，待验证=judge）")
     print("=" * 78)
-    print(f"  {'被判臂':<28}{'共同题':>7}{'覆盖率':>8}{'一致率':>8}{'Cohen κ':>9}"
+    print(f"  {'被判模型':<28}{'共同题':>7}{'覆盖率':>8}{'一致率':>8}{'Cohen κ':>9}"
           f"{'judge判不出':>11}")
     for arm in sorted({t["arm"] for t in judge_rows}):
         rep = judge_vs_rule(rule_rows, judge_rows, arm)
@@ -216,7 +216,7 @@ def main() -> int:
     print()
     print("  读法：")
     print("   * 一致率高 = 规则判分与 judge 结论相符，规则判分可辩护。")
-    print("   * **重点看臂间差异**：deepseek 臂明显更高 → 可能是 self-preference 的实测证据。")
+    print("   * **重点看模型间差异**：deepseek 模型明显更高 → 可能是 self-preference 的实测证据。")
     print("   * judge 判不出的条目（invalid）不算一致，也不该被算成答错。")
 
     out = paths.ROOT / "runs" / args.run_id / "judge_vs_rule.json"

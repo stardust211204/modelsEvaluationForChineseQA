@@ -1,6 +1,6 @@
-"""三臂连通性冒烟。
+"""三个模型连通性冒烟。
 
-目的：在花任何批量额度之前，确认三臂都能正常作答，且**没有静默空 content**。
+目的：在花任何批量额度之前，确认三个模型都能正常作答，且**没有静默空 content**。
 
 「静默空 content」是最危险的一种失败：HTTP 200，但 content 为空串
 （推理模型把 token 预算烧在 reasoning_content 上）。
@@ -48,7 +48,7 @@ def load_arms() -> list[dict]:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--n", type=int, default=3, help="每臂调用次数（默认 3，用于测稳定性）")
+    ap.add_argument("--n", type=int, default=3, help="每个模型调用次数（默认 3，用于测稳定性）")
     args = ap.parse_args()
 
     arms = load_arms()
@@ -56,7 +56,7 @@ def main() -> int:
         print("!! configs/arms.yaml 里没有 arms"); return 2
 
     print(f"端点: {paths.base_url()}")
-    print(f"臂数: {len(arms)}   每臂 {args.n} 次\n")
+    print(f"模型数: {len(arms)}   每个模型 {args.n} 次\n")
 
     client = ChatClient()
     out_dir = paths.evidence()
@@ -117,7 +117,7 @@ def main() -> int:
     if any(v.startswith("[WARN]") for v in verdicts.values()):
         print("\n!! 存在空 content：不要进入批量跑批。先跑 probe_params.py 定位原因。")
         return 1
-    print("\n可以进入下一步：probe_params.py（逐臂回填生效参数）")
+    print("\n可以进入下一步：probe_params.py（逐模型回填生效参数）")
     return 0
 
 

@@ -5,7 +5,7 @@
     .venv\\Scripts\\python.exe scripts\\report_metrics.py --run-id c1-full --config c1
 
 产物：
-    runs/{run_id}/metrics.csv          每臂 × 每口径 一行的 tidy 表
+    runs/{run_id}/metrics.csv          每个模型 × 每口径 一行的 tidy 表
     runs/{run_id}/metrics.json         含分层拆分、口径一致率、跨配置 Δacc
 """
 
@@ -45,8 +45,8 @@ def main() -> int:
     cfg = Config(args.config)
     instances = load_instances()
     results_list = execute.load_results(args.run_id, cfg)
-    # ★ 键必须含 arm —— 三臂跑同一批题（instance_id, rep 完全相同），
-    #   只用 (instance_id, rep) 做键会让三臂互相覆盖，只剩最后一个臂。
+    # ★ 键必须含 arm —— 三个模型跑同一批题（instance_id, rep 完全相同），
+    #   只用 (instance_id, rep) 做键会让三个模型互相覆盖，只剩最后一个模型。
     results = {(r.arm, r.instance_id, r.rep): r.to_dict() for r in results_list}
     tallies = metrics.load_tallies(args.run_id, cfg)
 
@@ -59,7 +59,7 @@ def main() -> int:
     print("=" * 78)
     print(f"指标报告   run_id={args.run_id}   config={cfg.value}")
     print("=" * 78)
-    print(f"记录: {len(results_list)} 次调用 | Tally: {len(tallies)} 条 | 臂: {len(arms)}")
+    print(f"记录: {len(results_list)} 次调用 | Tally: {len(tallies)} 条 | 模型: {len(arms)}")
     print(f"题集: {len(instances)} 题（含分层标签）\n")
 
     rows: list[dict] = []
@@ -95,7 +95,7 @@ def main() -> int:
             detail["arms"][arm]["rep_spread"] = metrics.rep_accuracy_spread(tallies, arm)
 
     # ---- 控制台表 ---------------------------------------------------------
-    print(f"{'臂':<28}{'口径':<9}{'准确率':>8}{'95% CI':>16}{'无效':>7}{'截断':>7}{'n':>6}")
+    print(f"{'模型':<28}{'口径':<9}{'准确率':>8}{'95% CI':>16}{'无效':>7}{'截断':>7}{'n':>6}")
     print("-" * 78)
     for r in rows:
         ci = "—"
@@ -181,7 +181,7 @@ def main() -> int:
         def _pct(x):
             return f"{x:.1%}" if isinstance(x, (int, float)) else "—"
 
-        print(f"  {'臂':<28}{'题数':>5}{'可答':>6}{'从不作答':>9}"
+        print(f"  {'模型':<28}{'题数':>5}{'可答':>6}{'从不作答':>9}"
               f"{'档位全同':>10}{'可答题档位全同':>16}{'答案全同':>10}")
         for arm in arms:
             c = detail["arms"][arm].get("consistency")
@@ -196,7 +196,7 @@ def main() -> int:
 
         spreads = {a: detail["arms"][a].get("rep_spread") or {} for a in arms}
         if any(spreads.values()):
-            print(f"\n  {'臂':<28}{'每次准确率':>11}{'最低':>8}{'最高':>8}{'极差pp':>9}{'SD':>8}")
+            print(f"\n  {'模型':<28}{'每次准确率':>11}{'最低':>8}{'最高':>8}{'极差pp':>9}{'SD':>8}")
             for arm in arms:
                 s = spreads[arm]
                 if not s:
@@ -219,7 +219,7 @@ def main() -> int:
          "cost_per_1k_correct": r["cost_per_1k_correct"], "total_tokens": r["total_tokens"]}
         for r in strict_rows
     ])
-    print(f"  {'臂':<28}{'准确率':>8}{'成本(元)':>10}{'千题成本':>10}"
+    print(f"  {'模型':<28}{'准确率':>8}{'成本(元)':>10}{'千题成本':>10}"
           f"{'tokens':>10}{'中位延迟':>9}{'p95':>8}{'前沿':>7}")
     for p in sorted(pts, key=lambda x: -(x["acc"] or 0)):
         print(f"  {p['arm']:<28}{p['acc']:>8.1%}{p['cost_cny']:>10.3f}"
@@ -228,7 +228,7 @@ def main() -> int:
               f"{'   ★' if p.get('pareto') else '   —':>7}")
     print("\n  ★ = 在「准确率↑ 成本↓」下非支配（Pareto 前沿）")
     tot_cost = sum(p["cost_cny"] for p in pts)
-    print(f"  三臂合计折算成本：{tot_cost:.3f} 元")
+    print(f"  三个模型合计折算成本：{tot_cost:.3f} 元")
 
     # 口径说明：κ 与一致率看似矛盾时，读这一段
     print("\n  读法提示：κ=1.0 但一致率<100% 并不矛盾 ——")

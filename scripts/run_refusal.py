@@ -8,7 +8,7 @@
 
 与准确率评测的关系
     完全独立。拒答判的是「该不该答」，准确率判的是「答得对不对」。
-    两侧共用同一套 Tally 结构、同一批臂、同一套 raw/tally 分离纪律，
+    两侧共用同一套 Tally 结构、同一批模型、同一套 raw/tally 分离纪律，
     但**档位与分母完全不同**（见 metrics.refusal_accounting）。
 
 纪律
@@ -114,7 +114,7 @@ def main() -> int:
     print(f"C7 拒答评测   run_id={args.run_id}")
     print("=" * 78)
     print(f"  种子集      : {len(items)} 条（过度拒答探针 {n_over} + 应拒探针 {n_under}）  hash={h}")
-    print(f"  臂          : {', '.join(a.name for a in arms)}")
+    print(f"  模型          : {', '.join(a.name for a in arms)}")
     print(f"  待执行      : {len(items) * len(arms)} 条")
 
     if not args.report_only:
@@ -167,7 +167,7 @@ def main() -> int:
                               ("under", "该拒（危险服从侧）", True)):
         ids = {i["id"] for i in items if i["should_refuse"] is want}
         print(f"\n  【{label}】n={len(ids)}")
-        print(f"    {'臂':<28}{'档位分布'}")
+        print(f"    {'模型':<28}{'档位分布'}")
         for a in arms:
             rs = [t for t in trows if t["arm"] == a.model and t["instance_id"] in ids]
             if not rs:

@@ -1,10 +1,10 @@
 """端点一致性核查：官方 `deepseek-flash` 与聚合端点的 `deepseek-v4.1-flash` 是不是同一个模型？
 
 为什么这件事对本项目重要
-    整个项目的定位声明是"三臂经**第三方聚合端点**接入，真实后端不可见，
+    整个项目的定位声明是"三个模型经**第三方聚合端点**接入，真实后端不可见，
     结论仅作方法学演示"。如果聚合端点的 `deepseek-v4.1-flash` 与官方
     `deepseek-flash`（官方口径下 V4.1-Flash 的正式名）行为一致，
-    那条免责声明就可以收紧为"至少 DeepSeek 臂已与官方端点交叉验证"。
+    那条免责声明就可以收紧为"至少 DeepSeek 模型已与官方端点交叉验证"。
 
 三类证据，按**可信度从高到低**
 
@@ -63,9 +63,9 @@ def load_agg_rows(run_id: str, arm: str, cfg: Config) -> list:
 
 
 def official_params() -> dict:
-    """与聚合端点那条臂**匹配**的参数。
+    """与聚合端点那条模型**匹配**的参数。
 
-    聚合端点的 deepseek 臂冻结的是 max_tokens=1024 / temperature=0.1 /
+    聚合端点的 deepseek 模型冻结的是 max_tokens=1024 / temperature=0.1 /
     reasoning_effort=none。官方端点实测同样认 `reasoning_effort`，
     因此可以对齐思考开关 —— 这是①类证据成立的前提。
     """

@@ -74,7 +74,7 @@ def main() -> int:
     md.append("\n## 标签集与判据\n")
     md.append(LABEL_HELP)
     md.append("\n## 全局提示\n")
-    md.append(f"* 分臂：{dict(Counter(r['arm'] for r in rows))}")
+    md.append(f"* 按模型：{dict(Counter(r['arm'] for r in rows))}")
     md.append(f"* 学科：{dict(Counter(r['subject'] for r in rows))}")
     md.append("* `启发式` 那一行**仅供参考、且已实测不可靠**（它实际只在区分"
               "回复长短）—— 请独立判断，不要被它带偏。\n")
@@ -128,7 +128,7 @@ def main() -> int:
     print("=" * 78)
     print(f"  条数     : {len(rows)}")
     print(f"  阅读量   : {total:,} 字（中位 {sorted(r['content_len'] for r in rows)[len(rows)//2]} 字/条）")
-    print(f"  分臂     : {dict(Counter(r['arm'] for r in rows))}")
+    print(f"  按模型     : {dict(Counter(r['arm'] for r in rows))}")
     print()
     print(f"  工作单   -> {mdp.relative_to(paths.ROOT)}   （读这个）")
     print(f"  填写表   -> {csvp.relative_to(paths.ROOT)}   （填这个，Excel 可直接打开）")

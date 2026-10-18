@@ -1,9 +1,9 @@
-"""三臂互异性指纹：确认三个模型 ID 背后确实是三个不同的模型。
+"""三个模型互异性指纹：确认三个模型 ID 背后确实是三个不同的模型。
 
 背景：`resp_model` 字段只是回显请求名，不含后端信息（实测确认）。
 因此只能用**行为证据** —— 同一批题，两个真别名的答案应几乎完全一致。
 
-⚠️ 解读前必须先剔除空响应。曾出现三臂 93–100% 一致的假象，
+⚠️ 解读前必须先剔除空响应。曾出现三个模型 93–100% 一致的假象，
    全部由共同返回空 content 造成（见 docs/param_matrix.md §6）。
 
 产物：data/raw_evidence/probe_distinct.jsonl
@@ -56,7 +56,7 @@ def main() -> int:
     records: list[dict] = []
     answers: dict[str, list[str | None]] = {}
 
-    print(f"指纹题数: {N_Q}   臂数: {len(arms)}\n")
+    print(f"指纹题数: {N_Q}   模型数: {len(arms)}\n")
 
     for arm in arms:
         name, model = arm["name"], arm["model"]
@@ -113,9 +113,9 @@ def main() -> int:
         print("!! 发现高度一致的对，疑似别名：")
         for v in verdict:
             print("   " + v)
-        print("   -> 需换臂，或说明这两臂为何仍可比较")
+        print("   -> 需换模型，或说明这两个模型为何仍可比较")
     else:
-        print("三臂互异性通过：无一对达到 80% 一致阈值")
+        print("三个模型互异性通过：无一对达到 80% 一致阈值")
     print(f"\n原始记录 -> {out}  ({len(records)} 次调用)")
     client.close()
     return 1 if verdict else 0

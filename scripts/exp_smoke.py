@@ -26,7 +26,7 @@ from meval.types import Config  # noqa: E402
 
 LETTERS = "ABCDEFGHIJ"
 DROP = exclusions.load()
-# ★ 正式跑批必须显式排除 space-bunny-free（限时窗口的限额模型，非被测五臂之一）
+# ★ 正式跑批必须显式排除 space-bunny-free（限时窗口的限额模型，非被测五个模型之一）
 MAIN_ARMS = ["deepseek-v4.1-flash", "deepseek-v4-pro", "longcat-2.5-preview-free",
              "mimo-v2.6-flash", "qwen3.8-flash"]
 CHECKS: list[tuple[str, str, bool, str]] = []   # (实验, 检查项, 通过, 详情)
@@ -41,7 +41,7 @@ def skip(exp: str, name: str, detail: str = "") -> None:
     """记录一项**无法执行**的检查 —— 输入不存在，不是失败。
 
     例：刚 clone 下来的仓库没有 raw（75 MB，走 GitHub Release 附件，见 README §六），
-    而「被复核 run 含 5 臂」这类检查的判据只能从 raw 里读出来。
+    而「被复核 run 含 5 个模型」这类检查的判据只能从 raw 里读出来。
     此时报 SKIP 而不是 FAIL —— **门禁乱报红比不报红更糟**：
     面试官照 README 跑一遍不该看到「有未通过项，先修」。
     """
@@ -111,9 +111,9 @@ def smoke_e1(show: int) -> None:
         spec, arms, insts, demos, specs = make_specs(
             Config.C3, "eval_set", params=p, drop_keys=dk, param_arms=pa, reps=1)
         n_arm = len({s.arm for s in specs})
-        print(f"\n  ▸ {label}   题 {len(insts)}   reps {spec.reps}   臂 {n_arm}"
+        print(f"\n  ▸ {label}   题 {len(insts)}   reps {spec.reps}   模型 {n_arm}"
               f"   待执行 {len(specs)}")
-        check(E, f"{label}·臂数 5（已排除 space-bunny）", n_arm == 5, f"实际 {n_arm}")
+        check(E, f"{label}·模型数 5（已排除 space-bunny）", n_arm == 5, f"实际 {n_arm}")
         check(E, f"{label}·reps==1", spec.reps == 1, f"实际 {spec.reps}")
         check(E, f"{label}·模板为 c1_strict（与 C1/C3/C6 同）",
               spec.prompt_template == "prompts/c1_strict.txt", spec.prompt_template)
@@ -126,7 +126,7 @@ def smoke_e1(show: int) -> None:
               "★ 三组必须只差参数、不差 prompt")
         # 参数断言
         if label.startswith("high"):
-            check(E, "high 组·4 臂带 reasoning_effort=high",
+            check(E, "high 组·4 个模型带 reasoning_effort=high",
                   all(a.params.get("reasoning_effort") == "high"
                       for a in arms if a.name in REASON_ARMS),
                   str({a.name: a.params.get("reasoning_effort") for a in arms}))
@@ -164,7 +164,7 @@ def smoke_e2(show: int) -> None:
     meta = json.loads((paths.data() / "e2_relabel_set.meta.json").read_text(encoding="utf-8"))
     Lmap = meta["label_order"]
 
-    print(f"  题 {len(insts_all)}（样例打印 {len(insts)}）   臂 {len(arms)}")
+    print(f"  题 {len(insts_all)}（样例打印 {len(insts)}）   模型 {len(arms)}")
     check(E, "题量 100", len(insts_all) == 100, f"实际 {len(insts_all)}")
     check(E, "模板不含 {options}",
           "{options}" not in (paths.ROOT / "prompts/e2_labelshuffle.txt")
@@ -226,7 +226,7 @@ def smoke_e6(show: int) -> None:
         spec, arms, insts, demos, specs = make_specs(cfg, "eval_set", template=tmpl)
         txt = specs[0].prompt_text
         print(f"\n  ▸ {label:<26} 模板 {tmpl:<28} 题 {len(insts)}")
-        check(E, f"{label}·臂数 5", len({s.arm for s in specs}) == 5)
+        check(E, f"{label}·模型数 5", len({s.arm for s in specs}) == 5)
         check(E, f"{label}·题量 {want_n}", len(insts) == want_n, f"实际 {len(insts)}")
         idsets[label] = {i.id for i in insts}
         for kw, should in feats.items():
@@ -268,7 +268,7 @@ def smoke_e5(show: int) -> None:
         txt = specs[0].prompt_text
         blocks = txt.count("示例 ")
         print(f"\n  ▸ n={n:<3} 题 {len(insts)}  示例 {[d.id for d in (demos or [])]}")
-        check(E, f"n={n}·臂数 5", len({s.arm for s in specs}) == 5)
+        check(E, f"n={n}·模型数 5", len({s.arm for s in specs}) == 5)
         check(E, f"n={n}·题量 150", len(insts) == 150, f"实际 {len(insts)}")
         check(E, f"n={n}·示例条数=={n}", len(demos or []) == n, f"实际 {len(demos or [])}")
         check(E, f"n={n}·prompt 含 {n} 个示例块", blocks == n, f"实际 {blocks}")
@@ -287,21 +287,21 @@ def smoke_e5(show: int) -> None:
 # ══════════════════════════════════════════════════════════════════════════
 def smoke_e3(show: int) -> None:
     E = "E3"
-    print(f"\n{'='*92}\n  E3 judge 复核补齐到 5 臂\n{'='*92}")
+    print(f"\n{'='*92}\n  E3 judge 复核补齐到 5 个模型\n{'='*92}")
     src = paths.ROOT / "runs" / "c1-5arm-v2" / "raw" / "c1"
     arms = sorted(p.stem for p in src.glob("*.jsonl")) if src.exists() else []
-    print(f"  被复核 run：c1-5arm-v2    实际臂 {len(arms)}：{arms}")
+    print(f"  被复核 run：c1-5arm-v2    实际模型 {len(arms)}：{arms}")
     if arms:
-        check(E, "被复核 run 含 5 臂", len(arms) == 5, str(arms))
+        check(E, "被复核 run 含 5 个模型", len(arms) == 5, str(arms))
     else:
-        skip(E, "被复核 run 含 5 臂", "raw 未下载（走 Release 附件，见 README §六）")
+        skip(E, "被复核 run 含 5 个模型", "raw 未下载（走 Release 附件，见 README §六）")
     old = paths.ROOT / "runs" / "c4-full2" / "judge_vs_rule.json"
     if old.exists():
         j = json.loads(old.read_text(encoding="utf-8"))
         prev = j.get("source_run")
         print(f"  既有复核 source_run = {prev}（旧基线，不含 ds-pro / qwen）")
-        check(E, "本轮将覆盖的臂多于既有复核",
-              True, f"既有 {prev} → 本轮 c1-5arm-v2 全 5 臂")
+        check(E, "本轮将覆盖的模型多于既有复核",
+              True, f"既有 {prev} → 本轮 c1-5arm-v2 全 5 个模型")
     tmpl = paths.ROOT / "prompts" / "judge_cot.txt"
     check(E, "judge 模板存在", tmpl.exists(), str(tmpl))
     if tmpl.exists():
@@ -311,7 +311,7 @@ def smoke_e3(show: int) -> None:
               got <= {"question", "options", "gold", "response"}, str(got))
         if show:
             print("      judge 模板：" + " / ".join(t.splitlines()[:3])[:160])
-    print("\n  ★ judge 无需新 prompt 模板；用 run_judge.py --arms 指定 5 臂即可")
+    print("\n  ★ judge 无需新 prompt 模板；用 run_judge.py --arms 指定 5 个模型即可")
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -324,7 +324,7 @@ def smoke_regression(show: int) -> None:
       ① `_tgt` 在 `if overrides:` 内定义 ⇒ 无 `--param` 时 UnboundLocalError，
          manifest 写不出来（E1 的 none 组实测踩到）
       ② 门禁只读 matrix.yaml 的 reps ⇒ `--reps 1` 被判"缺 4500 条"
-      ③ 门禁假定 param_overrides 作用于全部臂 ⇒ `--param-arms` 被误报成参数漂移
+      ③ 门禁假定 param_overrides 作用于全部模型 ⇒ `--param-arms` 被误报成参数漂移
     """
     import ast
     import inspect
@@ -394,7 +394,7 @@ def smoke_regression(show: int) -> None:
     check(E, "★ ci_gate.expected_specs 支持 reps 覆盖", es_ok)
     check(E, "★ ci_gate 调用处传入 man.get('reps')",
           "expected_specs(run_pool, spec, n_arms, reps=man.get(\"reps\"))" in gate_src)
-    check(E, "★ ci_gate 参数冻结按 param_arms 限定作用臂",
+    check(E, "★ ci_gate 参数冻结按 param_arms 限定作用模型",
           'man.get("param_arms")' in gate_src and "_pa is None or arm in _pa" in gate_src)
 
     # ---- ⑤ 默认路径零回归：不传任何新参数时 spec 与「只用 matrix」逐条相同 --
@@ -453,7 +453,7 @@ def smoke_regression(show: int) -> None:
     check(E, "Arm.to_dict 仅在显式设置时含 timeout_s（历史记录不变）",
           "timeout_s" not in _replace(_arms[0], timeout_s=None).to_dict())
     _sig = inspect.signature(execute.run_specs)
-    check(E, "run_specs 接受臂级 arm_timeouts / arm_retries",
+    check(E, "run_specs 接受模型级 arm_timeouts / arm_retries",
           "arm_timeouts" in _sig.parameters and "arm_retries" in _sig.parameters)
 
 

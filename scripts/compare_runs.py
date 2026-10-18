@@ -77,7 +77,7 @@ def main() -> int:
 
     for mode in modes:
         print(f"\n口径 = {mode.value}")
-        print(f"  {'臂':<28}{'共同题':>6}{'可配对':>7}{'覆盖':>7}{'基准':>8}{'对照':>8}"
+        print(f"  {'模型':<28}{'共同题':>6}{'可配对':>7}{'覆盖':>7}{'基准':>8}{'对照':>8}"
               f"{'Δpp':>8}{'基准对/对照错':>13}{'基准错/对照对':>13}{'McNemar p':>11}")
         for arm in arms:
             r = metrics.paired_compare(

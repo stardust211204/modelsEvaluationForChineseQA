@@ -47,7 +47,7 @@ print("=" * 100)
 print("  prompt 指纹重放（当前代码 vs manifest）")
 print("=" * 100)
 print()
-print(f"  {'run_id':<24}{'题数':>6}{'臂':>4}{'reps':>6}{'调用':>8}  {'指纹':<18}{'manifest':<18} 结果")
+print(f"  {'run_id':<24}{'题数':>6}{'模型':>4}{'reps':>6}{'调用':>8}  {'指纹':<18}{'manifest':<18} 结果")
 print("  " + "-" * 92)
 allok = True
 for dsfile, cfg, run_id, arms in PLAN:

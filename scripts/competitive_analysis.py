@@ -1,8 +1,8 @@
-"""竞品分析聚合：把各臂的**能力 / 稳定性 / 鲁棒性 / 成本效率**拼成一张可比的表。
+"""竞品分析聚合：把各模型的**能力 / 稳定性 / 鲁棒性 / 成本效率**拼成一张可比的表。
 
 为什么单独写一个脚本
     现有 `report_metrics.py` 是按**配置**组织的（C1 一节、C2 一节），输出的是
-    "方法学"视角。竞品分析需要的是**按臂**组织的视角：每个模型一行，维度是列，
+    "方法学"视角。竞品分析需要的是**按模型**组织的视角：每个模型一行，维度是列，
     能直接横向比 —— 那就是"模型画像卡"。
 
 口径纪律（每条都对应一次踩过的坑）
@@ -14,7 +14,7 @@
     * 成本 = 统一折算价（入 1 元/M、出 4 元/M）。**这不是账单** ——
       聚合端点计费不可见；真实价格跑完后单独查表
     * 截断率本身是一个竞品维度：同样 max_tokens 下谁更早撞上限 = 谁更烧预算
-    * **跨 run 的臂不顶替**：取不到就显式标 `—`，绝不用另一个 run 的同名臂凑数
+    * **跨 run 的模型不顶替**：取不到就显式标 `—`，绝不用另一个 run 的同名模型凑数
 
 用法
     .venv\\Scripts\\python.exe scripts\\competitive_analysis.py
@@ -71,7 +71,7 @@ def _read_raw(run: str, cfg: str, arm: str) -> list[dict]:
 
 
 def collect(run: str, tkey: str) -> dict[str, dict]:
-    """返回 {arm: 各维度}。缺失的臂**不伪造**，直接不出现。"""
+    """返回 {arm: 各维度}。缺失的模型**不伪造**，直接不出现。"""
     drop = exclusions.load()
     out: dict[str, dict] = {}
     tallies = _read_tallies(run, tkey)
@@ -146,14 +146,14 @@ def spacebunny_section() -> dict | None:
 
     为什么不进主表
         它的思考是**强制开启的**（实测 5 种关思考写法全部无效，`reasoning_effort`
-        与 `thinking` 直接 400）。而主表五臂的思考**都被我们关掉了**。
-        把它放进同一张表意味着「臂」和「思考模式」同时变化 ——
+        与 `thinking` 直接 400）。而主表五个模型的思考**都被我们关掉了**。
+        把它放进同一张表意味着「模型」和「思考模式」同时变化 ——
         违反项目「每个配置只改一个因子」的纪律，且成本维度完全失真
-        （它每次多烧 1,000+ 思考 token，其余臂只烧 1 个）。
+        （它每次多烧 1,000+ 思考 token，其余模型只烧 1 个）。
 
     怎么呈现
         给**区间**而不是点估计。因为剔除截断项会**高估**准确率：
-        实测被截断的题系统性更难（同批五臂 35.4% vs 未截断 60.4%，差 25pp）。
+        实测被截断的题系统性更难（同批五个模型 35.4% vs 未截断 60.4%，差 25pp）。
             acc_lower  只算可判项（现行四档口径，偏乐观）
             acc_upper  把截断项按难度外推（偏保守）
         `truncated_rate` 必须同时报 —— 它本身是一条竞品结论：
@@ -189,7 +189,7 @@ def spacebunny_section() -> dict | None:
         ref = collect(ref_run, ref_cfg)
         diff = metrics.item_difficulty(_read_tallies(ref_run, ref_cfg))
         b = metrics.truncation_bias(rows, "space-bunny-free", diff)
-        # 主表五臂在同一题集上的最好成绩，作参照（不是同一配置，只作标尺）
+        # 主表五个模型在同一题集上的最好成绩，作参照（不是同一配置，只作标尺）
         best = max((v["acc_lenient"] for v in ref.values() if v.get("acc_lenient") is not None),
                    default=None)
         out[label] = {**b, "ref_best_main": best, "n_answered": len(rows),
@@ -206,12 +206,12 @@ def fmt(v, pct=False, nd=2):
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="五臂竞品分析聚合")
+    ap = argparse.ArgumentParser(description="五个模型竞品分析聚合")
     ap.add_argument("--json", default="runs/competitive_analysis.json")
     args = ap.parse_args()
 
     print("=" * 104)
-    print("  五臂竞品分析")
+    print("  五个模型竞品分析")
     print("=" * 104)
     print(f"  {exclusions.summary()}")
     print(f"  成本口径：统一折算价（入 {PRICE_IN} 元/M、出 {PRICE_OUT} 元/M）—— **不是账单**")
@@ -226,7 +226,7 @@ def main() -> int:
         print("=" * 104)
         print(f"  {label}    run={run}")
         print("=" * 104)
-        print(f"  {'臂':<11}{'准确率':>9}{'可判':>7}{'无效':>7}{'截断':>7}"
+        print(f"  {'模型':<11}{'准确率':>9}{'可判':>7}{'无效':>7}{'截断':>7}"
               f"{'tokens_out':>12}{'中位out':>9}{'中位延迟':>10}{'p95':>8}{'成本(元)':>10}")
         print("  " + "-" * 100)
         for arm in ARMS:
@@ -252,7 +252,7 @@ def main() -> int:
         print("=" * 104)
         print("  稳定性（C3，修正口径：只统计所有 rep 都可解析的题）")
         print("=" * 104)
-        print(f"  {'臂':<11}{'修正口径':>10}{'原口径':>10}{'可用题':>8}{'偏差':>9}")
+        print(f"  {'模型':<11}{'修正口径':>10}{'原口径':>10}{'可用题':>8}{'偏差':>9}")
         for arm in ARMS:
             s = stab.get(arm)
             if not s:
@@ -266,10 +266,10 @@ def main() -> int:
     if sb:
         result["spacebunny_separate_section"] = sb
         print("=" * 104)
-        print("  ★ 单独成节：space-bunny-free（**不进主表**，与其他臂不可横向比较）")
+        print("  ★ 单独成节：space-bunny-free（**不进主表**，与其他模型不可横向比较）")
         print("=" * 104)
         print("  原因：它的思考**强制开启**（5 种关思考写法实测全部无效），")
-        print("        而主表五臂的思考都被关掉了 ⇒ 「臂」与「思考模式」同时变化。")
+        print("        而主表五个模型的思考都被关掉了 ⇒ 「模型」与「思考模式」同时变化。")
         print()
         print(f"  {'题集':<18}{'可判':>6}{'截断率':>9}{'可判项(乐观)':>13}"
               f"{'外推(保守)':>12}{'偏倚':>9}{'主表最好':>10}")

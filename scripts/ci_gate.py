@@ -3,7 +3,7 @@
 为什么需要它
     本项目报告里的每个数字都依赖三条**隐含前提**：
       ① 题集冻结后没被改过 —— 改了则 C1/C2/C3/C5 之间不可配对比较
-      ② 三臂参数是冻结的那一套 —— 漂了则跨 run 比较无意义
+      ② 三个模型参数是冻结的那一套 —— 漂了则跨 run 比较无意义
       ③ 严格/宽松两口径在**二元判分**上不产生分歧 ——
          一旦分歧，"判分口径不制造伪低分"这个核心结论就不成立
     这三条被破坏时，报告里的数字**看起来仍然正常**。静默失效是最难查的，
@@ -317,13 +317,13 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
         g.ok(cname, got)
 
     # ---- 8. 参数冻结 ----------------------------------------------------
-    # ★ 判据：这个 run 里的 manifest.arms 是**被测臂**还是**judge**？
+    # ★ 判据：这个 run 里的 manifest.arms 是**被测模型**还是**judge**？
     #   原先的假设是"judge 模型不在 arms.yaml 里，跳过"（下一行的 `arm not in cur`）。
-    #   但 2026-10-05 把 `deepseek-v4-pro` 同时加成了**被测臂**（旗舰档参照）之后，
+    #   但 2026-10-05 把 `deepseek-v4-pro` 同时加成了**被测模型**（旗舰档参照）之后，
     #   该假设失效 ⇒ 所有用 v4-pro 当 judge 的老 run 都被误报参数漂移（7 项假失败）。
     #
     #   为什么不能靠 arms.yaml 区分：**同一个模型可以身兼两职**，
-    #   而两个角色本来就用不同参数（judge 要短输出，被测臂要完整作答）。
+    #   而两个角色本来就用不同参数（judge 要短输出，被测模型要完整作答）。
     #   所以必须按 **run 的角色** 判断，而不是按模型名。
     #
     #   已验证的信号（全部 5 个 judge run 命中）：note 含 `judge=`，
@@ -342,10 +342,10 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
         if arm not in cur:
             continue                       # judge 模型不在 arms.yaml 里，跳过
         if _is_judge_run:
-            continue                       # ★ 该 run 里它是 judge，参数不适用臂配置
+            continue                       # ★ 该 run 里它是 judge，参数不适用模型配置
         # ★ 有意的覆盖不算漂移：期望值 = arms.yaml + 本 run 声明的覆盖
-        #   `param_arms`：覆盖**实际作用的臂**。用 `--param-arms` 限定后，
-        #   未覆盖的臂必须按 arms.yaml 原值比对 —— 否则会把「有意只给部分臂
+        #   `param_arms`：覆盖**实际作用的模型**。用 `--param-arms` 限定后，
+        #   未覆盖的模型必须按 arms.yaml 原值比对 —— 否则会把「有意只给部按模型
         #   加参数」误报成参数漂移（E1 的 longcat 就是这样被误报的）。
         #
         #   ★ `"<dropped>"` 是 `run_config.py --drop-param` 的哨兵：它表示该键被
@@ -363,13 +363,13 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
     if drift:
         g.bad(pname, "；".join(drift[:2]))
     elif _is_judge_run:
-        g.ok(pname, f"judge run（{'无配置' if not _cfgs else _cfgs}）—— judge 参数不参与臂冻结检查")
+        g.ok(pname, f"judge run（{'无配置' if not _cfgs else _cfgs}）—— judge 参数不参与模型冻结检查")
     elif not (man.get("params_effective") or {}):
         g.warn(pname, "manifest 未记录 params_effective")
     elif ov:
-        g.ok(pname, f"{len(man.get('params_effective'))} 臂 = arms.yaml + 声明的覆盖 {ov}")
+        g.ok(pname, f"{len(man.get('params_effective'))} 个模型 = arms.yaml + 声明的覆盖 {ov}")
     else:
-        g.ok(pname, f"{len(man.get('params_effective'))} 臂与 arms.yaml 一致")
+        g.ok(pname, f"{len(man.get('params_effective'))} 个模型与 arms.yaml 一致")
 
     # ---- 5/6. raw 与 tally 完整性 --------------------------------------
     n_arms = len(man.get("arms") or [])
@@ -406,9 +406,9 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
             continue                       # 题集读不出来 ⇒ 条数无从判断，跳过
         exp = expected_specs(run_pool, spec, n_arms, reps=man.get("reps"))
 
-        # ---- judge run（C4）：记录数 = 题数 × **被判臂数** ----------------
-        # 不能用 manifest.arms 推算 —— judge run 的 manifest 里只有 judge 自己一个臂，
-        # 但它要分别评审三臂的输出，实际记录数是 3 倍。
+        # ---- judge run（C4）：记录数 = 题数 × **被判模型数** ----------------
+        # 不能用 manifest.arms 推算 —— judge run 的 manifest 里只有 judge 自己一个模型，
+        # 但它要分别评审三个模型的输出，实际记录数是 3 倍。
         if getattr(spec, "judge", False):
             results = execute.load_results(run_id, spec.key)
             n_inst = len(adapt.subset_from_c1(run_pool, spec.n_instances))
@@ -423,27 +423,27 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
                 g.skip(rname, _RAW_HINT)
             elif missing:
                 g.bad(rname, f"{missing} 条记录的 target_arm 为空 —— "
-                             "三臂的 judge 请求会互相覆盖（与 HANDOFF §4 坑 6 同类）")
+                             "三个模型的 judge 请求会互相覆盖（与 HANDOFF §4 坑 6 同类）")
             elif failed:
                 g.bad(rname, f"{len(failed)} 条 success=False（例：{failed[0].error[:60]}）")
             elif len(targets) < 2:
-                g.warn(rname, f"只评审了 {len(targets)} 个臂，无法分臂比较 self-preference")
+                g.warn(rname, f"只评审了 {len(targets)} 个模型，无法按模型比较 self-preference")
             elif len(results) != exp_j:
-                g.bad(rname, f"应有 {exp_j} 条（{n_inst} 题 × {len(targets)} 臂），实有 {len(results)}")
+                g.bad(rname, f"应有 {exp_j} 条（{n_inst} 题 × {len(targets)} 个模型），实有 {len(results)}")
             else:
-                g.ok(rname, f"{len(results)}/{exp_j} 条全部成功，被判臂 {targets}")
+                g.ok(rname, f"{len(results)}/{exp_j} 条全部成功，被判模型 {targets}")
 
             tname = f"[{run_id}/{ckey}] judge tally 完整性"
             jt = metrics.load_tallies(run_id, spec.key, drop_excluded=False)  # 计数校验需全量
             if smoke:
                 g.skip(tname, "演练 run")
             elif not _RAW_AVAILABLE:
-                # 应有的条数是「题数 × 被判臂数」，而被判臂只能从 raw 里读出来
+                # 应有的条数是「题数 × 被判模型数」，而被判模型只能从 raw 里读出来
                 g.skip(tname, f"{_RAW_HINT}，无法核对应有条数（tally 实有 {len(jt)} 条）")
             elif len(jt) != len(results):
                 g.bad(tname, f"应有 {len(results)} 条（judge 只有单口径），实有 {len(jt)}")
             else:
-                g.ok(tname, f"{len(jt)} 条，被判臂 {sorted({t['arm'] for t in jt})}")
+                g.ok(tname, f"{len(jt)} 条，被判模型 {sorted({t['arm'] for t in jt})}")
             continue
 
         rname = f"[{run_id}/{ckey}] raw 完整性"
@@ -488,7 +488,7 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
         if offenders:
             g.bad(iname, "严格/宽松在**判分结论**上出现分歧（不只是解析覆盖）：" + "；".join(offenders))
         else:
-            g.ok(iname, "全部臂 FN=FP=0 —— 「口径不制造伪低分」成立")
+            g.ok(iname, "全部模型 FN=FP=0 —— 「口径不制造伪低分」成立")
 
 
 # --------------------------------------------------------------------------
@@ -621,10 +621,10 @@ def main() -> int:
         pdrift = [f"{a}: {norm(old_p.get(a))} → {norm(cur_p.get(a))}"
                   for a in cur_p if a in old_p and norm(cur_p[a]) != norm(old_p[a])]
         if pdrift:
-            g.bad("臂参数指纹", "arms.yaml 参数已变：" + "；".join(pdrift)
+            g.bad("模型参数指纹", "arms.yaml 参数已变：" + "；".join(pdrift)
                                 + "（跑批参数必须冻结，改了要重跑）")
         else:
-            g.ok("臂参数指纹", f"{len(cur_p)} 臂未变")
+            g.ok("模型参数指纹", f"{len(cur_p)} 个模型未变")
 
     # ---- 3. 题集结构 ----------------------------------------------------
     check_dataset(g, pool)

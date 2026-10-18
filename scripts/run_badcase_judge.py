@@ -15,8 +15,8 @@
     * **不给 judge 看启发式归因**：已实测它只是"回复长度带"，给它看会把 judge 锚定到噪声。
     * **截断/空回复不进判定**：读不出内容就无从归因。
     * **解析取最后一个 `归因：`**：judge 可能在「理由」里复述格式。
-    * **同家族偏差**：judge 是 deepseek 家族，而 104 条里有 24 条来自 deepseek 臂
-      ⇒ 一律**分臂报告**。
+    * **同家族偏差**：judge 是 deepseek 家族，而 104 条里有 24 条来自 deepseek 模型
+      ⇒ 一律**按模型报告**。
 
 用法
     .venv\\Scripts\\python.exe scripts\\run_badcase_judge.py --limit 6      # 试跑
@@ -231,7 +231,7 @@ def main() -> int:
     else:
         print("  还没有人工标签可对比")
 
-    # ---- 全量分布 + 分臂（同家族偏差检查）--------------------------------
+    # ---- 全量分布 + 按模型（同家族偏差检查）--------------------------------
     allv = [v for (_, _, rep), v in by_key.items() if rep == 0 and v != "UNCLEAR"]
     print()
     print("=" * 78)
@@ -240,7 +240,7 @@ def main() -> int:
     for k, v in Counter(allv).most_common():
         print(f"  {k:<18}{v:>4}  {v/len(allv):>6.1%}")
     print()
-    print("  分臂（★ judge 与 deepseek 同家族，必须分臂看）：")
+    print("  按模型（★ judge 与 deepseek 同家族，必须按模型看）：")
     for arm in sorted({a for (a, _, rep) in by_key if rep == 0}):
         vs = [v for (a, _, rep), v in by_key.items() if a == arm and rep == 0]
         ge = sum(1 for v in vs if v == "gold_error")

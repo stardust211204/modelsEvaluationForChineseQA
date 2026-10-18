@@ -93,7 +93,7 @@ for ds, (setfile, levels) in PLAN.items():
     # ---- 表1：准确率曲线 ---------------------------------------------------
     ks = sorted(k for k in have if isinstance(k, int))
     print(f"\n  【表1】准确率随示例数量（严格口径）")
-    print(f"  {'臂':<10}" + "".join(f"{'n='+str(k):>10}" for k in ks)
+    print(f"  {'模型':<10}" + "".join(f"{'n='+str(k):>10}" for k in ks)
           + f"{'n=0→10':>10}{'n=0→5':>9}")
     for arm in ARMS:
         row = [acc(have[k], arm)[0] for k in ks]
@@ -111,7 +111,7 @@ for ds, (setfile, levels) in PLAN.items():
     else:
         for k in ks[1:]:
             print(f"\n    ▸ 0-shot → n={k}")
-            print(f"      {'臂':<10}{'n=0':>8}{'n='+str(k):>8}{'差':>8}{'b':>5}{'c':>5}{'p':>11}")
+            print(f"      {'模型':<10}{'n=0':>8}{'n='+str(k):>8}{'差':>8}{'b':>5}{'c':>5}{'p':>11}")
             tb = tc = 0
             ds_ = []
             for arm in ARMS:
@@ -134,13 +134,13 @@ for ds, (setfile, levels) in PLAN.items():
                 print(f"      {SH[arm]:<10}{a0:>7.1f}%{a1:>7.1f}%{a1-a0:>+7.1f}"
                       f"{b:>5}{c:>5}{p:>11.4f}")
             p = metrics.mcnemar_exact(tb, tc) if tb + tc else float("nan")
-            print(f"      {'合并五臂':<10}{'':>8}{'':>8}{statistics.mean(ds_):>+7.1f}"
+            print(f"      {'合并五个模型':<10}{'':>8}{'':>8}{statistics.mean(ds_):>+7.1f}"
                   f"{tb:>5}{tc:>5}{p:>11.4g}")
 
     # ---- 表3：c5b 时段对照 -------------------------------------------------
     if "c5b对照" in have and 5 in have:
         print(f"\n  【表3】★ 时段对照：E5 的 n=5 与既有 c5b **逐条同示例**，仅跑批时段不同")
-        print(f"      {'臂':<10}{'E5 n=5（新）':>13}{'c5b（10-07）':>13}{'差':>9}")
+        print(f"      {'模型':<10}{'E5 n=5（新）':>13}{'c5b（10-07）':>13}{'差':>9}")
         for arm in ARMS:
             a, _ = acc(have[5], arm)
             b, _ = acc(have["c5b对照"], arm)
@@ -152,7 +152,7 @@ for ds, (setfile, levels) in PLAN.items():
     orun, ocfg = ORIG_C5[ds]
     orig = load(orun, ocfg)
     if orig and 0 in have:
-        print(f"      {'臂':<10}{'0-shot':>9}{'原 C5':>9}{'受控 n=5':>10}"
+        print(f"      {'模型':<10}{'0-shot':>9}{'原 C5':>9}{'受控 n=5':>10}"
               f"{'原C5−0':>9}{'受控−0':>9}")
         for arm in ARMS:
             a0, _ = acc(have[0], arm)

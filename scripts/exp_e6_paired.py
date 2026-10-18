@@ -68,7 +68,7 @@ STEPS = [("A", "B", "A→B 允许写理由"), ("B", "C", "B→C 要求末行答�
          ("A", "D", "A→D 合计")]
 for la, lb, title in STEPS:
     print(f"\n  ▸ {title}")
-    print(f"    {'臂':<10}{'共同可判':>9}{'前':>9}{'后':>9}{'差':>9}{'b':>5}{'c':>5}{'p':>11}")
+    print(f"    {'模型':<10}{'共同可判':>9}{'前':>9}{'后':>9}{'差':>9}{'b':>5}{'c':>5}{'p':>11}")
     tot_b = tot_c = 0
     ds = []
     for a in ARMS:
@@ -92,7 +92,7 @@ for la, lb, title in STEPS:
         print(f"    {SH[a]:<10}{len(common):>9}{a0:>8.1f}%{a1:>8.1f}%"
               f"{a1-a0:>+8.1f}{b:>5}{cc:>5}{p:>11.4f}")
     p = metrics.mcnemar_exact(tot_b, tot_c) if tot_b + tot_c else float("nan")
-    print(f"    {'合并五臂':<10}{'':>9}{'':>9}{'':>9}{sum(ds)/len(ds):>+8.1f}"
+    print(f"    {'合并五个模型':<10}{'':>9}{'':>9}{'':>9}{sum(ds)/len(ds):>+8.1f}"
           f"{tot_b:>5}{tot_c:>5}{p:>11.4g}")
 
 print()

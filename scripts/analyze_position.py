@@ -131,7 +131,7 @@ def main() -> int:
 
     detail: dict = {"c6_run": args.c6_run, "c3_run": args.c3_run, "arms": {}}
 
-    print(f"  {'臂':<28}{'各排列准确率':>28}{'极差pp':>9}{'排列0准确率':>12}")
+    print(f"  {'模型':<28}{'各排列准确率':>28}{'极差pp':>9}{'排列0准确率':>12}")
     for arm in arms:
         rows = [t for t in c6 if t["arm"] == arm and t["mode"] == STRICT]
         by_rep = defaultdict(list)
@@ -152,7 +152,7 @@ def main() -> int:
     print("★ 核心对比：乱序 vs 重复（同一批 100 题，故可直接比）")
     print("-" * 84)
     print("  主口径 = **逐对不一致率**（与抽取次数无关）；副口径 = 翻转率（同为 3 次观测）")
-    print(f"  {'臂':<28}{'乱序逐对':>10}{'重复逐对':>10}{'倍数':>8}"
+    print(f"  {'模型':<28}{'乱序逐对':>10}{'重复逐对':>10}{'倍数':>8}"
           f"{'乱序翻转':>10}{'重复翻转':>10}{'字母黏着':>10}{'选项一致':>10}")
     for arm in arms:
         o = orig_frame(c6, arm, pool, permuted=True)

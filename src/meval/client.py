@@ -178,8 +178,8 @@ class ChatClient:
             config=spec.config,
             rep=spec.rep,
             params=dict(spec.params),
-            # ★ 必须把 target_arm 带进结果：judge 场景下三臂的
-            #   (config, arm, instance_id, rep) 完全相同，只有它能区分"在判哪个臂"。
+            # ★ 必须把 target_arm 带进结果：judge 场景下三个模型的
+            #   (config, arm, instance_id, rep) 完全相同，只有它能区分"在判哪个模型"。
             #   漏掉它会让三条 judge 记录塌成一条、判分时全归到 "unknown"。
             target_arm=spec.target_arm,
         )

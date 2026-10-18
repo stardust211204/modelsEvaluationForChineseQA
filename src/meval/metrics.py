@@ -184,14 +184,14 @@ class ArmStats:
 # --------------------------------------------------------------------------
 # 计价表（每百万 token，人民币）
 # --------------------------------------------------------------------------
-# ⚠️ 这些是**折算用的近似价**，不是账单。三臂经第三方聚合端点接入，
+# ⚠️ 这些是**折算用的近似价**，不是账单。三个模型经第三方聚合端点接入，
 #    实际计费口径未知。报告里必须声明"折算成本仅供横向比较"。
 #    参考 DeepSeek 官方空闲时段价位（输入 1 元/M、输出 4 元/M）作为统一口径。
 DEFAULT_PRICING = {"in_per_m": 1.0, "out_per_m": 4.0}
 
 
 def estimate_cost(tokens_in: int, tokens_out: int, pricing: dict | None = None) -> float:
-    """按统一口径折算成本。统一口径是为了让三臂可比 —— 不是为了对账。"""
+    """按统一口径折算成本。统一口径是为了让三个模型可比 —— 不是为了对账。"""
     p = pricing or DEFAULT_PRICING
     return round(tokens_in / 1e6 * p["in_per_m"] + tokens_out / 1e6 * p["out_per_m"], 4)
 
@@ -205,10 +205,10 @@ def compute_arm(
     instances: dict[str, dict],
     mode: ParseMode = ParseMode.STRICT,
 ) -> ArmStats:
-    """算一个臂在一个口径下的全部指标。
+    """算一个模型在一个口径下的全部指标。
 
     `results` 的键是 (arm, instance_id, rep) —— **必须含 arm**。
-    三臂跑的是同一批题，只用 (instance_id, rep) 做键会让三臂互相覆盖。
+    三个模型跑的是同一批题，只用 (instance_id, rep) 做键会让三个模型互相覆盖。
     """
     st = ArmStats(arm=arm, config=config.value)
     rows = [t for t in tallies if t["arm"] == arm and t["mode"] == mode.value]
@@ -532,7 +532,7 @@ def _mode_pairs(tallies: list[dict], arm: str) -> list[tuple[str, str]]:
 
 
 def judge_agreement_report(tallies: list[dict], arm: str) -> dict:
-    """一个臂的完整判分一致性报告（二元 + 全档 + 文献要求的清单项）。"""
+    """一个模型的完整判分一致性报告（二元 + 全档 + 文献要求的清单项）。"""
     pairs = _mode_pairs(tallies, arm)
     return {
         "reference": "strict（严格口径：整段回复必须是单个字母）",
@@ -550,8 +550,8 @@ def consistency_c3(tallies: list[dict], arm: str) -> dict:
     """C3 重复采样：同题跨次一致率。
 
     这是「temperature 固定到底有多确定」的实测答案 ——
-    本项目已实测三臂温度被忽略，因此这里预期一致率很高；
-    若某臂一致率明显偏低，说明它的输出受采样影响更大。
+    本项目已实测三个模型温度被忽略，因此这里预期一致率很高；
+    若某模型一致率明显偏低，说明它的输出受采样影响更大。
 
     ★ 必须把「从不作答」的题与「答过」的题分开：
       一道 10 次全部 invalid 的题，档位当然"全同"，
@@ -599,10 +599,10 @@ def truncation_bias(tallies: list[dict], arm: str,
 
     为什么需要它
         四档口径把 `truncated` 排除在准确率分母外，这在截断率低时没问题
-        （实测五个主臂截断率 0–0.3%，偏倚 ≤0.2pp）。但**截断不是随机的**：
+        （实测五个主模型截断率 0–0.3%，偏倚 ≤0.2pp）。但**截断不是随机的**：
 
-            被截断的题（同批五臂平均准确率）  35.4%
-            未截断的题（同批五臂平均准确率）  60.4%
+            被截断的题（同批五个模型平均准确率）  35.4%
+            未截断的题（同批五个模型平均准确率）  60.4%
                                             ----
             差                              **−25.0pp**
 
@@ -611,8 +611,8 @@ def truncation_bias(tallies: list[dict], arm: str,
           偏倚可达 4pp —— 对一个"排名只看几个 pp"的评测来说不能忽略。
 
     做法
-        用**同批其他臂**在这些题上的平均准确率当作"难度代理"，
-        再按该臂相对难度的高低做平移，外推出"如果它答了会得多少"。
+        用**同批其他模型**在这些题上的平均准确率当作"难度代理"，
+        再按该模型相对难度的高低做平移，外推出"如果它答了会得多少"。
 
         ⚠️ 这是**外推，不是测量**。所以结果以**区间**呈现：
             acc_lower  只算可判项（现行口径，偏乐观）
@@ -645,7 +645,7 @@ def truncation_bias(tallies: list[dict], arm: str,
     if not d_cut or not d_keep:
         return out
     mean_cut, mean_keep = sum(d_cut) / len(d_cut), sum(d_keep) / len(d_keep)
-    # 该臂在可判项上高出"平均难度"的幅度，平移到截断项上
+    # 该模型在可判项上高出"平均难度"的幅度，平移到截断项上
     rel = a["acc"] - mean_keep
     est_cut = min(1.0, max(0.0, mean_cut + rel))
     n_keep, n_cut = a["n_gradeable"], len(cut_ids)
@@ -660,7 +660,7 @@ def truncation_bias(tallies: list[dict], arm: str,
 
 
 def item_difficulty(tallies: list[dict], *, min_arms: int = 3) -> dict[str, float]:
-    """每题的「难度代理」= 至少 `min_arms` 个臂都判出了对错时，答对的臂占比。
+    """每题的「难度代理」= 至少 `min_arms` 个模型都判出了对错时，答对的模型占比。
 
     只统计 `correct` / `wrong` 两侧 —— `invalid` / `truncated` 不代表能力，
     计进去会把"没答出来"误当成"答错了"。
@@ -921,7 +921,7 @@ def pareto_frontier(points: list[dict], *, quality: str = "acc",
 
 
 def cost_utility_summary(rows: list[dict]) -> dict:
-    """成本-效用汇总：每臂的准确率、成本、单位正确题成本、延迟。"""
+    """成本-效用汇总：每个模型的准确率、成本、单位正确题成本、延迟。"""
     by_arm: dict[str, dict] = {}
     for r in rows:
         if r.get("mode") != ParseMode.STRICT.value:

@@ -45,7 +45,7 @@ def acc(rows, arm):
 
 
 def picks(rows, arm, gold_filter=None, pool=None):
-    """标准答案满足 gold_filter 时，该臂选了哪些字母。"""
+    """标准答案满足 gold_filter 时，该模型选了哪些字母。"""
     c = Counter()
     for t in rows:
         if t["arm"] != arm:
@@ -123,7 +123,7 @@ def main() -> int:
 
     # ---- ④ 标准答案为 B 时错选 D 的比例（核心指标）----
     print("\n  ④ 标准答案为 B 的实例上，错选 D 的比例（核心指标）")
-    print(f"  {'组':<24}{'ds-flash':>11}{'ds-pro':>11}{'其余三臂':>12}")
+    print(f"  {'组':<24}{'ds-flash':>11}{'ds-pro':>11}{'其余三个模型':>12}")
     print("  " + "-" * 60)
     for label, run, cfg in ready:
         rows = load(run, cfg)

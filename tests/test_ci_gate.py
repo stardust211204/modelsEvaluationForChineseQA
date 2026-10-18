@@ -68,9 +68,9 @@ def test_expected_specs_c1_uses_whole_pool():
 
 def test_expected_specs_non_c1_is_subset_times_arms_times_reps():
     pool = [_inst(i) for i in range(588)]
-    # C3: 100 题 × 3 臂 × 10 次
+    # C3: 100 题 × 3 个模型 × 10 次
     assert ci_gate.expected_specs(pool, _spec(Config.C3, 100, reps=10), n_arms=3) == 3000
-    # C2: 150 题 × 3 臂 × 1 次
+    # C2: 150 题 × 3 个模型 × 1 次
     assert ci_gate.expected_specs(pool, _spec(Config.C2, 150), n_arms=3) == 450
 
 

@@ -137,7 +137,7 @@ class Instance:
 
 @dataclass(frozen=True)
 class PromptSpec:
-    """一次请求的输入。params 是该臂「实测生效后」冻结的字典，不是全局常量。"""
+    """一次请求的输入。params 是该模型「实测生效后」冻结的字典，不是全局常量。"""
 
     run_id: str
     config: Config
@@ -147,9 +147,9 @@ class PromptSpec:
     prompt_text: str = ""
     demos: list[str] = field(default_factory=list)  # 本次用到的 few-shot 题 id
     params: dict[str, Any] = field(default_factory=dict)
-    # judge 专用：这条请求在**评审哪个臂的输出**（非 judge 场景为空串）。
-    # ★ 必须进去重键：C4 要对三臂的同一批题各判一次，若键里只有 judge 自己的
-    #   名字，三臂的请求会互相覆盖、只剩最后一个臂
+    # judge 专用：这条请求在**评审哪个模型的输出**（非 judge 场景为空串）。
+    # ★ 必须进去重键：C4 要对三个模型的同一批题各判一次，若键里只有 judge 自己的
+    #   名字，三个模型的请求会互相覆盖、只剩最后一个模型
     #   —— 与 docs/HANDOFF.md §4 坑 6（"结果字典键必须含 arm"）是同一类错误。
     target_arm: str = ""
 
@@ -183,7 +183,7 @@ class ModelResult:
     arm: str
     config: Config
     rep: int = 0
-    target_arm: str = ""             # judge 专用：本条评审的是哪个臂的输出
+    target_arm: str = ""             # judge 专用：本条评审的是哪个模型的输出
 
     success: bool = False
     http_status: int | None = None
@@ -284,7 +284,7 @@ class RunManifest:
     # 断点续跑的键不含 prompt，改模板后沿用同一 run_id 会静默复用旧数据 ——
     # 记在 manifest 里，resume 时对不上就拒跑。
     prompt_fingerprints: dict[str, str] = field(default_factory=dict)
-    # 本 run 显式覆盖的臂参数（如 max_tokens=2048 的稳健性重跑）。
+    # 本 run 显式覆盖的模型参数（如 max_tokens=2048 的稳健性重跑）。
     # 门禁拿它来解释"为什么这个 run 的参数与 arms.yaml 不同" ——
     # 有声明就是有意的变体，没声明才是参数漂移。
     param_overrides: dict[str, Any] = field(default_factory=dict)
@@ -301,8 +301,8 @@ class RunManifest:
     # ---- 以下两项为**补充验证实验**新增，默认 None ⇒ 历史 manifest 不受影响 ----
     #   `reps`：本 run **实际**用的重复次数。门禁原先只读 matrix.yaml 的 reps，
     #     于是 `--reps 1` 的 run 会被按 matrix 的 reps（如 c3 的 10）判成"缺条数"。
-    #   `param_arms`：`--param` **实际作用的臂**。原先 param_overrides 被当作
-    #     作用于全部臂；用 `--param-arms` 限定后，未覆盖的臂会被误报成参数漂移。
+    #   `param_arms`：`--param` **实际作用的模型**。原先 param_overrides 被当作
+    #     作用于全部模型；用 `--param-arms` 限定后，未覆盖的模型会被误报成参数漂移。
     #   两项都是"把有意的变体如实声明出来"，与 param_overrides 的用途一致。
     reps: int | None = None
     param_arms: list[str] | None = None

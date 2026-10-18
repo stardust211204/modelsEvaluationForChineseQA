@@ -1,4 +1,4 @@
-"""E1 思考开关分析：三组对照 + 逐臂推断。
+"""E1 思考开关分析：三组对照 + 逐模型推断。
 
 组别
     1  e1-think-none-5arm        reasoning_effort 保持 arms.yaml 默认（none / thinking=disabled）
@@ -75,8 +75,8 @@ if any(v == 0 for v in DONE.values()):
     raise SystemExit(0)
 
 # ---- 表 1：准确率 + token 特征 -------------------------------------------
-print(f"\n  【表1】逐臂：准确率（严格口径）与 token 特征")
-print(f"  {'臂':<10}{'组':<12}{'准确率':>9}{'可判':>6}{'截断':>6}"
+print(f"\n  【表1】逐模型：准确率（严格口径）与 token 特征")
+print(f"  {'模型':<10}{'组':<12}{'准确率':>9}{'可判':>6}{'截断':>6}"
       f"{'reasoning均值':>14}{'out中位':>9}")
 acc = {}
 for arm in ARMS:
@@ -125,16 +125,16 @@ PAIRS = [("none@1024", "high@1024", "①→② 同预算下思考", REASON_ARMS)
           ["longcat-2.5-preview-free"])]
 for a, b, title, arms in PAIRS:
     print(f"\n  ▸ {title}")
-    print(f"    {'臂':<10}{'①→② 变化':>12}{'b(前对后错)':>13}{'c(前错后对)':>13}{'n':>6}{'p':>11}")
+    print(f"    {'模型':<10}{'①→② 变化':>12}{'b(前对后错)':>13}{'c(前错后对)':>13}{'n':>6}{'p':>11}")
     for arm in arms:
         bb, cc, n, p = paired(a, b, [arm])[arm]
         d = acc[(arm, b)][0] - acc[(arm, a)][0]
         print(f"    {SH[arm]:<10}{d:>+11.1f}{bb:>13}{cc:>13}{n:>6}{p:>11.4f}")
 
-# ---- 表 3：合并四臂 -------------------------------------------------------
+# ---- 表 3：合并四个模型 -------------------------------------------------------
 print()
 print("=" * 100)
-print("  【表3】四臂合并（仅 REASON_ARMS）")
+print("  【表3】四个模型合并（仅 REASON_ARMS）")
 print("=" * 100)
 for a, b, title, arms in PAIRS[:3]:
     bb = cc = 0

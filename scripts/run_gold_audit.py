@@ -71,7 +71,7 @@ def main() -> int:
     review = [json.loads(l) for l in
               (paths.ROOT / "runs" / args.run_id / "badcase_review.jsonl")
               .read_text(encoding="utf-8").splitlines() if l.strip()]
-    # 按题去重（同一道题可能被多个臂答错，但题集缺陷只需审一次）
+    # 按题去重（同一道题可能被多个模型答错，但题集缺陷只需审一次）
     seen, items = set(), []
     for r in review:
         if r["instance_id"] not in seen and r["instance_id"] in pool:
@@ -86,7 +86,7 @@ def main() -> int:
     print(f"标准答案审计（stage 2）   out_run={args.out_run}")
     print("=" * 78)
     print(f"  judge 模型 : {judge_model}")
-    print(f"  待审题目   : {len(items)}（按题去重；同一题被多臂答错只审一次）")
+    print(f"  待审题目   : {len(items)}（按题去重；同一题被多个模型答错只审一次）")
     print(f"  已知文本重复题: {sorted(KNOWN_DUP & set(items))}")
 
     specs = []

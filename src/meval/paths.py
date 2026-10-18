@@ -139,7 +139,7 @@ def base_url() -> str:
     return env("OPENCODE_BASE_URL", "https://opencode.ai/zen/go/v1") or ""
 
 
-# ---- judge 端点（与三臂的聚合端点**分开**）--------------------------------
+# ---- judge 端点（与三个模型的聚合端点**分开**）--------------------------------
 # judge 必须与被评模型尽量不同源：见 docs/OPEN_ISSUES.md P2-1。
 
 def judge_api_key() -> str:

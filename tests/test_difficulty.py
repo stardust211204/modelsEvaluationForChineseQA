@@ -32,12 +32,12 @@ def test_mixed_is_mid():
 
 
 def test_single_arm_all_correct_is_easy():
-    """单臂也算全对（留一法下另一臂缺席时不该崩）。"""
+    """单个模型也算全对（留一法下另一个模型缺席时不该崩）。"""
     assert consensus_label(["correct"]) == "easy"
 
 
 def test_abstention_makes_it_unknown():
-    """★ 有一臂没给出二元判定 -> unknown。
+    """★ 有一个模型没给出二元判定 -> unknown。
 
     "没人答上来"和"很难"是两件事：invalid/truncated 归因于格式或我们的配置，
     混进难度会把配置问题记成题目难度。
@@ -52,14 +52,14 @@ def test_empty_is_unknown():
 
 
 def test_circular_consensus_is_a_tautology():
-    """★ 全量共识（含目标臂）必然退化：标签来自目标臂自己的对错。
+    """★ 全量共识（含目标模型）必然退化：标签来自目标模型自己的对错。
 
-    三臂全对 -> 目标臂必对（100%）；三臂全错 -> 目标臂必错（0%）。
+    三个模型全对 -> 目标模型必对（100%）；三个模型全错 -> 目标模型必错（0%）。
     这正是 HANDOFF §7.4「多模型共识」建议不能用 numerical 理由。
     """
     arms_tiers = ["correct", "correct", "correct"]
     assert consensus_label(arms_tiers) == "easy"
-    # 目标臂是其中任意一个，其 tier 都必然是 correct -> 该桶准确率恒为 100%
+    # 目标模型是其中任意一个，其 tier 都必然是 correct -> 该桶准确率恒为 100%
     for t in arms_tiers:
         assert t == "correct"
 

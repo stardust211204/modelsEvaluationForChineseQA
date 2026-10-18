@@ -80,14 +80,14 @@ def acc(t, arm):
 
 # ---- 表1：四组准确率 -------------------------------------------------------
 print(f"\n  【表1】四组准确率（宽松口径）")
-print(f"  {'臂':<10}" + "".join(f"{l:>9}" for l, _ in GROUPS) + f"{'A→D':>9}")
+print(f"  {'模型':<10}" + "".join(f"{l:>9}" for l, _ in GROUPS) + f"{'A→D':>9}")
 for arm in ARMS:
     row = [acc(T[l], arm)[0] for l, _ in GROUPS]
     print(f"  {SH[arm]:<10}" + "".join(f"{x:>8.1f}%" for x in row)
           + f"{row[3]-row[0]:>+8.1f}")
 
 print(f"\n  【表1b】交叉校验：A 组（只答字母）的严格 vs 宽松")
-print(f"  {'臂':<10}{'严格':>9}{'宽松':>9}{'差':>8}   说明")
+print(f"  {'模型':<10}{'严格':>9}{'宽松':>9}{'差':>8}   说明")
 for arm in ARMS:
     a, n1 = acc(T_STRICT["A"], arm)
     b, n2 = acc(T["A"], arm)
@@ -126,7 +126,7 @@ STEPS = [("A", "B", "A→B 允许写字"), ("B", "C", "B→C 要求末行答案"
          ("A", "C", "A→C（对照 §3.5）")]
 for la, lb, title in STEPS:
     print(f"\n  ▸ {title}")
-    print(f"    {'臂':<10}{'前':>8}{'后':>8}{'差':>8}{'b':>5}{'c':>5}{'p':>11}")
+    print(f"    {'模型':<10}{'前':>8}{'后':>8}{'差':>8}{'b':>5}{'c':>5}{'p':>11}")
     tb = tc = 0
     ds_ = []
     for arm in ARMS:
@@ -139,7 +139,7 @@ for la, lb, title in STEPS:
         p = metrics.mcnemar_exact(b, c) if b + c else float("nan")
         print(f"    {SH[arm]:<10}{a1:>7.1f}%{a2:>7.1f}%{a2-a1:>+7.1f}{b:>5}{c:>5}{p:>11.4f}")
     p = metrics.mcnemar_exact(tb, tc) if tb + tc else float("nan")
-    print(f"    {'合并五臂':<10}{'':>8}{'':>8}{statistics.mean(ds_):>+7.1f}"
+    print(f"    {'合并五个模型':<10}{'':>8}{'':>8}{statistics.mean(ds_):>+7.1f}"
           f"{tb:>5}{tc:>5}{p:>11.4g}")
 
 # ---- 表3：解析阶梯与输出长度 ----------------------------------------------
@@ -164,7 +164,7 @@ for l, run in GROUPS:
             if r["arm"] in ARMS:
                 d[r["arm"]].append(len(r.get("content") or ""))
     R[l] = d
-print(f"  {'臂':<10}" + "".join(f"{l:>10}" for l, _ in GROUPS))
+print(f"  {'模型':<10}" + "".join(f"{l:>10}" for l, _ in GROUPS))
 for arm in ARMS:
     print(f"  {SH[arm]:<10}"
           + "".join(f"{statistics.median(R[l][arm]) if R[l].get(arm) else 0:>10.0f}"
