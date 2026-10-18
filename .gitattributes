@@ -1,0 +1,29 @@
+# 换行与二进制的显式规则 —— 使行为**不依赖本机 git 配置**。
+#
+# 背景：本仓库 100% 在 Windows 上开发，本机 `core.autocrlf=true`，
+# 因此工作区是 CRLF、入库 blob 是 LF。这个组合本身是对的，但它靠的是
+# **一台机器的配置**：换一台 core.autocrlf=false 的机器提交，就会把
+# 几百个文件以 CRLF 写进历史，之后所有人的 diff 都变成整文件变红。
+#
+# 入库侧实测（写这份文件时）：git ls-files --eol → i/crlf 0 / i/lf 715 / i/-text 40。
+# 所以 `text=auto eol=lf` 对索引是**幂等的**，不会产生一次性的规范化大 diff。
+
+# 默认：git 自行探测文本文件，入库一律 LF，检出也一律 LF。
+* text=auto eol=lf
+
+# 二进制：明确声明，避免 git 对它们做换行探测或文本 diff。
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.pdf  binary
+*.xlsx binary
+
+# ---- 有意**不写** `*.jsonl -text` ----
+# 判分台账（runs/*/tallies/**.jsonl，95 个）当前是「索引 LF / 工作区 CRLF」——
+# 那正是 autocrlf 的正常转换结果。-text 会让 git 停止转换，
+# 于是工作区的 CRLF 与索引的 LF 直接对不上，**95 个文件立刻全部显示为已修改**。
+# 它们是逐行 JSON，本来就该按文本处理，text=auto 会给到正确行为。
+
+# ---- 导出与归档产物 ----
+# git archive 时把 .gitignore / .gitattributes 也排除掉的可能性见 `export-ignore`；
+# 本仓库暂不需要，留此注释备查。
