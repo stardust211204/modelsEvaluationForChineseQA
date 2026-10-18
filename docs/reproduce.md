@@ -80,7 +80,7 @@ Copy-Item .env.example .env    # 填入真实 key
 
 ```
 src/meval/       管线本体（见 README §二）
-scripts/         入口、实验与分析脚本、核校工具（236 个 .py）
+scripts/         入口、实验与分析脚本、核校工具（241 个 .py）
 configs/         arms.yaml（五个模型 + 各自生效参数）· matrix.yaml · exclusions.json
 data/            eval_set.jsonl · ceval_set.jsonl · orbench_set.jsonl · frozen.json
 prompts/         c1_strict / c2_free / c5_fewshot / e2_labelshuffle / e6_* / judge_*
