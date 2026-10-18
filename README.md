@@ -3,7 +3,6 @@
 **大模型中文问答能力的评测工程实践** —— 以 HELM 的「场景 × 适配 × 指标」三元组为口径字典，自建轻量双管线框架，覆盖「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」。
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
-[![Tests](https://img.shields.io/badge/%E5%8D%95%E6%B5%8B-168%20passed-brightgreen.svg)](tests/)
 
 > [评测规模](#一评测规模) · [系统架构](#二系统架构与对-helm-的工程修正) · [项目中的缺陷与经验](#三项目中的缺陷与经验) · [自动化校验](#四自动化校验) · [复现](#五复现) · [成果物映射](reports/PROJECT_SUMMARY.md)
 
@@ -102,7 +101,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | # | 缺陷 | 代价 | 经验与修法 | 固化为 |
 |---|---|---|---|---|
 | **1** | 推理模型的**静默失败** | 推理预算耗尽时返回空串，**而 HTTP 状态是 200**。这类题本身偏难（正确率比未截断题低 **28 个百分点**），直接剔除会让结果虚高 | 按 `finish_reason` 把截断独立归入 `truncated`，跨模型对比时强制收敛到各模型共同完成的题集 | `tests/test_truncation_bias.py` · `tests/test_tally.py` |
-| **2** | **裁判模型的思考没关** | 隐藏推理吃光输出预算，约 **9%** 的判定拿不到结果，且失败集中在本身易错的题上 —— 一致率会被高估 | 判分前显式冻结 judge 的 `reasoning_effort="none"`，并记入运行元数据 | `scripts/_check_judge_verdicts.py` |
+| **2** | **裁判模型的思考没关** | 隐藏推理吃光输出预算，约 **12%** 的判定拿不到结果，且失败集中在本身易错的题上 —— 一致率会被高估 | 判分前显式冻结 judge 的 `reasoning_effort="none"`，并记入运行元数据 | `scripts/_check_judge_verdicts.py` |
 | **3** | **示例的示范作用压倒正文指令**；跨集选项数错配 | 首轮示例写成 `答案：X`，模型照抄这个外形，**87%** 的输出无法严格解析 —— 当时算出的那轮「增益」其实来自格式顺从。另有 C-Eval 的 4 选项题沿用了 10 选项示例 | 示例改为示范目标输出格式本身；选项数量严格对齐；模板改动前做指纹比对，不一致即拒绝跑批 | `tests/test_prompt_letters.py` · `src/meval/adapt.py` |
 | **4** | **分母不一致时直接相减** | 放宽格式后各档的可判条目数差一倍以上（**276 对 635**），直接相减会得出方向相反的结论 | 跨配置比较一律限制在双方均可判的**配对交集**上，做配对 McNemar 检验 | `tests/test_paired.py` · `scripts/exp_e6_paired.py` |
 | **5** | **两个指标其实不可比**；乱序未还原坐标系 | 「是否翻转过」随观测次数单调上升，观测次数不同的实验不能直接相除；选项乱序若不还原原题坐标系，会算出虚假翻转 | 改用与次数无关的「逐对不一致率」；乱序后强制还原坐标系再比 | `tests/test_position_refusal.py` · `scripts/_ratio_pairwise.py` |
@@ -139,7 +138,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 | 项 | 当前状态 |
 |---|---|
-| `tests/` | **13 个模块 / 168 个用例**（判分阶梯、配对检验、截断偏倚、难度、位置还原、参数分流、断点续跑……） |
+| `tests/` | **13 个模块 / 182 项**（168 个测试函数，14 项来自参数化展开；覆盖判分阶梯、配对检验、截断偏倚、难度、位置还原、参数分流、断点续跑……） |
 | `scripts/ci_gate.py` | **210 项**运行完整性与数据契约检查（两种工作区状态下的完整读数见 [`docs/reproduce.md`](docs/reproduce.md)） |
 | `scripts/exp_smoke.py` | **124 项**补充实验冒烟，**124/124** |
 
@@ -148,7 +147,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | 脚本 | 查什么 |
 |---|---|
 | `scripts/report_metrics.py` | **从 `tallies/` 逐格重算报告正文与表格里的每一个数字** |
-| `scripts/_check_polished_report.py` · `_check_external_report.py` | 图序与图表索引一致、表格结构、章节引用可解析（完整版 **27/27**） |
+| `scripts/_check_polished_report.py` · `_check_external_report.py` | 图序与图表索引一致、表格结构、章节引用可解析 |
 | `scripts/_check_render_safe.py` | 反引号内含 CJK、字体缺失符号、代码块含中文 —— 这些在 PDF 里**静默渲染成空白，不报错**，属排版侧兜底 |
 
 配合 [`reports/report_data_provenance.md`](reports/report_data_provenance.md)，**报告中的数字均可逐格复算**。

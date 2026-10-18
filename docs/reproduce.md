@@ -88,5 +88,5 @@ docs/            design.md · limitations.md · open_issues.md · param_matrix.m
 figures/         14 张正式图 + latex/（管线图源码与 HOWTO.md）
 runs/            每次跑批：manifest + raw（未入库） + tallies（已入库，可直接复算）
 reports/         对外报告 · 溯源清单 · 批次台账 · 专项实验报告
-tests/           13 个模块 / 168 个用例
+tests/           13 个模块 / 182 项（168 个测试函数，14 项来自参数化展开）
 ```
