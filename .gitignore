@@ -21,7 +21,7 @@ figures/*.pdf
 reports/*.pdf
 # 例外：**对外报告 PDF 入库**（2026-10-18 决定）。
 # 理由：作品集的读者不会为了看报告去解压 Release 附件，1.3 MB 换「点开就是排版好的 35 页」是划算的。
-# ★ 页数随行距变：2026-10-18 行距由单倍改为 1.5 倍（中文报告常规值），28 → 35 页。
+# ★ 页数随行距变：行距由单倍改为 1.5 倍（中文报告常规值）后，28 → 35 页。
 # 注意：`reports/report_external_helm.pdf`（旧编译）**有意不豁免** —— 两个同名 PDF 并存早晚发错。
 !reports/report_external_helm_polished.pdf
 figures/latex/*.pdf
