@@ -1,21 +1,15 @@
 # modelsEvaluation
 
-**大模型中文问答能力的评测工程实践** —— 以 HELM 的「场景 × 适配 × 指标」三元组为口径字典，自建轻量双管线框架，把「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」这条闭环完整走一遍。
+**大模型中文问答能力的评测工程实践** —— 以 HELM 的「场景 × 适配 × 指标」三元组为口径字典，自建轻量双管线框架，覆盖「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」六个环节。
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
-[![Runs](https://img.shields.io/badge/%E6%9D%83%E5%A8%81%E6%89%B9%E6%AC%A1-37%20%2F%2085-blue.svg)](reports/RUN_AUDIT.md)
-[![Calls](https://img.shields.io/badge/API%20%E8%B0%83%E7%94%A8-53%2C379-blue.svg)](reports/RUN_AUDIT.md)
 [![Tests](https://img.shields.io/badge/%E5%8D%95%E6%B5%8B-168%20passed-brightgreen.svg)](tests/)
-[![Report](https://img.shields.io/badge/%E6%8A%A5%E5%91%8A-27%20%E8%A1%A8%20%2F%2014%20%E5%9B%BE-purple.svg)](reports/report_external_helm_polished.md)
 
-> - **一句话定位**：**准确性是载体，评测工程闭环是目的** —— 本项目侧重用单因子受控实验量化评测协议自身的失真边界。
-> - **工程与质量基线**：五层解耦双管线 · 37 个权威批次 / 53,379 次调用 · 13 模块 168 项单测 · 210 项 CI 回归门禁 · 报告全部数字无需 API 离线逐格复算。
-> - **快速导航**：[评测规模](#一项目定位与评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六大排障陷阱](#三六大评测陷阱与排障闭环) · [四道质量防线](#四四道自动化质量防线) · [快速复算](#六快速开始与一键复算)
-> - **要按图索骥找文件**：见 [`reports/PROJECT_SUMMARY.md`](reports/PROJECT_SUMMARY.md) —— 它按「每一环 → 产出什么 → 怎么验证」给出完整映射。
+> [评测规模](#一评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六大排障陷阱](#三六大评测陷阱与排障闭环) · [四道质量防线](#四四道自动化质量防线) · [快速复算](#六快速开始与一键复算) · [成果物映射](reports/PROJECT_SUMMARY.md)
 
 ---
 
-## 一、项目定位与评测规模
+## 一、评测规模
 
 | 项 | 值 |
 |---|---|
@@ -25,9 +19,7 @@
 | **调用总量** | **53,379 次**（成功 53,291，失败 88），**37 个权威批次**（全库 85 批次 / 77,512 次） |
 | **口径** | 准确率 = `correct ÷ (correct + wrong)`；`invalid` / `truncated` 不进分母、单独报告 |
 
-> **结论、得分表与统计检验都在对外报告里**，本文件不重复：
-> [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（6 章 / 27 表 / 14 图。
-> 建议读序：§1.3 实测速览 → 第 4 章 → §5.1 方法学结论）。
+> 结论与统计检验见 [对外报告](reports/report_external_helm_polished.md)（§1.3 实测速览 → 第 4 章 → §5.1 方法学结论）。
 
 ---
 
@@ -52,7 +44,7 @@ HELM 已于 2026-06-01 进入 maintenance mode，且其前提（开放权重 + l
 ![准确率评测管线的五层划分](figures/40_pipeline_main.png)
 
 <details>
-<summary>五层模块清单（点击展开）</summary>
+<summary>五层模块清单</summary>
 
 ```
 src/meval/
@@ -83,7 +75,7 @@ src/meval/
 改判分规则**不需要重跑 API** —— 项目期间判分口径改过多次，**一次 API 都没重跑**；返工成本从小时级降到秒级。
 
 <details>
-<summary>目录布局与两者分工（点击展开）</summary>
+<summary>目录布局与两者分工</summary>
 
 ```
 runs/{run_id}/manifest.json                 # 参数生效表、代码版本、数据哈希
@@ -97,8 +89,6 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 ## 三、六大评测陷阱与排障闭环
 
-本节记录六类实际发生过的失真，以及各自的发现方式、处理办法与固化成的防线。
-
 | # | 陷阱 | 现象与实测影响 | 应对 | 固化为 |
 |---|---|---|---|---|
 | **1** | **推理模型空 `content` 静默失败与截断幸存者偏差** | 预算烧在内部思维链上返回空串，**而 HTTP 状态是 200**。1,024 预算下 **31% 截断**、且截断题系统性偏难（截断题 65.4% vs 未截断题 93.5%，差 **28.1pp**），直接剔除使准确率**虚高 7.8pp** | `finish_reason=='length'` 独立归入 `truncated`；扩至 8,192 预算并强制取五模型 **76 题统一共同集** | `tests/test_truncation_bias.py` · `tests/test_tally.py` |
@@ -108,13 +98,13 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | **5** | **跨采样次数翻转率不可除 & 乱序未还原坐标系** | 选项重排（4 次）与重复采样（10 次）观测次数不同，翻转率随次数单调上升使比值被压低；C-Eval 乱序未还原坐标系会产生 **67%~76%** 假值 | 改用与观测次数无关的**逐对不一致率**；强制还原原题坐标系再比 | `tests/test_position_refusal.py` · `scripts/_ratio_pairwise.py` |
 | **6** | **固定温度 ≠ 输出可复现 & 厂商私有参数冲突** | 探针实测多臂**忽略温度参数**，但同题重复 10 次全同率最低仅 **28.0%**；不同厂商关闭思考的参数互斥，或本地抛 `TypeError` | 放弃全局统一参数，改为按臂探测后冻结至 `configs/arms.yaml`；私有参数走 `extra_body` | `tests/test_client_params.py` · `docs/param_matrix.md` |
 
-> 陷阱 2、3 标注「三臂期」是因为它们发生在项目早期的三臂阶段。数字与结论未经修改，但口径范围要如实说明。
+> 陷阱 2、3 标注「三臂期」是因为它们发生在项目早期的三臂阶段。数字与结论未经修改。
 
 ---
 
 ## 四、四道自动化质量防线
 
-按测试生命周期排列。**四道防线都是跑批流程中的实际环节，各有对应脚本与失败记录。**
+按测试生命周期排列。
 
 ### 防线 1 · 跑批前探针
 
@@ -146,7 +136,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | `scripts/exp_smoke.py` | **124 项**补充实验冒烟，**124/124** |
 
 > 那 1 项 FAIL 是 `longcat` 的**上游连接失败**（间歇性路由缺陷，客户端无法修复），与口径无关。
-> 这里如实写「210 项，PASS 203 / FAIL 1」：**门禁的意义在于它报告真实状态，包括未通过项**。
+
 
 ### 防线 4 · 报告逐格自检
 
@@ -157,7 +147,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 | `scripts/_check_render_safe.py` | 反引号内含 CJK、字体缺失符号、代码块含中文 —— 这些在 PDF 里**静默渲染成空白，不报错** |
 | `scripts/report_metrics.py` | 从 `tallies/` 逐格重算报告正文与表格数字 |
 
-配合 [`reports/report_data_provenance.md`](reports/report_data_provenance.md)（35 表 / 14 图 / 52 处正文数字的来源与复算命令），**报告中的数字均可逐格复算**。
+配合 [`reports/report_data_provenance.md`](reports/report_data_provenance.md)，**报告中的数字均可逐格复算**。
 
 ---
 
@@ -189,7 +179,7 @@ Copy-Item .env.example .env    # 填入真实 key
 .\.venv\Scripts\python.exe scripts\ci_gate.py      # 210 项
 .\.venv\Scripts\python.exe scripts\exp_smoke.py    # 124 项
 
-# 5) 出报告（Markdown → PDF；默认源即唯一权威报告）
+# 5) 出报告（Markdown → PDF；默认源即对外报告）
 .\.venv\Scripts\python.exe scripts\build_pdf.py
 
 # 6) 报告自检与逐格复算（不需要 API）
@@ -205,7 +195,7 @@ Copy-Item .env.example .env    # 填入真实 key
 > 与报告 §3.1 逐个吻合。
 
 <details>
-<summary>门禁在两种工作区状态下的读数差异（点击展开）</summary>
+<summary>门禁在两种工作区状态下的读数差异</summary>
 
 > 差别只在 `raw` 在不在（原始响应包走 Release，不入库）：
 
@@ -226,7 +216,7 @@ Copy-Item .env.example .env    # 填入真实 key
 **小样本走完整条管线**：`.\run_all.ps1`（末步即门禁）。**报告排版**：`build_pdf.py` 一键编译 PDF（pandoc + xelatex + Eisvogel），参数取自 CCL 2026 官方中文论文模板。
 
 <details>
-<summary>目录结构（点击展开）</summary>
+<summary>目录结构</summary>
 
 ```
 src/meval/       五层管线本体（见 §二）
