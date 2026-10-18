@@ -175,6 +175,10 @@ def main() -> int:
                     help="行内代码里的中文。**必须设**，否则该处中文渲染成空白")
     ap.add_argument("--linestretch", default="1",
                     help="行距倍率，1 = 单倍（中文会议论文常规值）")
+    ap.add_argument("--sansfont", default="SimHei",
+                    help="西文无衬线（\\sffamily 的拉丁部分）。Eisvogel 封面用 "
+                         "\\textsf 排 subtitle 与 date，不显式给就落回 LaTeX 默认的 "
+                         "Latin Modern Sans。默认 SimHei，与封面中文标题同族")
     ap.add_argument("--author", default="", help="封面与页脚作者；留空则不显示")
     ap.add_argument("--date", default="", help="封面日期；留空则用 pandoc 默认")
     ap.add_argument("--cover-background", default=COVER_BACKGROUND,
@@ -240,6 +244,15 @@ def main() -> int:
         "--resource-path", os.pathsep.join([str(paths.ROOT), str(src.parent)]),
         "-V", f"mainfont={args.mainfont}",
         "-V", f"monofont={args.monofont}",
+        # ★ sansfont 必须显式给。Eisvogel 的封面用 \textsf 排 subtitle 与 date
+        #   （eisvogel.latex:935 `{\Large \textsf{$subtitle$}}`），而 pandoc
+        #   只在给了 -V sansfont 时才写 \setsansfont。不给的话 \sffamily 落回
+        #   LaTeX 默认的 **Latin Modern Sans** —— 封面日期就是这样变成了
+        #   `LMSans12`，一套跟我们选的字体毫无关系的系统自带字体。
+        #   实测（2026-10-18，pdftohtml -xml 逐段取字体）：
+        #     标题 SimHei(30) / 副标题 SimHei(21) / **日期 LMSans12** ← 只它不对
+        #   中文不受影响：xeCJK 下 \sffamily 的汉字走 CJKsansfont(SimHei)，本就对。
+        "-V", f"sansfont={args.sansfont}",
         # ★ 中文字体分三档传。以前 mainfont 同时兼作 CJKmainfont（都用雅黑），
         #   现在西文换成 Times New Roman，就必须单独指定中文，
         #   否则中文会落到 Times 上 → 整篇缺字。
