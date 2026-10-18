@@ -201,7 +201,7 @@ Copy-Item .env.example .env    # 填入真实 key
 > **只复算、不跑批**：第 4~6 步全部是离线脚本。`runs/*/tallies/` 判分台账**已入库**，
 > clone 后**无需任何 API key** 即可复算报告全部指标。
 > 实测：全新 clone 里跑 `report_metrics.py --run-id c1-5arm-v2 --config c1`，
-> 五个模型的 MMLU-ProX 准确率复算为 58.6 / 64.1 / 62.9 / 49.1 / 61.2（n=546），
+> 五个模型的 MMLU-ProX 准确率复算为 `deepseek-v4-pro` 58.6 / `deepseek-v4.1-flash` 64.1 / `longcat-2.5` 62.9 / `mimo-v2.6` 49.1 / `qwen3.8` 61.2（n=546），
 > 与报告 §3.1 逐个吻合。
 
 <details>
