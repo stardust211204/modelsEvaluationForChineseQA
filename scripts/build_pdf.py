@@ -104,7 +104,10 @@ VSPACE = [
     # ★ 必须设 lang=zh-CN，否则图注前缀是英文 "Figure"；设了才是「图」
     "-V", "lang=zh-CN",
     "-V", "fontsize=10pt",
-    # 行距改由 --linestretch 传（默认单倍），不再写死在这里
+    # 行距由 --linestretch 传，**不写死在这里**。2026-10-18 用户定为 1.5 倍
+    # （中文报告/论文的常规行距；单倍在 10pt 正文下偏挤）。
+    # ★ 改行距会改页数（单倍 28 页 → 1.5 倍 40 页），凡登记了页数的地方都要同步，
+    #   目前交付面上只有 .gitignore 的说明里写了页数。
     "-V", "colorlinks=true",
     "-V", "linkcolor=NavyBlue",
     "-V", "urlcolor=NavyBlue",
@@ -173,8 +176,8 @@ def main() -> int:
                     help="中文无衬线（黑体）。CJK 的粗体没有独立字面时会回退到它")
     ap.add_argument("--cjkmonofont", default="SimSun",
                     help="行内代码里的中文。**必须设**，否则该处中文渲染成空白")
-    ap.add_argument("--linestretch", default="1",
-                    help="行距倍率，1 = 单倍（中文会议论文常规值）")
+    ap.add_argument("--linestretch", default="1.5",
+                    help="行距倍率。默认 1.5 —— 中文报告常规行距，10pt 宋体正文下比单倍好读")
     ap.add_argument("--sansfont", default="SimHei",
                     help="西文无衬线（\\sffamily 的拉丁部分）。Eisvogel 封面用 "
                          "\\textsf 排 subtitle 与 date，不显式给就落回 LaTeX 默认的 "
