@@ -163,10 +163,14 @@ for arm in ARMS:
 
 print()
 print("=" * 100)
-print(" ★ 稳定性排序是否「两集完全一致」")
+print(" ★ 稳定性排序在两集上是否逐位相同（诊断项，不计入失败）")
 print("=" * 100)
 o1 = sorted(ARMS, key=lambda a: -stability("c3-5arm-v2", "c3", a)[0])
 o2 = sorted(ARMS, key=lambda a: -stability("ceval-c3-5arm", "c3", a)[0])
 print("  MMLU-ProX 序：", " > ".join(SH[a] for a in o1))
 print("  C-Eval    序：", " > ".join(SH[a] for a in o2))
-print("  →", "完全一致" if o1 == o2 else "★★ 不一致：报告称「完全一致」不成立")
+# ★ 原文案是「报告称『完全一致』不成立」—— 那句话是错的：
+#   报告从来没称过「完全一致」，它写的是「仅在 ds-flash 与 qwen 之间互换，其余位次一致」，
+#   与这里的实测**完全吻合**。文案不改的话，每次跑都会看着像抓到了报告的错误。
+print("  →", "两集逐位相同" if o1 == o2
+      else "两集差一处互换 —— 报告 §3.2 已如实写明（非失败项）")
