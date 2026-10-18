@@ -184,7 +184,7 @@ McNemar 精确检验，**只在两组都可判的条目上做**（`src/meval/met
 
 ### F1 `40_pipeline_main.png` / F2 `41_pipeline_safety.png`
 **无数据**，是管线定义图。
-- 源文件：`figures/latex/pipeline_main_v10.tex` / `figures/latex/pipeline_safety_v13.tex`
+- 源文件：`figures/latex/pipeline_main_v11.tex` / `figures/latex/pipeline_safety_v13.tex`
 - 编译：`xelatex <file>.tex` → `pdftoppm -png -r 150 <file>.pdf` → 复制到 `figures/`
 - 图上的「思考关闭」标注对应 §3.9 的结论
 
