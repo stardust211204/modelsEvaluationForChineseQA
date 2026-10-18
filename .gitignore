@@ -45,7 +45,18 @@ figures/*.png
 !figures/44_shot_gradient.png
 
 # ---- vendored 第三方包（30 MB，可由上游重新获取）----
-reports/Eisvogel-3.5.1/
+# ★ 但**模板本体必须入库**。原来整个目录被忽略，后果是：
+#   `build_pdf.py` 里 `TEMPLATE = reports/Eisvogel-3.5.1/eisvogel.latex` 找不到文件，
+#   克隆仓库的人**重建 PDF 直接失败**（exit 1），报告的封面、字号、字体、标题样式、
+#   页眉页脚、配色全都拿不到 —— 也就是「排版设置丢了」。
+#   实测 2026-10-18：提交版 `build_pdf.py` 报
+#     [失败] 找不到模板 reports\Eisvogel-3.5.1\eisvogel.latex
+#   而 `eisvogel.latex` 只有 29 KB，且不 \input 同目录任何其它文件。
+#   ⇒ 放行模板本体 + LICENSE（LPPL-1.3c 允许再分发，随附许可证即可），
+#     其余（examples/、document.pdf、preview.png 等 30 MB）继续忽略。
+reports/Eisvogel-3.5.1/*
+!reports/Eisvogel-3.5.1/eisvogel.latex
+!reports/Eisvogel-3.5.1/LICENSE
 
 # ---- 引用审计的参考图渲染（可由 HELM 原文 PDF 重新导出）----
 reports/_audit/

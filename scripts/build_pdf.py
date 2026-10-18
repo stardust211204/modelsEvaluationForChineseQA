@@ -195,7 +195,13 @@ def main() -> int:
         return 1
     if not TEMPLATE.exists():
         print(f"  [失败] 找不到模板 {TEMPLATE.relative_to(paths.ROOT)}")
-        print("         该目录被 .gitignore 忽略，换机器时需重新放置 Eisvogel 3.5.1。")
+        # ★ 2026-10-18 起模板本体**已入库**（reports/Eisvogel-3.5.1/eisvogel.latex，
+        #   29 KB）。原来整个目录被 .gitignore 忽略，导致克隆仓库的人重建 PDF
+        #   直接失败 —— 封面、字号、字体、标题样式、页眉页脚、配色全都拿不到。
+        #   所以这句提示从「需重新放置 30 MB 的 Eisvogel」改成「从仓库取回」。
+        print("         该文件应随仓库提供。若缺失，请执行：")
+        print("           git checkout -- reports/Eisvogel-3.5.1/")
+        print("        整包（含 examples/、30 MB）仍被 .gitignore 忽略，本项目不需要它。")
         return 1
     if not shutil.which("pandoc"):
         print("  pandoc 未安装")
