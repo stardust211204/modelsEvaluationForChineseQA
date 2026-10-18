@@ -1,30 +1,21 @@
 # modelsEvaluation
 
-大模型**中文问答能力**的评测工程实践：以 HELM 的「场景 × 适配 × 指标」三元组为口径字典，自建轻量双管线框架，把「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」这条闭环完整走一遍。
+**大模型中文问答能力的评测工程实践** —— 以 HELM 的「场景 × 适配 × 指标」三元组为口径字典，自建轻量双管线框架，把「评测方案设计 → 评测集构建 → 判分体系 → 抽检复核 → badcase 归因 → 评测报告」这条闭环完整走一遍。
 
-> - **一句话定位**：**准确性是载体，评测工程闭环是目的** —— 本项目侧重用单因子受控实验量化评测协议自身的失真边界（见 §一）。
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
+[![Runs](https://img.shields.io/badge/%E6%9D%83%E5%A8%81%E6%89%B9%E6%AC%A1-37%20%2F%2085-blue.svg)](reports/RUN_AUDIT.md)
+[![Calls](https://img.shields.io/badge/API%20%E8%B0%83%E7%94%A8-53%2C379-blue.svg)](reports/RUN_AUDIT.md)
+[![Tests](https://img.shields.io/badge/%E5%8D%95%E6%B5%8B-168%20passed-brightgreen.svg)](tests/)
+[![Report](https://img.shields.io/badge/%E6%8A%A5%E5%91%8A-27%20%E8%A1%A8%20%2F%2014%20%E5%9B%BE-purple.svg)](reports/report_external_helm_polished.md)
+
+> - **一句话定位**：**准确性是载体，评测工程闭环是目的** —— 本项目侧重用单因子受控实验量化评测协议自身的失真边界。
 > - **工程与质量基线**：五层解耦双管线 · 37 个权威批次 / 53,379 次调用 · 13 模块 168 项单测 · 210 项 CI 回归门禁 · 报告全部数字无需 API 离线逐格复算。
-> - **审阅导航**：
->   - 关注**评测方法学与模型实测结论** → [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（及同名 PDF，重点看 §1.3 实测速览、第 4 章与 §5.1 方法学结论）
->   - 关注**测试框架架构、实战排障与自动化门禁** → 本文件 §二（系统架构）→ §三（六类失真排障）→ §四（四道质量防线）
->   - 关注**数据溯源、批次台账与结论边界** → [`reports/report_data_provenance.md`](reports/report_data_provenance.md) · [`reports/RUN_AUDIT.md`](reports/RUN_AUDIT.md) · [`docs/limitations.md`](docs/limitations.md)
+> - **快速导航**：[评测规模](#一项目定位与评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六大排障陷阱](#三六大评测陷阱与排障闭环) · [四道质量防线](#四四道自动化质量防线) · [快速复算](#六快速开始与一键复算)
+> - **要按图索骥找文件**：见 [`reports/PROJECT_SUMMARY.md`](reports/PROJECT_SUMMARY.md) —— 它按「每一环 → 产出什么 → 怎么验证」给出完整映射。
 
 ---
 
-## 一、项目定位与成果物
-
-### 核心方法学问题与实证结论速览
-
-公开榜单通常直接给出单一总分排名，本项目则用受控实验回答下面四个方法学问题（完整得分表与统计检验见对外报告 §3～§5）：
-
-| 核心方法学问题 | 实测现象与失真量级 | 工程结论与报告指引 |
-|---|---|---|
-| **1. 判分口径与提示词构造会改变结论多少？** | 自由作答下（680 条响应）严格口径 **0 条可判**（准确率无定义，不可读作 0%），宽松口径可判率恢复至 **40.6%~93.4%**；强格式约束压缩了推理空间（平均输出 1.0~12.8 vs 200~962 token），在 MMLU-ProX 上造成 **13.8~29.1pp** 的系统性低估；示例格式错配曾伪造出 **+11.9~+17.3pp** 的假增益 | 必须解耦「推理生成」与「末行选项提取」；跨格式对比只能取双方均可判的**配对交集**做 McNemar，否则分母差异会让因果归因反转（报告 §2.4、§4.1、§4.4） |
-| **2. 规则判分能否替代 LLM Judge？** | 五模型各 150 题复核，一致率 **99.3%~100%**、Cohen κ **0.986~1.000**，判自身与判他模无差别；但该批复核取自「直接作答」，此时输出几乎全是裸字母 | 封闭式选择题以规则判分为主口径、Judge 抽样复核作可靠性证据；**开放式安全评测不能**——7,870 条判定全依赖 Judge，且无跨厂交叉验证（报告 §2.4、§2.7） |
-| **3. 思考开关会不会改变模型排序？** | 开启思考后五模型一致跃升 **25.0~36.8pp**；关闭思考时旗舰落后轻量档 10.5pp 的倒挂被消除，但**开启后四个领先模型仅差 1 道题**（$p=1.000$） | 任何跨模型对比必须声明思考状态；同时**不能**据此推出新的排序（报告 §4.2） |
-| **4. 单一总分排名的可信边界在哪？** | 前三名在合并集上最大差仅 **1.8pp**（低于 5pp 阈值），两题集排序相反；C-Eval 配比由 50% 降至 20% 即翻转首位；同题重复 10 次全同率最低 **28.0%** | **不给出总体排名**；改按 14 个学科领域、留一法难度分层、重复采样稳定性、逐对不一致率与安全双向取舍分维呈现（报告 §3.1~§3.3、§4.3、§4.5、§1.3） |
-
-### 评测规模
+## 一、项目定位与评测规模
 
 | 项 | 值 |
 |---|---|
@@ -34,23 +25,9 @@
 | **调用总量** | **53,379 次**（成功 53,291，失败 88），**37 个权威批次**（全库 85 批次 / 77,512 次） |
 | **口径** | 准确率 = `correct ÷ (correct + wrong)`；`invalid` / `truncated` 不进分母、单独报告 |
 
-### 成果物索引
-
-| 文件 | 内容 |
-|---|---|
-| [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（及同名 PDF） | **对外评测报告 —— 唯一权威版**，6 章 / 27 表 / 14 图 |
-| [`reports/report_data_provenance.md`](reports/report_data_provenance.md) | 数据溯源清单：报告全部数字的来源与复算命令 |
-| [`reports/RUN_AUDIT.md`](reports/RUN_AUDIT.md) · [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) | 批次台账：全库 85 批次分类 · 37 个权威批次与数据可用性核查 |
-| [`docs/design.md`](docs/design.md) | 评测方案设计，含对 HELM 判分契约的三处修正 |
-| [`docs/param_matrix.md`](docs/param_matrix.md) | 逐臂参数探测矩阵 |
-| [`docs/badcase_method.md`](docs/badcase_method.md) | badcase 归因方法（含未完成部分与执行状态） |
-| [`docs/open_issues.md`](docs/open_issues.md) | 缺陷清单与修复记录 |
-| [`docs/limitations.md`](docs/limitations.md) | 局限必读 |
-| `reports/exp_*.md` | 专项实验报告（思考开关 / 选项标签替换 / judge 复核 / 5-shot / 作答格式递进） |
-| 本文件 §二 · §三 · §四 | 工程侧：系统架构 · 六类失真与对应防线 · 四道自动化质量防线 |
-| `reports/_archive/report_external_helm_full.md` | 完整版报告（35 表，已冻结归档，仅供技术参考） |
-
-> 时间有限时，建议的阅读顺序为：**对外报告 → 本文件 §二（系统架构）与 §三（六类失真）→ [`docs/limitations.md`](docs/limitations.md)**。
+> **结论、得分表与统计检验都在对外报告里**，本文件不重复：
+> [`reports/report_external_helm_polished.md`](reports/report_external_helm_polished.md)（6 章 / 27 表 / 14 图。
+> 建议读序：§1.3 实测速览 → 第 4 章 → §5.1 方法学结论）。
 
 ---
 
@@ -72,6 +49,11 @@ HELM 已于 2026-06-01 进入 maintenance mode，且其前提（开放权重 + l
 
 ### 五层管线与职责边界
 
+![准确率评测管线的五层划分](figures/40_pipeline_main.png)
+
+<details>
+<summary>五层模块清单（点击展开）</summary>
+
 ```
 src/meval/
   types.py       数据模型
@@ -84,6 +66,8 @@ src/meval/
   exclusions.py  题集剔除清单（42 题，带指纹）
 ```
 
+</details>
+
 **各层职责边界（越界即为缺陷）—— 五条纪律**：
 
 1. **`execute` 层不解读模型输出。** 判分逻辑出现在这一层即为 bug。
@@ -95,14 +79,19 @@ src/meval/
 
 ### 核心工程决策：`raw` 与 `tally` 分离
 
+最可能返工的是**判分逻辑**（解析阶梯、档位边界）。把不可变的模型原始输出与可重算的判分结果分开存放后，
+改判分规则**不需要重跑 API** —— 项目期间判分口径改过多次，**一次 API 都没重跑**；返工成本从小时级降到秒级。
+
+<details>
+<summary>目录布局与两者分工（点击展开）</summary>
+
 ```
 runs/{run_id}/manifest.json                 # 参数生效表、代码版本、数据哈希
 runs/{run_id}/raw/{config}/{arm}.jsonl      # 不可变：PromptSpec + ModelResult（不入库，走 Release）
 runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，报告全部指标由它算出）
 ```
 
-最可能返工的是**判分逻辑**（解析阶梯、档位边界）。分离后改判分规则**不需要重跑 API** ——
-项目期间判分口径改过多次，**一次 API 都没重跑**；返工成本从小时级降到秒级。
+</details>
 
 ---
 
@@ -176,8 +165,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 - **badcase 归因由 LLM judge 完成，未做人工复核。** 归因逻辑已实现并跑完（`scripts/run_badcase_judge.py`）：**99/104** 条错题可标，用 `deepseek-v4-pro`（关思考、temp 0.1）**跑两遍**测自一致率，得 **93.9%（κ = 0.914）** —— 这是标签稳定性的证据，**不等于人工一致率**。因此归因分布属于「单标注者 + 自一致率佐证」的强度，**不作为强结论使用**。标准答案审计独立进行（`scripts/run_gold_audit.py`）：61 题中 **56 题（91.8%）无缺陷**。
   > 其中一条待查线索的抽样背景较易被误读（20 条子集取自「多模型共错」的高危候选池，比例不能外推到全库），完整说明见 [`docs/limitations.md`](docs/limitations.md) 的 badcase 归因条目。
-- `manifest.params_effective` 有 13 处与实际请求参数不符（3 处在权威批次上）。**报告结论不受影响** —— raw 记录才是真值。见 [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) §4.6。
-- 完整局限见 [`docs/limitations.md`](docs/limitations.md)。
+- 完整局限、`manifest.params_effective` 的 13 处登记不符等细节，见 [`docs/limitations.md`](docs/limitations.md) 与 [`reports/RUN_INVENTORY.md`](reports/RUN_INVENTORY.md) §4.6。
 
 ---
 
@@ -216,13 +204,16 @@ Copy-Item .env.example .env    # 填入真实 key
 > 五个模型的 MMLU-ProX 准确率复算为 58.6 / 64.1 / 62.9 / 49.1 / 61.2（n=546），
 > 与报告 §3.1 逐个吻合。
 
-> **门禁的两种读数**（差别只在 raw 在不在）：
->
-> | 场景 | `ci_gate`（210 项） | `exp_smoke`（124 项） |
-> | --- | --- | --- |
-> | **完整工作区**（raw 已下载） | PASS **203** / FAIL **1** / WARN 6 | **124/124** |
-> | **刚 clone**（raw 走 Release，不在 git 里） | PASS 162 / FAIL **0** / **SKIP 42** | **123/123**（跳过 1 项） |
->
+<details>
+<summary>门禁在两种工作区状态下的读数差异（点击展开）</summary>
+
+> 差别只在 `raw` 在不在（原始响应包走 Release，不入库）：
+
+| 场景 | `ci_gate`（210 项） | `exp_smoke`（124 项） |
+| --- | --- | --- |
+| **完整工作区**（raw 已下载） | PASS **203** / FAIL **1** / WARN 6 | **124/124** |
+| **刚 clone**（raw 未下载） | PASS 162 / FAIL **0** / **SKIP 42** | **123/123**（跳过 1 项） |
+
 > 被跳过的是**输入不存在**的检查（「raw 完整性」「judge tally 完整性」「被复核 run 含 5 臂」等），
 > 脚本会写明原因 —— **这些是跳过项，不计为失败**（§四 防线 3 另说明了那 1 项 FAIL 的来历）。
 >
@@ -230,11 +221,12 @@ Copy-Item .env.example .env    # 填入真实 key
 > 此时某个批次缺 raw 是**真事故**，照报 FAIL。要拿到完整读数，
 > 把 Release 里的 raw 包解压到仓库根（保持 `runs/{run_id}/raw/...` 结构）即可。
 
-**小样本走完整条管线**：`.\run_all.ps1`（末步即门禁）。
+</details>
 
-**报告排版**：PDF 走 `build_pdf.py`（pandoc + xelatex + Eisvogel），排版参数取自 **CCL 2026 官方中文论文模板** —— 宋体正文 + Times New Roman 西文 + 单倍行距 + 首行缩进 1em + 一级标题 12pt 黑体 / 二三级 10pt 黑体。调研产物（含官方模板原件与编译预览）在 `reports/_verify/web/`。
+**小样本走完整条管线**：`.\run_all.ps1`（末步即门禁）。**报告排版**：`build_pdf.py` 一键编译 PDF（pandoc + xelatex + Eisvogel），参数取自 CCL 2026 官方中文论文模板。
 
-### 目录结构
+<details>
+<summary>目录结构（点击展开）</summary>
 
 ```
 src/meval/       五层管线本体（见 §二）
@@ -248,3 +240,5 @@ runs/            每次跑批：manifest + raw（未入库） + tallies（已入
 reports/         对外报告 · 溯源清单 · 批次台账 · 专项实验报告
 tests/           13 个模块 / 168 个用例
 ```
+
+</details>
