@@ -225,7 +225,7 @@ def main() -> int:
     # ★ 断点续跑的键是 (config, arm, instance_id, rep)，**不含 prompt**。
     #   改了模板却沿用同一 run_id，scan_done() 会把全部请求当成"已完成"跳过，
     #   于是产出一批用**旧模板**跑出来的数据 —— 而且不报任何错。
-    #   （C5 首轮作废后重跑时就差一点踩到：见 docs/OPEN_ISSUES.md P1-6。）
+    #   （C5 首轮作废后重跑时就差一点踩到：见 docs/open_issues.md P1-6。）
     tmpl_text = (paths.ROOT / spec_cfg.prompt_template).read_text(encoding="utf-8")
     fp = adapt.prompt_fingerprint(
         instances, tmpl_text, demos,

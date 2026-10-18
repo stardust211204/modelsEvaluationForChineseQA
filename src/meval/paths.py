@@ -140,7 +140,7 @@ def base_url() -> str:
 
 
 # ---- judge 端点（与三个模型的聚合端点**分开**）--------------------------------
-# judge 必须与被评模型尽量不同源：见 docs/OPEN_ISSUES.md P2-1。
+# judge 必须与被评模型尽量不同源：见 docs/open_issues.md P2-1。
 
 def judge_api_key() -> str:
     key = env("DEEPSEEK_API_KEY") or env("JUDGE_API_KEY")
