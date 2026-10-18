@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/%E5%8D%95%E6%B5%8B-168%20passed-brightgreen.svg)](tests/)
 
-> [评测规模](#一评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六大排障陷阱](#三六大评测陷阱与修复) · [四层自动化校验](#四四层自动化校验) · [快速复算](#六快速开始与一键复算) · [成果物映射](reports/PROJECT_SUMMARY.md)
+> [评测规模](#一评测规模) · [系统架构](#二系统架构与对-helm-的三处工程修正) · [六类评测失真](#三六大评测失真与修复) · [四层自动化校验](#四四层自动化校验) · [复现](#六复现) · [成果物映射](reports/PROJECT_SUMMARY.md)
 
 ---
 
@@ -90,18 +90,16 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 ---
 
-## 三、六大评测陷阱与修复
+## 三、六大评测失真与修复
 
-| # | 陷阱 | 现象与实测影响 | 应对 | 固化为 |
+| # | 失真 | 现象与实测影响 | 应对 | 固化为 |
 |---|---|---|---|---|
 | **1** | **推理模型空 `content` 静默失败与截断幸存者偏差** | 推理预算耗在内部思维链上、返回空串，**而 HTTP 状态是 200**。1,024 预算下 **31% 截断**、且截断题系统性偏难（截断题 65.4% vs 未截断题 93.5%，差 **28.1pp**），直接剔除使准确率**虚高 7.8pp** | `finish_reason=='length'` 独立归入 `truncated`；扩至 8,192 预算并强制取五模型 **76 题统一共同集** | `tests/test_truncation_bias.py` · `tests/test_tally.py` |
-| **2** | **LLM Judge 思考未关 = 选择性偏差**（**三臂期**） | C4 首轮 judge 隐藏思考吃光预算，**9.1%（41/450）**判不出，**且失败集中在规则判错的题上** → 一致率被高估 | 判分前显式冻结 judge `reasoning_effort="none"`，并记入 manifest；覆盖率 85–92% → **98%~100%** | `scripts/_check_judge_verdicts.py` |
-| **3** | **Few-shot 示例格式压倒正文指令 & 跨集选项数错配**（**三臂期**） | C5 首轮示例写成 `答案：X`，伪造出 **+11.9~+17.3pp** 的假显著增益（严格口径 393/450 判不出）；C-Eval 共用 10 选项示例致 `deepseek-v4-pro` 暴跌 16.0pp | 示例强制示范**目标输出格式本身**、严取 `valid` split，并按目标题选项数严格匹配 | `tests/test_prompt_letters.py` · `adapt.prompt_fingerprint()` 模板指纹校验（跑批前比对，不一致即拒绝启动） |
+| **2** | **LLM Judge 思考未关 = 选择性偏差** | C4 首轮判分时 judge 的思考模式未关，隐藏推理吃光输出预算，**9.1%（41/450 条判定）**判不出，**且失败集中在规则判错的题上** → 一致率被高估 | 判分前显式冻结 judge `reasoning_effort="none"`，并记入 manifest；覆盖率 85–92% → **98%~100%** | `scripts/_check_judge_verdicts.py` |
+| **3** | **Few-shot 示例格式压倒正文指令 & 跨集选项数错配** | C5 首轮示例写成 `答案：X` 而非裸字母，模型照抄示例外形、末尾带上「答案：」前缀，**严格口径 393/450 条判不出**；改用宽松口径虽能解析，测到的却是「格式顺从」，与「示例有没有帮助答题」无关 —— 那轮 **+11.9~+17.3pp** 的增益即由此而来。另一处：C-Eval 的 4 选项题沿用了 MMLU-ProX 的 10 选项示例，`deepseek-v4-pro` 因此下跌 **16.0pp** | 示例强制示范**目标输出格式本身**、严取 `valid` split，并按目标题选项数严格匹配 | `tests/test_prompt_letters.py` · `adapt.prompt_fingerprint()` 模板指纹校验（跑批前比对，不一致即拒绝启动） |
 | **4** | **自由作答拆解分母不一致 → 因果归因反转** | B 组宽松口径仅 **276/680** 可判，直接拿各组绝对准确率相减会得出「末行要求贡献最大（+13.8 vs +8.1）」的**相反结论** | 跨配置比较一律限制在双方均可判的**配对交集**上做 McNemar；修正后为「允许写理由（**+15.9**）> 末行要求（**+10.0**）」 | `tests/test_paired.py` · `scripts/exp_e6_paired.py` |
 | **5** | **跨采样次数翻转率不可除 & 乱序未还原坐标系** | 选项重排（4 次）与重复采样（10 次）观测次数不同，翻转率随次数单调上升使比值被压低；C-Eval 乱序未还原坐标系会产生 **67%~76%** 假值 | 改用与观测次数无关的**逐对不一致率**；强制还原原题坐标系再比 | `tests/test_position_refusal.py` · `scripts/_ratio_pairwise.py` |
 | **6** | **固定温度 ≠ 输出可复现 & 厂商私有参数冲突** | 探针实测多臂**忽略温度参数**，但同题重复 10 次全同率最低仅 **28.0%**；不同厂商关闭思考的参数互斥，或本地抛 `TypeError` | 放弃全局统一参数，改为按臂探测后冻结至 `configs/arms.yaml`；私有参数走 `extra_body` | `tests/test_client_params.py` · `docs/param_matrix.md` |
-
-> 陷阱 2、3 标注「三臂期」是因为它们发生在项目早期的三臂阶段。数字与结论未经修改。
 
 ---
 
@@ -140,7 +138,6 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 > 那 1 项 FAIL 是 `longcat` 的**上游连接失败**（间歇性路由缺陷，客户端无法修复），与口径无关。
 
-
 ### ④ 报告逐格自检
 
 | 脚本 | 查什么 |
@@ -162,76 +159,17 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算：Tally（已入库，�
 
 ---
 
-## 六、快速开始与一键复算
+## 六、复现
+
+`runs/*/tallies/` 判分台账已随仓库入库，原始响应（约 75 MB）另以 Release 数据包发布。
+**clone 后无需任何 API key 即可复算报告里的全部指标** —— 例如
 
 ```powershell
-# 1) 环境（自建；他人 .venv 内含绝对路径，不可移植）
-uv venv .venv --python 3.12
-uv pip install --python ".\.venv\Scripts\python.exe" `
-  --index-url https://pypi.tuna.tsinghua.edu.cn/simple -e ".[dev]"
-
-# 2) 密钥
-Copy-Item .env.example .env    # 填入真实 key
-
-# 3) 跑批前探针（前置步骤，结果回填 docs/param_matrix.md）
-.\.venv\Scripts\python.exe scripts\smoke_arms.py
-.\.venv\Scripts\python.exe scripts\probe_params.py
-
-# 4) 单测 + 两个门禁
-.\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe scripts\ci_gate.py      # 210 项
-.\.venv\Scripts\python.exe scripts\exp_smoke.py    # 124 项
-
-# 5) 出报告（Markdown → PDF；默认源即对外报告）
-.\.venv\Scripts\python.exe scripts\build_pdf.py
-
-# 6) 报告自检与逐格复算（不需要 API）
-.\.venv\Scripts\python.exe scripts\_check_polished_report.py
-.\.venv\Scripts\python.exe scripts\_check_render_safe.py
 .\.venv\Scripts\python.exe scripts\report_metrics.py --run-id c1-5arm-v2 --config c1
 ```
 
-> **只复算、不跑批**：第 4~6 步全部是离线脚本。`runs/*/tallies/` 判分台账**已入库**，
-> clone 后**无需任何 API key** 即可复算报告全部指标。
-> 实测：全新 clone 里跑 `report_metrics.py --run-id c1-5arm-v2 --config c1`，
-> 五个模型的 MMLU-ProX 准确率复算为 `deepseek-v4-pro` 58.6 / `deepseek-v4.1-flash` 64.1 / `longcat-2.5` 62.9 / `mimo-v2.6` 49.1 / `qwen3.8` 61.2（n=546），
-> 与报告 §3.1 逐个吻合。
+复算出的五模型 MMLU-ProX 准确率与报告 §3.1 逐格吻合。每处数字的来源与复算命令登记在
+[`reports/report_data_provenance.md`](reports/report_data_provenance.md)。
 
-<details>
-<summary>门禁在两种工作区状态下的读数差异</summary>
-
-> 差别只在 `raw` 在不在（原始响应包走 Release，不入库）：
-
-| 场景 | `ci_gate`（210 项） | `exp_smoke`（124 项） |
-| --- | --- | --- |
-| **完整工作区**（raw 已下载） | PASS **203** / FAIL **1** / WARN 6 | **124/124** |
-| **刚 clone**（raw 未下载） | PASS 162 / FAIL **0** / **SKIP 42** | **123/123**（跳过 1 项） |
-
-> 被跳过的是**输入不存在**的检查（「raw 完整性」「judge tally 完整性」「被复核 run 含 5 臂」等），
-> 脚本会写明原因 —— **这些是跳过项，不计为失败**（§四「③ 单元测试与回归门禁」另说明了那 1 项 FAIL 的来历）。
->
-> 判据是**全局**的：只要有一个 `runs/*/raw` 存在，就按完整工作区标准判 ——
-> 此时某个批次缺 raw 视为**破坏性变更**，直接判 FAIL。要拿到完整读数，
-> 把 Release 里的 raw 包解压到仓库根（保持 `runs/{run_id}/raw/...` 结构）即可。
-
-</details>
-
-**小样本走完整条管线**：`.\run_all.ps1`（末步即门禁）。**报告排版**：`build_pdf.py` 一键编译 PDF（pandoc + xelatex + Eisvogel），参数取自 CCL 2026 官方中文论文模板。
-
-<details>
-<summary>目录结构</summary>
-
-```
-src/meval/       五层管线本体（见 §二）
-scripts/         入口、实验与分析脚本、核校工具（~190 个）
-configs/         arms.yaml（五臂 + 各自生效参数）· matrix.yaml · exclusions.json
-data/            eval_set.jsonl · ceval_set.jsonl · orbench_set.jsonl · frozen.json
-prompts/         c1_strict / c2_free / c5_fewshot / e2_labelshuffle / e6_* / judge_*
-docs/            design.md · limitations.md · open_issues.md · param_matrix.md · badcase_method.md
-figures/         14 张正式图 + latex/（管线图源码与 HOWTO.md）
-runs/            每次跑批：manifest + raw（未入库） + tallies（已入库，可直接复算）
-reports/         对外报告 · 溯源清单 · 批次台账 · 专项实验报告
-tests/           13 个模块 / 168 个用例
-```
-
-</details>
+环境搭建、跑批流程、门禁在两种工作区状态下的读数差异、以及目录结构，见
+[`docs/reproduce.md`](docs/reproduce.md)。
