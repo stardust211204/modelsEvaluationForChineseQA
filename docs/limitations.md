@@ -80,7 +80,7 @@ NeurIPS 2025 立场论文（*Neither Valid nor Reliable? Investigating the Use o
 - **安全评测必须用 judge**（"给没给内容"无法用正则判定），这构成一处方法学依赖。
 - **judge 自身的口径必须锁定**：判分前显式关闭 judge 的思考模式
   （`reasoning_effort: "none"`）并记入 manifest。早期一次未关闭导致 **9.1%（41/450）**
-  判不出，**且失败集中在规则判错的题上** —— 那会系统性高估一致率。详见 README §二。
+  判不出，**且失败集中在规则判错的题上** —— 那会系统性高估一致率。详见 README §三。
 
 ---
 

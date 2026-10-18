@@ -144,7 +144,7 @@
 >    这就是「放弃全局统一参数、改为按臂探测后冻结」的实证依据（`design.md` §6）。
 > 3. **厂商私有参数必须走 `extra_body`** —— 直传 kwarg 会在**本地**抛 `TypeError`，
 >    错误信息却像网络问题。已固化为 `tests/test_client_params.py`，
->    并记入 README §二 陷阱 6。
+>    并记入 README §三 缺陷 6。
 
 已选定并**完成逐臂探测**（`scripts/probe_arms.py`，39 次调用；原始记录 `data/raw_evidence/probe_arms.jsonl`）：
 

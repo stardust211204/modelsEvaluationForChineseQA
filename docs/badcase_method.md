@@ -20,7 +20,7 @@
 >
 > **本文 §4「不要做的事」纪律仍然成立且未被违反**：归因分布之所以不能作为强结论引用，
 > 正是因为**只有 LLM 自一致率、没有人工一致率**。完整对照见
-> [`limitations.md`](limitations.md) §7 与 README §五。
+> [`limitations.md`](limitations.md) §7。
 
 > 依据：ErrorMap / ErrorAtlas（[arXiv 2601.15812](https://ar5iv.labs.arxiv.org/html/2601.15812)，IBM + Stanford），
 > 以及 [When Errors Become Narratives: A Longitudinal Taxonomy of Silent Failures](https://ar5iv.labs.arxiv.org/html/2606.14589)（2606.14589）。
