@@ -79,7 +79,7 @@ Copy-Item .env.example .env    # 填入真实 key
 ## 四、目录结构
 
 ```
-src/meval/       五层管线本体（见 README §二）
+src/meval/       管线本体（见 README §二）
 scripts/         入口、实验与分析脚本、核校工具（~190 个）
 configs/         arms.yaml（五臂 + 各自生效参数）· matrix.yaml · exclusions.json
 data/            eval_set.jsonl · ceval_set.jsonl · orbench_set.jsonl · frozen.json
