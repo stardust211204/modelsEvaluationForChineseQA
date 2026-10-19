@@ -33,7 +33,7 @@ class Arm:
     model: str
     concurrency: int = 4
     params: dict[str, Any] = field(default_factory=dict)
-    # ★ 模型级端点覆盖（2026-10-05 加）。
+    # ★ 模型级端点覆盖。
     #   默认 None ⇒ 走 `paths.base_url()`（聚合端点）。
     #   为什么要它：旗舰档 `deepseek-v4-pro` 走**官方端点**（聚合端点该模型额度少），
     #   于是同一批评测里**不同模型落在不同端点**。若客户端仍是全局单例，
@@ -45,7 +45,7 @@ class Arm:
     #      v4-pro 的端点一致性未验证 —— 报告里必须声明。
     base_url: str | None = None
     key_env: str | None = None      # 该模型用哪个环境变量取 key；None ⇒ OPENCODE_API_KEY
-    # ★ 客户端参数（2026-10-10 修）：原先 `load_arms` 把这两个键从 params 里
+    # ★ 客户端参数：原先 `load_arms` 把这两个键从 params 里
     #   `pop` 出来**直接丢弃** ⇒ `configs/arms.yaml` 的 `timeout_s: 120` 一直是摆设，
     #   实际生效的只是 `client.py` 的同值默认。后果是**改了这个配置项没有任何效果**，
     #   而开思考的请求实测会超过 120s（E1 实测 8/1000 条被掐断记成 transport 失败）。

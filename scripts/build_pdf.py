@@ -35,7 +35,7 @@ r"""把 Markdown 报告转成 PDF（pandoc + xelatex + Eisvogel 模板）。
        目录**与摘要同页**（封面 → 摘要 + 目录 → 正文）。不要改成目录单独一页 ——
        摘要只有几行，单独占一页会显得很空。
     3. **中文段落格式**：宋体正文 + Times New Roman 西文 + 单倍行距 + 首行缩进 1em。
-       这套参数取自 CCL 2026 官方中文论文模板（调研产物在 `reports/_verify/web/`）。
+       这套参数取自 CCL 2026 官方中文论文模板。
     4. **分级标题**：一级 12pt 黑体、二三级 10pt 黑体（同样取自 CCL 模板）。
        实现在 `latex_headings.tex` —— 注意 **xeCJK 没有 `\CJKsffamily`**
        （那是 ctex 的接口），要单独切中文必须 `\setCJKfamilyfont` + `\CJKfamily`。
@@ -202,10 +202,6 @@ def main() -> int:
         return 1
     if not TEMPLATE.exists():
         print(f"  [失败] 找不到模板 {TEMPLATE.relative_to(paths.ROOT)}")
-        # ★ 2026-10-18 起模板本体**已入库**（reports/Eisvogel-3.5.1/eisvogel.latex，
-        #   29 KB）。原来整个目录被 .gitignore 忽略，导致克隆仓库的人重建 PDF
-        #   直接失败 —— 封面、字号、字体、标题样式、页眉页脚、配色全都拿不到。
-        #   所以这句提示从「需重新放置 30 MB 的 Eisvogel」改成「从仓库取回」。
         print("         该文件应随仓库提供。若缺失，请执行：")
         print("           git checkout -- reports/Eisvogel-3.5.1/")
         print("        整包（含 examples/、30 MB）仍被 .gitignore 忽略，本项目不需要它。")
@@ -252,7 +248,7 @@ def main() -> int:
         #   只在给了 -V sansfont 时才写 \setsansfont。不给的话 \sffamily 落回
         #   LaTeX 默认的 **Latin Modern Sans** —— 封面日期就是这样变成了
         #   `LMSans12`，一套跟我们选的字体毫无关系的系统自带字体。
-        #   实测（2026-10-18，pdftohtml -xml 逐段取字体）：
+        #   实测（pdftohtml -xml 逐段取字体）：
         #     标题 SimHei(30) / 副标题 SimHei(21) / **日期 LMSans12** ← 只它不对
         #   中文不受影响：xeCJK 下 \sffamily 的汉字走 CJKsansfont(SimHei)，本就对。
         "-V", f"sansfont={args.sansfont}",
@@ -335,7 +331,7 @@ def main() -> int:
     print(f"  产出 : {shown}  ({out.stat().st_size / 1024:,.0f} KB)")
     print(f"  图注 : {n_fig} / {n_img}{flag}")
 
-    # ★ 图注数**证明不了图片被嵌进去了**（2026-10-17 实测）：
+    # ★ 图注数**证明不了图片被嵌进去了**：
     #   pandoc 找不到图片文件时只打一行 warning，**图注照输出** ——
     #   实测把路径写错一层后，count_captions 仍报 14/14，而 PDF 从 1,329 KB 掉到 407 KB、
     #   内嵌图片从 52 掉到 20。也就是说这道检查对「图全没了」完全无感。

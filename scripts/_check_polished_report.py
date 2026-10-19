@@ -7,11 +7,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REP = ROOT / "reports" / "report_external_helm_polished.md"
-# 2026-10-17：完整版报告已冻结归档，作为「原报告宽度」基线的路径随归档更新。
 OLD = ROOT / "reports" / "_archive" / "report_external_helm_full.md"
 
 text = REP.read_text(encoding="utf-8")
-# ★ 归档完整版已于 2026-10-19 下线（用户裁决：自述/过程类文档不进交付面）。
+# ★ 归档完整版已下线（用户裁决：自述/过程类文档不进交付面）。
 #   本检查器**其余检查照常**，只有「图序与宽度基线」这两项依赖它，
 #   拿不到就跳过 —— 不要因此让整个检查器失败。
 old = OLD.read_text(encoding="utf-8") if OLD.is_file() else ""
@@ -30,7 +29,7 @@ def note(tag, msg):
 
 
 # ---------- 1. 图片引用 ----------
-# ★ 图片路径的写法有两种，本脚本必须都认（2026-10-17 起）：
+# ★ 图片路径的写法有两种，本脚本必须都认：
 #   报告里写 `../figures/x.png`（归档件写 `../../figures/x.png`）—— 这是给
 #   **GitHub 预览**用的，它按文件所在目录解析；pandoc 从仓库根跑，
 #   靠 build_pdf.py 的 --resource-path 折回来。
@@ -130,7 +129,7 @@ for m in re.finditer(r"§(\d+(?:\.\d+)?)", text):
 # ---------- 5. 关键数字必须出现 ----------
 MUST = {
     "53,379": "总调用数",
-    "53,291": None,  # 润色版改成「逾 5.2 万」，见下
+    "53,291": None,
     "588": "MMLU-ProX 构建题数",
     "546": "MMLU-ProX 计分题数",
     "583": "C-Eval 题数",

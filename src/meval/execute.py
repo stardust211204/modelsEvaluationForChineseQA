@@ -36,7 +36,7 @@ def _key_of(d: dict) -> Key:
     ★ 含 `target_arm`：C4 要对三个模型的同一批题各判一次，而三次调用的
       (config, arm, instance_id, rep) 完全相同（arm 都是 judge 模型）。
       键里不带 target_arm 就会三个模型互相覆盖、只剩最后一个模型 ——
-      与 docs/HANDOFF.md §4 坑 6 是同一类错误。
+      结果字典的键漏掉 arm 就会互相覆盖 —— 这个坑在本项目里踩过两次。
     """
     return (str(d.get("config")), str(d.get("arm")), str(d.get("instance_id")),
             int(d.get("rep", 0)), str(d.get("target_arm", "")))

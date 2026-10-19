@@ -149,7 +149,7 @@ def test_scan_done_distinguishes_target_arm(isolated_runs):
 
     三次调用的 (config, arm, instance_id, rep) 完全相同（arm 都是 judge 模型），
     只有 target_arm 不同。键里不带它就会三个模型互相覆盖、只剩最后一个模型
-    —— 与 docs/HANDOFF.md §4 坑 6 是同一类错误。
+    —— 「结果字典键必须含 arm」这个坑在本项目里踩过两次。
     """
     write_raw(isolated_runs, "r1", "c4", "judge",
               [row("c4", "judge", "q1", True, target_arm=a)

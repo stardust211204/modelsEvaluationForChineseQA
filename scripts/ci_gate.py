@@ -319,7 +319,7 @@ def check_run(g: Gate, run_id: str, run_dir: Path, pool: list,
     # ---- 8. 参数冻结 ----------------------------------------------------
     # ★ 判据：这个 run 里的 manifest.arms 是**被测模型**还是**judge**？
     #   原先的假设是"judge 模型不在 arms.yaml 里，跳过"（下一行的 `arm not in cur`）。
-    #   但 2026-10-05 把 `deepseek-v4-pro` 同时加成了**被测模型**（旗舰档参照）之后，
+    #   但把 `deepseek-v4-pro` 同时加成了**被测模型**（旗舰档参照）之后，
     #   该假设失效 ⇒ 所有用 v4-pro 当 judge 的老 run 都被误报参数漂移（7 项假失败）。
     #
     #   为什么不能靠 arms.yaml 区分：**同一个模型可以身兼两职**，
