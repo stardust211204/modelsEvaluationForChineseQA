@@ -4,7 +4,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 
-> **核心文档直达**：[对外评测报告](reports/report_external_helm_polished.md) · [数据逐格溯源清单](reports/report_data_provenance.md) · [全库 85 批次审计台账](reports/RUN_AUDIT.md) · [闭环成果物映射](reports/PROJECT_SUMMARY.md) · [复现与门禁指南](docs/reproduce.md)
+> **核心文档直达**：[评测报告](reports/report_external_helm_polished.md) · [运行清单](reports/RUN_INVENTORY.md) · [复现与门禁指南](docs/reproduce.md)
 
 ---
 
