@@ -4,7 +4,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 
-> **核心文档直达**：[评测报告](reports/report_external_helm_polished.md) · [实测参数矩阵](docs/param_matrix.md) · [复现与门禁指南](docs/reproduce.md)
+> **核心文档直达**：[评测报告](reports/report_external_helm_polished.md) · [门禁指南](docs/reproduce.md)
 
 ---
 
