@@ -11,7 +11,10 @@ REP = ROOT / "reports" / "report_external_helm_polished.md"
 OLD = ROOT / "reports" / "_archive" / "report_external_helm_full.md"
 
 text = REP.read_text(encoding="utf-8")
-old = OLD.read_text(encoding="utf-8")
+# ★ 归档完整版已于 2026-10-19 下线（用户裁决：自述/过程类文档不进交付面）。
+#   本检查器**其余检查照常**，只有「图序与宽度基线」这两项依赖它，
+#   拿不到就跳过 —— 不要因此让整个检查器失败。
+old = OLD.read_text(encoding="utf-8") if OLD.is_file() else ""
 lines = text.split("\n")
 
 problems = []
@@ -38,7 +41,7 @@ def _base(p: str) -> str:
 
 
 IMG_RE = r"!\[[^\]]*\]\((?:\.\./)*figures/([^)]+)\)"
-img_old = [_base(p) for p in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", old)]
+img_old = [_base(p) for p in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", old)] if old else []
 img_new = re.findall(IMG_RE, text)
 pairs_new = re.findall(IMG_RE[:-1] + r"\{width=(\d+%)\}", text)
 if not img_new:
@@ -54,7 +57,7 @@ else:
 
 # 图号与 width 顺序比对：正文图片顺序应与 §6.1 图表索引一致，且宽度沿用原报告
 new_order = [w for _, w in pairs_new]
-old_w = dict(re.findall(r"figures/([^)]+)\)\{width=(\d+%)\}", old))
+old_w = dict(re.findall(r"figures/([^)]+)\)\{width=(\d+%)\}", old)) if old else {}
 idx = re.findall(r"\| `(\d+_[a-z_]+\.png)` \| §", text)
 if len(idx) != len(img_new):
     bad("图", f"图表索引 {len(idx)} 行 vs 正文图片 {len(img_new)} 处，数量不符")
