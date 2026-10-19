@@ -7,7 +7,8 @@
 ## 0. 一次完整跑批的全部命令
 
 ```powershell
-cd <workspace>\modelsEvaluation
+# 在仓库根目录执行（克隆或解压后的目录名即 modelsEvaluationForChineseQA）
+cd <仓库根目录>
 $py = ".\.venv\Scripts\python.exe"
 
 # ① 冒烟：确认三个模型连通

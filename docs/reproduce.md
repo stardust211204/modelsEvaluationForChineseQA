@@ -7,7 +7,7 @@
 ## 一、不跑批也能复算全部指标
 
 `runs/*/tallies/`（判分台账）**已随仓库入库**，因此**不需要任何 API key** 即可复算报告里的全部统计量。
-原始响应（约 75 MB）不在 git 里，另以 Release 数据包发布。
+原始响应（约 75 MB）不在 git 里，另以 [Release 数据包](https://github.com/stardust211204/modelsEvaluationForChineseQA/releases/tag/v1.0.0)发布。
 
 ```powershell
 # 以主评测批次为例：复算五个模型的 MMLU-ProX 准确率
@@ -74,7 +74,7 @@ Copy-Item .env.example .env    # 填入真实 key
 
 读数判据是**全局**的：只要有一个 `runs/*/raw` 存在，就按完整工作区标准判 ——
 此时某个批次缺 raw 视为破坏性变更，直接判 FAIL。要拿到完整读数，
-把 Release 里的 raw 包解压到仓库根（保持 `runs/{run_id}/raw/...` 结构）即可。
+把 [Release 里的 raw 包](https://github.com/stardust211204/modelsEvaluationForChineseQA/releases/tag/v1.0.0)解压到仓库根（保持 `runs/{run_id}/raw/...` 结构）即可。
 
 ## 四、目录结构
 

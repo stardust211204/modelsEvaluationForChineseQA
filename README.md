@@ -83,7 +83,7 @@ src/meval/
 
 ```
 runs/{run_id}/manifest.json                 # 参数生效对账表、代码版本、数据与模板哈希
-runs/{run_id}/raw/{config}/{arm}.jsonl      # 不可变原始层：PromptSpec + ModelResult（大文件走 GitHub Release）
+runs/{run_id}/raw/{config}/{arm}.jsonl      # 不可变原始层：PromptSpec + ModelResult（大文件走 [GitHub Release](https://github.com/stardust211204/modelsEvaluationForChineseQA/releases/tag/v1.0.0)）
 runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已随 Git 入库，报告全部指标直接由它生成）
 ```
 
@@ -152,7 +152,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 
 ## 五、复现与核心文档导航
 
-`runs/*/tallies/` 判分台账已随 Git 仓库入库，原始响应数据（`raw/`，约 75 MB）另通过 GitHub Release 数据包发布。**克隆仓库后无需配置任何 API Key，即可离线复算报告中的全部指标**——例如运行：
+`runs/*/tallies/` 判分台账已随 Git 仓库入库，原始响应数据（`raw/`，约 75 MB）另通过 [GitHub Release 数据包](https://github.com/stardust211204/modelsEvaluationForChineseQA/releases/tag/v1.0.0)发布。**克隆仓库后无需配置任何 API Key，即可离线复算报告中的全部指标**——例如运行：
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\report_metrics.py --run-id c1-5arm-v2 --config c1
@@ -174,3 +174,10 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 | [docs/badcase\_method.md](docs/badcase_method.md) · [docs/reproduce.md](docs/reproduce.md) | **错题归因与复现指南**：LLM Judge 双次自一致率核查方案 · 环境搭建与门禁读数说明 |
 
 </details>
+
+
+---
+
+## 许可
+
+代码与文档以 **[MPL-2.0](LICENSE)** 授权。`data/` 下的题集与随仓库分发的第三方件（Eisvogel 模板、PlotNeuralNet）不在该授权范围内，各自保留上游协议；逐份清单、出处、引用与致谢见 [`data/README.md`](data/README.md) 与 [`THIRD_PARTY.md`](THIRD_PARTY.md)。

@@ -53,7 +53,7 @@ figures/*.png
 #   实测 2026-10-18：提交版 `build_pdf.py` 报
 #     [失败] 找不到模板 reports\Eisvogel-3.5.1\eisvogel.latex
 #   而 `eisvogel.latex` 只有 29 KB，且不 \input 同目录任何其它文件。
-#   ⇒ 放行模板本体 + LICENSE（LPPL-1.3c 允许再分发，随附许可证即可），
+#   ⇒ 放行模板本体 + LICENSE（BSD-3-Clause 允许再分发，随附许可证即可），
 #     其余（examples/、document.pdf、preview.png 等 30 MB）继续忽略。
 reports/Eisvogel-3.5.1/*
 !reports/Eisvogel-3.5.1/eisvogel.latex

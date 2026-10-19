@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "若本报告的评测方法、实验设计或公开的数据与脚本对你的工作有帮助，可按下面的格式引用。"
+title: "中文问答能力评测：五模型三维度实测与评测条件敏感度实证"
+abstract: >-
+  面向中文问答场景，对四家厂商的五个主流模型做准确率、输出稳定性与安全对齐
+  三维度实测，并通过单因子受控实验定量检验判分口径、格式约束、少样本数量、
+  思考开关与集间配比对结论的影响。报告不折算单一总分，各章结论均锚定在
+  对应实验条件内；全部统计数字可由随仓库公开的判分台账离线逐格复算。
+
+  ★ 授权范围是切开的：本项目自己写的代码与文档以 MPL-2.0 授权；
+  data/ 下的题集保留各自的上游协议（C-Eval 为 CC-BY-NC-SA-4.0，
+  MMLU-ProX 为 MIT，OR-Bench 为 CC-BY-4.0）；随仓库分发的第三方件
+  （Eisvogel 模板 BSD-3-Clause、PlotNeuralNet MIT）亦各自保留其协议。
+  详见仓库 README 的「许可与致谢」一节、THIRD_PARTY.md 与 data/README.md。
+authors:
+  - name: "stardust211204"
+date-released: "2026-10-05"
+license: MPL-2.0
+repository-code: "https://github.com/stardust211204/modelsEvaluationForChineseQA"
+keywords:
+  - "大模型评测"
+  - "LLM evaluation"
+  - "中文问答"
+  - "benchmark"
+  - "评测条件敏感度"
+  - "LLM-as-a-Judge"
+  - "HELM"
+  - "安全对齐"
