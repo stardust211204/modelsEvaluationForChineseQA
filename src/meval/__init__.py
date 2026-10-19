@@ -1,6 +1,6 @@
 """meval —— 大模型准确性评测管线。
 
-分层（各层职责边界见 docs/design.md §3）：
+分层（各层职责边界见 README「管线分层与职责边界」）：
     ① build_set  造题          Instance[]
     ② adapt      请求构造      Instance × Config × Arm → PromptSpec
     ③ execute    执行          PromptSpec → ModelResult   （唯一发 HTTP 的地方）

@@ -160,7 +160,6 @@ NeurIPS 2025 立场论文（*Neither Valid nor Reliable? Investigating the Use o
   全部由共同返回空 `content` 造成。
 - **`manifest.params_effective` 有 13 处与实际请求参数不符**（3 处在权威批次上）。
   报告结论不受影响 —— **raw 记录里的 `params` 才是真值**，问题字段不能单独作证据。
-  见 [`../reports/RUN_INVENTORY.md`](../reports/RUN_INVENTORY.md) §4.6。
 - **免费 / 预览档可能限流或变更**：`longcat-2.5-preview-free` 与 `mimo-v2.6-flash`
   均为免费档，跑批中途的限流或后端变更会影响数据可比性。
 - **安全维度仅覆盖 4 个模型**（`deepseek-v4-pro` 是判卷方，未参评），

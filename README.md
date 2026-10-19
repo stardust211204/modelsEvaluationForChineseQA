@@ -4,7 +4,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 
-> **核心文档直达**：[评测报告](reports/report_external_helm_polished.md) · [运行清单](reports/RUN_INVENTORY.md) · [复现与门禁指南](docs/reproduce.md)
+> **核心文档直达**：[评测报告](reports/report_external_helm_polished.md) · [实测参数矩阵](docs/param_matrix.md) · [复现与门禁指南](docs/reproduce.md)
 
 ---
 
@@ -18,7 +18,7 @@
 | **调用总量** | **53,379 次**（成功 53,291，失败 88），对应 **37 个权威结论批次** |
 | **计分口径** | 准确率 = `correct ÷ (correct + wrong)`；`invalid`（解析失败）与 `truncated`（生成截断）不计入分母、单独统计报告 |
 
-上表仅统计最终进入报告结论的 **37 个权威批次（53,379 次调用）**。在全周期研发与排障过程中，全库累计执行 **85 个批次、77,512 次模型调用**；其余 48 个批次（逾 2.4 万次调用）涵盖前置参数探针、口径校准，以及因检出方法学缺陷而主动隔离归档的历史批次。全量批次的状态流转与数据可用性核查详见 [reports/RUN\_AUDIT.md](reports/RUN_AUDIT.md) 与 [reports/RUN\_INVENTORY.md](reports/RUN_INVENTORY.md)。
+上表仅统计最终进入报告结论的 **37 个权威批次（53,379 次调用）**。在全周期研发与排障过程中，全库累计执行 **85 个批次、77,512 次模型调用**；其余 48 个批次（逾 2.4 万次调用）涵盖前置参数探针、口径校准，以及因检出方法学缺陷而主动隔离归档的历史批次。批次分类与归档情况见 `runs/` 与 `archive/runs/` 的目录结构。
 
 > 各维度的实测结果、单因子受控实验、统计检验与**分场景适配建议**详见 [reports/report\_external\_helm\_polished.md](reports/report_external_helm_polished.md)（§1.3 实测速览 → 第 3 章基线表现 → 第 4 章评测条件敏感度 → §5.1 方法学结论 → §5.3 分场景建议）。
 
@@ -33,7 +33,7 @@
 - **本项目沿用**：分层架构、严格数据契约、截断与异常单列、数据污染显式声明。
 - **本项目裁去**：`logprob` 打分路径、16 场景重型套件、多客户端抽象层与前端展示层。
 
-**对 HELM 判分契约的三处工程修正**（详见 [docs/design.md](docs/design.md)）：
+**对 HELM 判分契约的三处工程修正**：
 
 | 维度 | HELM 原生处理 | 本项目工程修正 | 修正理由（保障测试归因准确性） |
 |---|---|---|---|
@@ -166,10 +166,8 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 | 路径 | 说明 |
 |---|---|
 | [reports/report\_external\_helm\_polished.md](reports/report_external_helm_polished.md) | **对外评测报告（唯一权威版）**：6 章结构，含完整方法学实证与分场景建议（配套同名 PDF） |
-| [reports/PROJECT\_SUMMARY.md](reports/PROJECT_SUMMARY.md) | **评测工程闭环映射**：六大评测环节执行状态与全周期自我纠错记录 |
 | [reports/report\_data\_provenance.md](reports/report_data_provenance.md) | **数据溯源清单**：全部表格、14 张图件与正文数字的来源批次及复算命令 |
-| [reports/RUN\_AUDIT.md](reports/RUN_AUDIT.md) · [reports/RUN\_INVENTORY.md](reports/RUN_INVENTORY.md) | **批次审计台账**：全库 85 批次分类台账 · 37 个权威批次可用性核查 |
-| [docs/design.md](docs/design.md) · [docs/param\_matrix.md](docs/param_matrix.md) | **方案设计与参数矩阵**：架构契约设计（含对 HELM 的三处修正）· 各模型参数生效实测表 |
+| [docs/param\_matrix.md](docs/param_matrix.md) | **实测参数矩阵**：各模型温度 / 思考开关 / max\_tokens 的实际生效情况 |
 | [docs/limitations.md](docs/limitations.md) | **结论边界**：统计与外推的适用条件、未闭合项与已知风险 |
 | [docs/badcase\_method.md](docs/badcase_method.md) · [docs/reproduce.md](docs/reproduce.md) | **错题归因与复现指南**：LLM Judge 双次自一致率核查方案 · 环境搭建与门禁读数说明 |
 
