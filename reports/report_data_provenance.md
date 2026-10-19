@@ -739,7 +739,6 @@ T35 的「依据来源」列指向题集论文与官方文档。
 ```bash
 python scripts/ci_gate.py          # 门禁：题集/参数/指纹冻结检查
 python scripts/exp_smoke.py        # 冒烟：124 项
-python scripts/_check_external_report.py   # 报告一致性：27 项
 ```
 
 ### 4.2 批次与规模

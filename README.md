@@ -143,7 +143,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 | 脚本 | 核查内容 |
 |---|---|
 | `scripts/report_metrics.py` | **从 `tallies/` 判分台账逐格重算报告正文与表格里的每一个统计数字** |
-| `scripts/_check_polished_report.py` · `_check_external_report.py` | 校验正文图序与附录图表索引一致、图片宽度合规、表格结构完整、内部 `§X.Y` 章节引用全部可解析 |
+| `scripts/_check_polished_report.py` | 校验正文图序与附录图表索引一致、图片宽度合规、表格结构完整、内部 `§X.Y` 章节引用全部可解析 |
 | `scripts/_check_render_safe.py` | **PDF 渲染安全兜底**：拦截反引号内含中文（CJK）、字体缺失符号与代码块含中文——此类字符在 XeLaTeX 编译 PDF 时会**静默渲染为空白且不报错** |
 
 配合 [reports/report\_data\_provenance.md](reports/report_data_provenance.md)，**报告中的每一个图表与统计数字均可离线逐格复算**。
