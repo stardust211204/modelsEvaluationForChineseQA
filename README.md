@@ -4,7 +4,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](pyproject.toml)
 
-> **核心文档直达**：[评测报告](reports/report_external_helm_polished.md) · [复现指南](docs/reproduce.md)
+> **核心文档直达**：[评测报告](reports/modelsEvaluationForChineseQA.md) · [复现指南](docs/reproduce.md)
 
 ---
 
@@ -20,7 +20,7 @@
 
 上表仅统计最终进入报告结论的 **37 个权威批次（53,379 次调用）**。在全周期研发与排障过程中，全库累计执行 **85 个批次、77,512 次模型调用**；其余 48 个批次（逾 2.4 万次调用）涵盖前置参数探针、口径校准，以及因检出方法学缺陷而主动隔离归档的历史批次。批次分类与归档情况见 `runs/` 与 `archive/runs/` 的目录结构。
 
-> 各维度的实测结果、单因子受控实验、统计检验与**分场景适配建议**详见 [reports/report\_external\_helm\_polished.md](reports/report_external_helm_polished.md)（§1.3 实测速览 → 第 3 章基线表现 → 第 4 章评测条件敏感度 → §5.1 方法学结论 → §5.3 分场景建议）。
+> 各维度的实测结果、单因子受控实验、统计检验与**分场景适配建议**详见 [reports/modelsEvaluationForChineseQA.md](reports/modelsEvaluationForChineseQA.md)（§1.3 实测速览 → 第 3 章基线表现 → 第 4 章评测条件敏感度 → §5.1 四个评测疑问的结论 → §5.3 分场景建议）。
 
 ---
 
@@ -165,7 +165,7 @@ runs/{run_id}/tallies/{config}/{arm}.jsonl  # 可重算判分层：Tally（已�
 
 | 路径 | 说明 |
 |---|---|
-| [reports/report\_external\_helm\_polished.md](reports/report_external_helm_polished.md) | **对外评测报告（唯一权威版）**：6 章结构，含完整方法学实证与分场景建议（配套同名 PDF） |
+| [reports/modelsEvaluationForChineseQA.md](reports/modelsEvaluationForChineseQA.md) | **对外评测报告（唯一权威版）**：6 章结构，含完整方法学实证与分场景建议（配套同名 PDF） |
 | [reports/report\_data\_provenance.md](reports/report_data_provenance.md) | **数据溯源清单**：全部表格、14 张图件与正文数字的来源批次及复算命令 |
 | [docs/param\_matrix.md](docs/param_matrix.md) | **实测参数矩阵**：各模型温度 / 思考开关 / max\_tokens 的实际生效情况 |
 | [docs/limitations.md](docs/limitations.md) | **结论边界**：统计与外推的适用条件、未闭合项与已知风险 |

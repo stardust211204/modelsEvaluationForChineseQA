@@ -2,7 +2,7 @@
 
 > 本文件收纳跑批环境、门禁读数与目录结构等操作细节。
 > 想先看项目做了什么，读 [`../README.md`](../README.md)；想看结论，读
-> [`../reports/report_external_helm_polished.md`](../reports/report_external_helm_polished.md)。
+> [`../reports/modelsEvaluationForChineseQA.md`](../reports/modelsEvaluationForChineseQA.md)。
 
 ## 一、不跑批也能复算全部指标
 

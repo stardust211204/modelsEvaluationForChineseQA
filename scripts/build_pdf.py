@@ -53,7 +53,7 @@ r"""把 Markdown 报告转成 PDF（pandoc + xelatex + Eisvogel 模板）。
     .venv\\Scripts\\python.exe scripts\\build_pdf.py --src reports/_archive/report_external_helm_full.md
     .venv\\Scripts\\python.exe scripts\\build_pdf.py --author "某某" --date "2026-10-05"
 
-默认源是精简版 `reports/report_external_helm_polished.md` —— 它自 2026-10-17 起是
+默认源是精简版 `reports/modelsEvaluationForChineseQA.md` —— 它自 2026-10-17 起是
 **唯一权威对外报告**；完整版已冻结归档到 `reports/_archive/`，需要时用 --src 显式指定。
 """
 
@@ -166,7 +166,7 @@ def count_embedded_images(pdf: Path) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Markdown 报告 -> PDF（Eisvogel）")
-    ap.add_argument("--src", default="reports/report_external_helm_polished.md")
+    ap.add_argument("--src", default="reports/modelsEvaluationForChineseQA.md")
     ap.add_argument("--out", default=None)
     ap.add_argument("--mainfont", default="Times New Roman",
                     help="西文正文字体")

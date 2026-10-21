@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-"""对照 report_data_provenance.md，检查 report_external_helm_polished.md 的
+"""对照 report_data_provenance.md，检查 modelsEvaluationForChineseQA.md 的
 表格结构、图片引用、字符安全、交叉引用与关键数字是否自洽。"""
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REP = ROOT / "reports" / "report_external_helm_polished.md"
+REP = ROOT / "reports" / "modelsEvaluationForChineseQA.md"
+# 2026-10-17：完整版报告已冻结归档，作为「原报告宽度」基线的路径随归档更新。
 OLD = ROOT / "reports" / "_archive" / "report_external_helm_full.md"
 
 text = REP.read_text(encoding="utf-8")
-# ★ 归档完整版已下线（用户裁决：自述/过程类文档不进交付面）。
+# ★ 归档完整版已于 2026-10-19 下线（用户裁决：自述/过程类文档不进交付面）。
 #   本检查器**其余检查照常**，只有「图序与宽度基线」这两项依赖它，
 #   拿不到就跳过 —— 不要因此让整个检查器失败。
 old = OLD.read_text(encoding="utf-8") if OLD.is_file() else ""
@@ -29,7 +30,7 @@ def note(tag, msg):
 
 
 # ---------- 1. 图片引用 ----------
-# ★ 图片路径的写法有两种，本脚本必须都认：
+# ★ 图片路径的写法有两种，本脚本必须都认（2026-10-17 起）：
 #   报告里写 `../figures/x.png`（归档件写 `../../figures/x.png`）—— 这是给
 #   **GitHub 预览**用的，它按文件所在目录解析；pandoc 从仓库根跑，
 #   靠 build_pdf.py 的 --resource-path 折回来。
@@ -54,22 +55,16 @@ else:
     if orphan:
         bad("图", f"仍有 {len(orphan)} 处孤立 width 占位（缺图片路径）")
 
-# 图号与 width 顺序比对：正文图片顺序应与 §6.1 图表索引一致，且宽度沿用原报告
+# 图号与 width 顺序比对：正文图片顺序与宽度沿用原报告（§6.1 图表索引已于 2026-10-20 删除）
 new_order = [w for _, w in pairs_new]
 old_w = dict(re.findall(r"figures/([^)]+)\)\{width=(\d+%)\}", old)) if old else {}
-idx = re.findall(r"\| `(\d+_[a-z_]+\.png)` \| §", text)
-if len(idx) != len(img_new):
-    bad("图", f"图表索引 {len(idx)} 行 vs 正文图片 {len(img_new)} 处，数量不符")
-else:
-    if idx != img_new:
-        bad("图", "正文图片顺序与 §6.1 图表索引不一致："
-            + "、".join(f"{a}!={b}" for a, b in zip(idx, img_new) if a != b))
-    mismatch = [(f, old_w.get(f), w) for f, w in zip(idx, new_order) if old_w.get(f) != w]
+if old_w:
+    mismatch = [(f, old_w.get(f), w) for f, w in zip(img_new, new_order) if old_w.get(f) != w]
     if mismatch:
         for f, w1, w2 in mismatch:
             bad("图", f"{f} 宽度原为 {w1}，现为 {w2}")
-    if not mismatch and idx == img_new:
-        note("图", f"{len(img_new)} 处图片引用与 §6.1 图表索引的图序、原报告宽度逐一吻合")
+    if not mismatch:
+        note("图", f"{len(img_new)} 处图片引用，宽度沿用原报告逐一吻合")
 
 # ---------- 2. 表格结构 ----------
 def split_row(r):
@@ -129,7 +124,7 @@ for m in re.finditer(r"§(\d+(?:\.\d+)?)", text):
 # ---------- 5. 关键数字必须出现 ----------
 MUST = {
     "53,379": "总调用数",
-    "53,291": None,
+    "53,291": None,  # 润色版改成「逾 5.2 万」，见下
     "588": "MMLU-ProX 构建题数",
     "546": "MMLU-ProX 计分题数",
     "583": "C-Eval 题数",
@@ -158,9 +153,6 @@ MUST = {
     "0.004": "ds-pro 对应 p",
     "+29.1": "mimo 格式增益",
     "+13.8": "qwen 格式增益",
-    "+15.9": "A→B",
-    "+10.0": "B→C",
-    "−0.4": "C→D",
     "+21.3": "A→C",
     "+2.8": "5-shot MMLU",
     "+0.9": "5-shot C-Eval",

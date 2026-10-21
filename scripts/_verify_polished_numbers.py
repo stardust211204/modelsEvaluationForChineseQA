@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""逐格复算 report_external_helm_polished.md 里的表格数字。
+"""逐格复算 modelsEvaluationForChineseQA.md 里的表格数字。
 
 只做「报告单元格 vs 从 runs/ 重算」的比对，不改任何数据。
 """

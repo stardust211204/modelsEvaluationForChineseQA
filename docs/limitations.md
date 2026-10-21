@@ -3,7 +3,7 @@
 > 纪律：**一条不留地写出来，比让面试官问出来强。**
 > 本文件是报告结论的必读前置 —— 不读本文的结论不要引用。
 >
-> **时效**：本文与对外报告（[`../reports/report_external_helm_polished.md`](../reports/report_external_helm_polished.md)）
+> **时效**：本文与对外报告（[`../reports/modelsEvaluationForChineseQA.md`](../reports/modelsEvaluationForChineseQA.md)）
 > 同步，覆盖 **5 个模型期**的最终状态。早期三模型阶段的局限记录见 git 历史。
 
 ---
