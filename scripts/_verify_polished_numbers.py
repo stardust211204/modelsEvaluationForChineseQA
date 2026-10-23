@@ -2,6 +2,9 @@
 """逐格复算 modelsEvaluationForChineseQA.md 里的表格数字。
 
 只做「报告单元格 vs 从 runs/ 重算」的比对，不改任何数据。
+
+退出码：发现任何**严格口径**报告数字与台账不符 → exit 1（供一键编译脚本接力）。
+宽松口径的差异仅作诊断，不计入失败 —— 报告主表是严格口径。
 """
 import json
 import sys
@@ -28,6 +31,8 @@ SH = {
     "qwen3.8-flash": "qwen",
 }
 DROP = exclusions.load()
+
+FAILS: list[str] = []   # 收集非诊断性的不符项；宽松口径仅作诊断
 
 _CACHE = {}
 
@@ -73,6 +78,9 @@ for mode in ("strict", "lenient"):
         r = REPORT[arm]
         ok = all(abs(v - x) < 0.05 for v, x in zip((merged, am, ac), r))
         flag = "OK " if ok else "XX "
+        # 报告主表是严格口径：只有 strict 不符才算失败；lenient 仅作诊断
+        if mode == "strict" and not ok:
+            FAILS.append(f"§3.1 准确率 {SH[arm]} 严格口径")
         print(
             f"  {SH[arm]:<10}{am:>8.1f}%{ac:>8.1f}%{merged:>8.1f}%   "
             f"{r[0]:>7.1f}/{r[1]:>6.1f}/{r[2]:>6.1f}   {flag}"
@@ -98,6 +106,8 @@ for label, (rid, cfg) in E6.items():
     n_l = sum(1 for t in ts if t["mode"] == "lenient" and t["tier"] in ("correct", "wrong"))
     rs, rl = rep6[label]
     flag = "OK " if (n_s == rs and n_l == rl) else "XX "
+    if flag.startswith("XX"):
+        FAILS.append(f"§2.4 可判条目 {label}")
     print(f"  {label:<20}{n_s:>8}{n_l:>8}   {rs:>7}/{rl:<7}  {flag}  (总条目 {len(ts)//2})")
 
 print()
@@ -159,6 +169,8 @@ for arm in ARMS:
     TOL = 0.051
     f1 = "OK" if abs(s1 - r[0]) <= TOL else "XX"
     f2 = "OK" if abs(s2 - r[1]) <= TOL else "XX"
+    if f1 == "XX" or f2 == "XX":
+        FAILS.append(f"§3.2 稳定性 {SH[arm]}")
     print(f"  {SH[arm]:<10}{s1:>11.1f}%{n1:>5}{s2:>13.1f}%{n2:>5}   {r[0]:>5.1f}/{r[1]:<5.1f}  {f1} {f2}")
 
 print()
@@ -171,3 +183,13 @@ print("  MMLU-ProX 序：", " > ".join(SH[a] for a in o1))
 print("  C-Eval    序：", " > ".join(SH[a] for a in o2))
 print("  →", "两集逐位相同" if o1 == o2
       else "两集差一处互换 —— 报告 §3.2 已如实写明（非失败项）")
+
+print()
+print("=" * 100)
+if FAILS:
+    print(f" ✗ 发现 {len(FAILS)} 处报告数字与台账不符（宽松口径仅诊断，不计入）：")
+    for f in FAILS:
+        print(f"     {f}")
+    sys.exit(1)
+print(" ✓ 报告数字与台账全部吻合（严格口径）")
+sys.exit(0)
